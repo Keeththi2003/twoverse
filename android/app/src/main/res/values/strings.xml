@@ -6,7 +6,12 @@
     <string name="nav_ours">Ours</string>
     <string name="nav_you_and_her">You &amp; Her</string>
 
+    <string name="splash_tagline">A private universe for two.</string>
+    <string name="splash_connecting">Connecting your worlds…</string>
+    <string name="splash_loading">Loading</string>
+
     <string name="welcome_title">Close, no matter the distance.</string>
+    <string name="welcome_body">A private little universe for the two of you. See how far apart you are, find each other\'s direction, and keep memories only you two can open.</string>
     <string name="welcome_get_started">Get started</string>
     <string name="welcome_have_code">I have a couple code</string>
 
@@ -39,7 +44,6 @@
     <string name="common_close">Close</string>
 
     <string name="placeholder_note">Placeholder screen</string>
-    <string name="placeholder_continue">Continue</string>
     <string name="placeholder_connect_birthday">Connect (birthday recipient)</string>
     <string name="placeholder_open_memory">Open a memory</string>
 </resources>
