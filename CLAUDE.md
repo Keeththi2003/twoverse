@@ -88,7 +88,5 @@ features; shared things go in `core/`.
 
 Always make sure the project builds before saying a task is done.
 
-## Git
 
-- Work on a feature branch (e.g. `feature/ui-design-system`), small commits with clear messages.
-- Never commit `local.properties`, keystores or `google-services.json`.
+
