@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Twoverse</string>
+
+    <string name="nav_universe">Universe</string>
+    <string name="nav_your_star">Your Star</string>
+    <string name="nav_ours">Ours</string>
+    <string name="nav_you_and_her">You &amp; Her</string>
 </resources>
