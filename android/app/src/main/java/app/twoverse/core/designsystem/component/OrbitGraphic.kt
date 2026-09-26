@@ -62,6 +62,8 @@ fun OrbitGraphic(
     youSize: Dp = 36.dp,
     starSize: Dp = 18.dp,
     animated: Boolean = false,
+    showInnerRing: Boolean = true,
+    showShadows: Boolean = true,
 ) {
     val outline = TwoverseTheme.colors.outline
     val rotation = orbitRotation(animated)
@@ -74,6 +76,7 @@ fun OrbitGraphic(
                 radius = outerRadius - OuterRingStroke.toPx() / 2,
                 style = Stroke(width = OuterRingStroke.toPx()),
             )
+            if (!showInnerRing) return@Canvas
             drawCircle(
                 color = outline,
                 radius = outerRadius * InnerRingRatio,
@@ -85,17 +88,17 @@ fun OrbitGraphic(
                 ),
             )
         }
-        GoldStar(size = starSize)
+        GoldStar(size = starSize, glow = showShadows)
         Planet(
             kind = PlanetKind.Her,
             size = herSize,
-            elevated = true,
+            elevated = showShadows,
             modifier = Modifier.offset { orbitOffset(her, rotation.value, size) },
         )
         Planet(
             kind = PlanetKind.You,
             size = youSize,
-            elevated = true,
+            elevated = showShadows,
             modifier = Modifier.offset { orbitOffset(you, rotation.value, size) },
         )
     }
