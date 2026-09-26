@@ -21,6 +21,9 @@ import app.twoverse.core.data.sample.SampleData
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
+import app.twoverse.feature.splash.SplashDestination
+import app.twoverse.feature.splash.SplashRoute as SplashFeatureRoute
 
 @Composable
 fun TwoverseNavHost(modifier: Modifier = Modifier) {
@@ -62,22 +65,14 @@ fun TwoverseNavHost(modifier: Modifier = Modifier) {
 
 private fun NavGraphBuilder.onboardingGraph(navController: NavHostController) {
     composable<SplashRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.app_name,
-            actions = listOf(
-                PlaceholderAction(R.string.placeholder_continue) {
-                    navController.navigate(WelcomeRoute) { popUpTo<SplashRoute> { inclusive = true } }
-                },
-            ),
+        SplashFeatureRoute(
+            onNavigate = { destination -> navController.navigateClearingBackStack(destination.toRoute()) },
         )
     }
     composable<WelcomeRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.welcome_title,
-            actions = listOf(
-                PlaceholderAction(R.string.welcome_get_started) { navController.navigate(SignInRoute) },
-                PlaceholderAction(R.string.welcome_have_code) { navController.navigate(PairRoute) },
-            ),
+        WelcomeFeatureRoute(
+            onGetStarted = { navController.navigate(SignInRoute) },
+            onHaveCoupleCode = { navController.navigate(PairRoute) },
         )
     }
     composable<SignInRoute> {
@@ -162,6 +157,13 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             ),
         )
     }
+}
+
+private fun SplashDestination.toRoute(): Any = when (this) {
+    SplashDestination.Welcome -> WelcomeRoute
+    SplashDestination.Pair -> PairRoute
+    SplashDestination.Birthday -> BirthdayRoute
+    SplashDestination.Home -> HomeRoute
 }
 
 /** Switches tabs, keeping Home as the root and restoring each tab's own back stack. */
