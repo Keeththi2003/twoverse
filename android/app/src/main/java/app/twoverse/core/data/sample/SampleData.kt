@@ -39,7 +39,7 @@ object SampleData {
 
     val coupleCode = CoupleCode(code = "AB72-KP91", expiresAt = now + Duration.ofHours(24))
 
-    /** Colombo and Kandy, 94.6 km apart. */
+    /** 94.6 km apart at a bearing of 42° (north-east), matching the Home and Compass mockups. */
     val myLocation = UserLocation(
         userId = me.id,
         latitude = 6.9271,
@@ -52,20 +52,24 @@ object SampleData {
 
     val partnerLocation = UserLocation(
         userId = partner.id,
-        latitude = 7.2935,
-        longitude = 80.6350,
+        latitude = 7.5590,
+        longitude = 80.4354,
         accuracyMeters = 1_000f,
         precision = LocationPrecision.Approximate,
         city = "Kandy",
         updatedAt = now - Duration.ofSeconds(12),
     )
 
-    /** 12 days, 8 h 24 min 10 s to go, in Kandy around 10:00 AM. */
+    /** 10:00 local time, 13 days from today (12-and-a-bit days to go), in Kandy; set 15 days ago. */
     val reunion = Reunion(
-        meetAt = now + Duration.ofDays(12).plusHours(8).plusMinutes(24).plusSeconds(10),
+        meetAt = LocalDate.now(ZoneId.systemDefault()).plusDays(13)
+            .atTime(10, 0)
+            .atZone(ZoneId.systemDefault())
+            .toInstant(),
         hasTime = true,
         place = "Kandy",
         note = null,
+        updatedAt = now - Duration.ofDays(15),
     )
 
     /** 17 memories, newest first: two unviewed, three with expiry badges (24h, 7d, 2d). */
