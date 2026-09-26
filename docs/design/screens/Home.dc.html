@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Our Universe</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 20px 0; background: {{t.bg}}; color: {{t.ink}}; font-family: 'Manrope', system-ui, sans-serif; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div>
+<p style="margin: 0; font-size: 14px; color: {{t.muted}}">Good evening</p>
+<h1 style="margin: 2px 0 0; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 30px; letter-spacing: -0.5px">Our Universe</h1>
+</div>
+<div style="display: flex; align-items: center; gap: 6px; background: {{t.chip}}; border-radius: 20px; padding: 8px 12px; font-size: 12px; font-weight: 600">
+<div style="width: 8px; height: 8px; border-radius: 50%; background: {{t.gold}}"></div>
+Location on</div>
+</div>
+<div style="margin-top: 20px; background: {{t.surface}}; border: {{t.cardBorder}}; box-shadow: {{t.shadow}}; border-radius: 28px; padding: 20px 22px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 13px; font-weight: 600; color: {{t.muted}}">Distance between you</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: {{t.goldInk}}">
+<span style="width: 7px; height: 7px; border-radius: 50%; background: {{t.gold}}"></span>
+Live</span>
+</div>
+<div style="display: flex; align-items: baseline; gap: 8px; margin-top: 6px">
+<span style="font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 60px; line-height: 1; letter-spacing: -1px">94.6</span>
+<span style="font-size: 16px; font-weight: 600; color: {{t.muted}}">km apart</span>
+</div>
+<div style="position: relative; height: 70px; margin-top: 10px">
+<svg width="100%" height="70" viewBox="0 0 306 70" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0"><path d="M24 50 Q153 -10 282 50" fill="none" stroke="{{t.line}}" stroke-width="2" stroke-dasharray="4 6"></path></svg>
+<div style="position: absolute; left: 147px; top: 14px; width: 12px; height: 12px; border-radius: 50%; background: {{t.starP}}; box-shadow: 0 0 14px 4px rgba(232,176,74,0.35)"></div>
+<div style="position: absolute; left: 4px; top: 30px; width: 40px; height: 40px; border-radius: 50%; background: {{t.roseP}}"></div>
+<div style="position: absolute; right: 6px; top: 36px; width: 30px; height: 30px; border-radius: 50%; background: {{t.lavP}}"></div>
+</div>
+<div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; font-weight: 600">
+<span>You <span style="color: {{t.muted}}; font-weight: 500">· Colombo</span></span>
+<span>Her <span style="color: {{t.muted}}; font-weight: 500">· Kandy</span></span>
+</div>
+<p style="margin: 12px 0 0; font-size: 12px; color: {{t.muted}}">Updated 12 seconds ago</p>
+</div>
+<div style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+<a href="Compass.dc.html" style="background: {{t.surface}}; border: {{t.cardBorder}}; box-shadow: {{t.shadow}}; border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: {{t.ink}}">
+<div style="width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid {{t.line}}; display: flex; align-items: center; justify-content: center; box-sizing: border-box">
+<svg width="30" height="30" viewBox="0 0 24 24" style="transform: rotate(42deg)"><path d="M12 3 L15 12 L12 10.5 L9 12 Z" fill="{{t.accent}}"></path><path d="M12 21 L15 12 L12 13.5 L9 12 Z" fill="{{t.line}}"></path></svg>
+</div>
+<div>
+<div style="font-size: 16px; font-weight: 700">Your Star</div>
+<div style="font-size: 13px; color: {{t.muted}}; margin-top: 2px">She's north-east</div>
+</div>
+</a>
+<a href="Countdown.dc.html" style="background: {{t.surface}}; border: {{t.cardBorder}}; box-shadow: {{t.shadow}}; border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: {{t.ink}}">
+<div style="width: 48px; height: 48px; border-radius: 16px; background: {{t.chip}}; color: {{t.primary}}; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4z M4 10h16 M8 3v4 M16 3v4"></path></svg>
+</div>
+<div>
+<div style="font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-weight: 600; line-height: 1">12 days</div>
+<div style="font-size: 13px; color: {{t.muted}}; margin-top: 4px">Until we meet</div>
+</div>
+</a>
+</div>
+<a href="Vault.dc.html" style="margin-top: 14px; background: {{t.surface}}; border: {{t.cardBorder}}; box-shadow: {{t.shadow}}; border-radius: 24px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; text-decoration: none; color: {{t.ink}}">
+<div style="width: 48px; height: 48px; border-radius: 16px; background: {{t.chip}}; color: {{t.primary}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12v9H6z M8.5 11V8a3.5 3.5 0 0 1 7 0v3"></path></svg>
+</div>
+<div style="flex-grow: 1">
+<div style="font-size: 16px; font-weight: 700">Ours</div>
+<div style="font-size: 13px; color: {{t.muted}}; margin-top: 2px">17 memories · 2 new</div>
+</div>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.muted}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"></path></svg>
+</a>
+<a href="AddMemory.dc.html" style="margin-top: 16px; height: 56px; border-radius: 28px; background: {{t.primary}}; color: {{t.onPrimary}}; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 700; text-decoration: none">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14 M5 12h14"></path></svg>
+Send a memory</a>
+<nav style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; box-sizing: border-box; padding-top: 10px; background: {{t.surface}}; border-top: 1px solid {{t.line}}; display: flex; justify-content: space-around; align-items: flex-start">
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="4">
+<a href="{{n.href}}" style="min-width: 72px; min-height: 48px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: {{n.color}}; font-size: 12px; font-weight: 600">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{n.d}}"></path></svg>
+<span>{{n.label}}</span>
+</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var d = this.props.dark ?? false;
+    var t = d ? {bg:'#120E24',surface:'#1C1733',surface2:'#231D3E',ink:'#F6ECF1',muted:'#B8AECF',line:'#2E2650',primary:'#F07C98',onPrimary:'#2A0F1C',accent:'#F07C98',gold:'#F2C46D',goldInk:'#F2C46D',chip:'#2A2247',danger:'#FF9494'} : {bg:'#F6ECF1',surface:'#FFFFFF',surface2:'#FBF4F7',ink:'#2B1633',muted:'#6B5572',line:'#EAD9E2',primary:'#C4466A',onPrimary:'#FFFFFF',accent:'#E0607E',gold:'#E8B04A',goldInk:'#8A5A0B',chip:'#F3E1EA',danger:'#B3261E'};
+    t.roseP = 'radial-gradient(circle at 32% 30%, #FFE0E8, #E0607E 55%, #9E3552)';
+    t.lavP = 'radial-gradient(circle at 32% 30%, #F1E9FF, #9D86D0 55%, #5E4A94)';
+    t.starP = 'radial-gradient(circle at 35% 35%, #FFF3D1, #E8B04A 60%, #C98A22)';
+    t.shadow = d ? 'none' : '0 8px 24px rgba(43,22,51,0.07)';
+    t.cardBorder = d ? '1px solid #2E2650' : '1px solid transparent';
+    var active = 0;
+    var items = [
+      ['Universe', 'Home.dc.html', 'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z M2.5 12c0-2.2 4.3-4 9.5-4s9.5 1.8 9.5 4s-4.3 4-9.5 4s-9.5-1.8-9.5-4z'],
+      ['Your Star', 'Compass.dc.html', 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M15.5 8.5l-2 5l-5 2l2-5z'],
+      ['Ours', 'Vault.dc.html', 'M6 11h12v9H6z M8.5 11V8a3.5 3.5 0 0 1 7 0v3'],
+      ['You & Her', 'Settings.dc.html', 'M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8z M4.5 20c1.4-3.2 4.2-5 7.5-5s6.1 1.8 7.5 5']
+    ];
+    var nav = items.map(function (x, i) { return { label: x[0], href: x[1], d: x[2], color: i === active ? t.primary : t.muted }; });
+    return { t: t, nav: nav };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twoverse splash, dark</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Manrope:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#120E24}
+@keyframes tv-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes tv-twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes tv-pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.tv-orbit{animation:tv-spin 28s linear infinite}
+.tv-counter{animation:tv-spin 28s linear infinite reverse}
+.tv-twinkle{animation:tv-twinkle 3.2s ease-in-out infinite}
+.tv-dot{animation:tv-pulse 1.4s ease-in-out infinite}
+.tv-dot2{animation-delay:.2s}
+.tv-dot3{animation-delay:.4s}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #120E24; color: #F6ECF1; font-family: 'Manrope', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; box-sizing: border-box">
+<sc-for list="{{stars}}" as="s" hint-placeholder-count="22">
+<div class="tv-twinkle" style="{{s.style}}"></div>
+</sc-for>
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; position: relative">
+<div style="width: 232px; height: 232px; position: relative">
+<div style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid #2E2650"></div>
+<div style="position: absolute; inset: 44px; border-radius: 50%; border: 1px dashed #282043"></div>
+<div style="position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFF6DC, #F2C46D 60%, #D39B35); box-shadow: 0 0 30px 10px rgba(242,196,109,0.40)"></div>
+<div class="{{orbitClass}}" style="position: absolute; inset: 0">
+<div class="{{counterClass}}" style="position: absolute; left: 50%; top: 0; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: radial-gradient(circle at 32% 30%, #FFE3EA, #F07C98 55%, #A83E5C); box-shadow: 0 0 26px rgba(240,124,152,0.35)"></div>
+<div class="{{counterClass}}" style="position: absolute; left: 50%; bottom: 0; width: 36px; height: 36px; margin: 0 0 -18px -18px; border-radius: 50%; background: radial-gradient(circle at 32% 30%, #EEE6FF, #A48FDA 55%, #5B4896); box-shadow: 0 0 22px rgba(164,143,218,0.32)"></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 46px; letter-spacing: -0.5px; line-height: 1; color: #F6ECF1">Twoverse</h1>
+<p style="margin: 0; font-size: 15px; font-weight: 500; color: #B8AECF; letter-spacing: 0.2px">A private universe for two.</p>
+</div>
+</div>
+<div style="padding-bottom: 56px; display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative">
+<div style="display: flex; gap: 8px" aria-label="Loading">
+<div class="tv-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #F2C46D"></div>
+<div class="tv-dot tv-dot2" style="width: 7px; height: 7px; border-radius: 50%; background: #F2C46D"></div>
+<div class="tv-dot tv-dot3" style="width: 7px; height: 7px; border-radius: 50%; background: #F2C46D"></div>
+</div>
+<p style="margin: 0; font-size: 13px; color: #B8AECF">Connecting your worlds…</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"animate":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var animate = this.props.animate ?? true;
+    var pts = [[6,10,2],[9,70,3],[14,42,2],[18,86,2],[22,22,3],[27,60,2],[31,5,2],[35,93,3],[62,12,2],[66,80,3],[70,34,2],[74,58,2],[79,90,2],[83,18,3],[87,66,2],[91,44,2],[95,8,2],[4,54,2],[12,28,2],[58,95,2],[76,4,2],[24,74,2]];
+    var stars = pts.map(function (p, i) {
+      return { style: 'position: absolute; top: ' + p[0] + '%; left: ' + p[1] + '%; width: ' + p[2] + 'px; height: ' + p[2] + 'px; border-radius: 50%; background: ' + (i % 4 === 0 ? '#F2C46D' : '#E8E2F7') + '; animation-delay: ' + (i * 0.29).toFixed(2) + 's' };
+    });
+    return {
+      stars: stars,
+      orbitClass: animate ? 'tv-orbit' : '',
+      counterClass: animate ? 'tv-counter' : ''
+    };
+  }
+}
+</script>
+</body>
+</html>

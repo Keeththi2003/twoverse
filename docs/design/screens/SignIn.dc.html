@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; box-sizing: border-box; padding: 64px 28px 36px; background: {{t.bg}}; color: {{t.ink}}; font-family: 'Manrope', system-ui, sans-serif; display: flex; flex-direction: column">
+<div style="width: 44px; height: 44px; position: relative">
+<div style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid {{t.line}}"></div>
+<div style="position: absolute; left: 17px; top: 17px; width: 10px; height: 10px; border-radius: 50%; background: {{t.starP}}"></div>
+<div style="position: absolute; left: 26px; top: -3px; width: 15px; height: 15px; border-radius: 50%; background: {{t.roseP}}"></div>
+<div style="position: absolute; left: 1px; top: 30px; width: 11px; height: 11px; border-radius: 50%; background: {{t.lavP}}"></div>
+</div>
+<h1 style="margin: 24px 0 0; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 34px; letter-spacing: -0.5px; line-height: 1.1">Welcome back</h1>
+<p style="margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: {{t.muted}}">Sign in to return to your little universe.</p>
+<button type="button" style="margin-top: 32px; width: 100%; height: 56px; border-radius: 28px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.ink}}; font-family: 'Manrope', system-ui, sans-serif; font-size: 16px; font-weight: 600">Continue with Google</button>
+<div style="display: flex; align-items: center; gap: 12px; margin: 24px 0">
+<div style="flex-grow: 1; height: 1px; background: {{t.line}}"></div>
+<span style="font-size: 13px; color: {{t.muted}}">or</span>
+<div style="flex-grow: 1; height: 1px; background: {{t.line}}"></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="email" style="font-size: 13px; font-weight: 600; color: {{t.muted}}">Email</label>
+<input id="email" type="email" placeholder="you@example.com" style="width: 100%; height: 54px; box-sizing: border-box; border-radius: 16px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.ink}}; padding: 0 18px; font-family: 'Manrope', system-ui, sans-serif; font-size: 16px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="password" style="font-size: 13px; font-weight: 600; color: {{t.muted}}">Password</label>
+<div style="position: relative">
+<input id="password" type="password" placeholder="Your password" style="width: 100%; height: 54px; box-sizing: border-box; border-radius: 16px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.ink}}; padding: 0 56px 0 18px; font-family: 'Manrope', system-ui, sans-serif; font-size: 16px">
+<button type="button" aria-label="Show password" style="position: absolute; right: 5px; top: 5px; width: 44px; height: 44px; border: none; background: transparent; color: {{t.muted}}; display: flex; align-items: center; justify-content: center; padding: 0">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7s10 7 10 7s-3.5 7-10 7s-10-7-10-7z M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z"></path></svg>
+</button>
+</div>
+</div>
+<a href="#" style="align-self: flex-end; font-size: 14px; font-weight: 600; color: {{t.primary}}; text-decoration: none; min-height: 32px; display: flex; align-items: center">Forgot password?</a>
+</div>
+<div style="flex-grow: 1"></div>
+<a href="Pair.dc.html" style="height: 56px; border-radius: 28px; background: {{t.primary}}; color: {{t.onPrimary}}; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; text-decoration: none">Sign in</a>
+<p style="margin: 18px 0 0; text-align: center; font-size: 14px; color: {{t.muted}}">New to Twoverse? <a href="Pair.dc.html" style="color: {{t.primary}}; font-weight: 700; text-decoration: none">Create an account</a></p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var d = this.props.dark ?? false;
+    var t = d ? {bg:'#120E24',surface:'#1C1733',surface2:'#231D3E',ink:'#F6ECF1',muted:'#B8AECF',line:'#2E2650',primary:'#F07C98',onPrimary:'#2A0F1C',accent:'#F07C98',gold:'#F2C46D',goldInk:'#F2C46D',chip:'#2A2247',danger:'#FF9494'} : {bg:'#F6ECF1',surface:'#FFFFFF',surface2:'#FBF4F7',ink:'#2B1633',muted:'#6B5572',line:'#EAD9E2',primary:'#C4466A',onPrimary:'#FFFFFF',accent:'#E0607E',gold:'#E8B04A',goldInk:'#8A5A0B',chip:'#F3E1EA',danger:'#B3261E'};
+    t.roseP = 'radial-gradient(circle at 32% 30%, #FFE0E8, #E0607E 55%, #9E3552)';
+    t.lavP = 'radial-gradient(circle at 32% 30%, #F1E9FF, #9D86D0 55%, #5E4A94)';
+    t.starP = 'radial-gradient(circle at 35% 35%, #FFF3D1, #E8B04A 60%, #C98A22)';
+    return { t: t };
+  }
+}
+</script>
+</body>
+</html>
