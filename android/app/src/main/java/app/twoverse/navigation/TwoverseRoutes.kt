@@ -32,6 +32,7 @@ data object SettingsRoute
 @Serializable
 data object CountdownRoute
 
+/** [memoryId] is read by `MemoryViewModel` under the same name (`MemoryIdKey`). */
 @Serializable
 data class MemoryRoute(val memoryId: String)
 

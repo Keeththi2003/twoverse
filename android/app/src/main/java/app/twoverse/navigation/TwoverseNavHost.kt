@@ -22,22 +22,34 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.twoverse.R
-import app.twoverse.core.data.sample.SampleData
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.feature.auth.SignInRoute as SignInFeatureRoute
+import app.twoverse.feature.birthday.BirthdayRoute as BirthdayFeatureRoute
 import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
 import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
 import app.twoverse.feature.home.HomeRoute as HomeFeatureRoute
 import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
 import app.twoverse.feature.pairing.PairRoute as PairFeatureRoute
+import app.twoverse.feature.settings.SettingsRoute as SettingsFeatureRoute
 import app.twoverse.feature.splash.SplashDestination
 import app.twoverse.feature.splash.SplashRoute as SplashFeatureRoute
+import app.twoverse.feature.vault.AddMemoryRoute as AddMemoryFeatureRoute
+import app.twoverse.feature.vault.MemoryRoute as MemoryFeatureRoute
+import app.twoverse.feature.vault.VaultRoute as VaultFeatureRoute
 import kotlinx.coroutines.launch
 
+/**
+ * App navigation (DESIGN.md §7). [openHome] starts on Our Universe instead of the splash, for
+ * widget taps (FR-WGT-4). [isOffline] shows the offline banner above every screen.
+ */
 @Composable
-fun TwoverseNavHost(modifier: Modifier = Modifier) {
+fun TwoverseNavHost(
+    modifier: Modifier = Modifier,
+    openHome: Boolean = false,
+    isOffline: Boolean = false,
+) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -52,6 +64,7 @@ fun TwoverseNavHost(modifier: Modifier = Modifier) {
         modifier = modifier,
         containerColor = TwoverseTheme.colors.background,
         contentWindowInsets = WindowInsets(0),
+        topBar = { if (isOffline) OfflineBanner() },
         snackbarHost = { TwoverseSnackbarHost(snackbarHostState) },
         bottomBar = {
             if (selectedTab >= 0) {
@@ -67,7 +80,7 @@ fun TwoverseNavHost(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = SplashRoute,
+            startDestination = if (openHome) HomeRoute else SplashRoute,
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),
@@ -81,6 +94,7 @@ fun TwoverseNavHost(modifier: Modifier = Modifier) {
     }
 }
 
+/** [onConnected] confirms pairing (FR-PAIR-6); the birthday welcome is its own confirmation. */
 private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, onConnected: () -> Unit) {
     composable<SplashRoute> {
         SplashFeatureRoute(
@@ -102,19 +116,18 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
     composable<PairRoute> {
         PairFeatureRoute(
             onBack = { navController.popBackStack() },
-            onConnected = {
-                navController.navigateClearingBackStack(HomeRoute)
-                onConnected()
+            onConnected = { showBirthday ->
+                if (showBirthday) {
+                    navController.navigateClearingBackStack(BirthdayRoute)
+                } else {
+                    navController.navigateClearingBackStack(HomeRoute)
+                    onConnected()
+                }
             },
         )
     }
     composable<BirthdayRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.birthday_title,
-            actions = listOf(
-                PlaceholderAction(R.string.birthday_enter) { navController.navigateClearingBackStack(HomeRoute) },
-            ),
-        )
+        BirthdayFeatureRoute(onEnter = { navController.navigateClearingBackStack(HomeRoute) })
     }
 }
 
@@ -131,38 +144,31 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
         CompassFeatureRoute()
     }
     composable<VaultRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.vault_title,
-            actions = listOf(
-                PlaceholderAction(R.string.placeholder_open_memory) {
-                    navController.navigate(MemoryRoute(memoryId = SampleData.SUNSET_MEMORY_ID))
-                },
-                PlaceholderAction(R.string.vault_add_memory) { navController.navigate(AddMemoryRoute) },
-            ),
+        VaultFeatureRoute(
+            onOpenMemory = { id -> navController.navigate(MemoryRoute(memoryId = id)) },
+            onAddMemory = { navController.navigate(AddMemoryRoute) },
         )
     }
     composable<SettingsRoute> {
-        PlaceholderScreen(titleRes = R.string.settings_title, actions = emptyList())
+        SettingsFeatureRoute(
+            onSignedOut = { navController.navigateClearingBackStack(WelcomeRoute) },
+            onDisconnected = { navController.navigateClearingBackStack(PairRoute) },
+            onShowBirthday = { navController.navigate(BirthdayRoute) },
+        )
     }
     composable<CountdownRoute> {
         CountdownFeatureRoute(onBack = { navController.popBackStack() })
     }
     composable<MemoryRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.vault_memory_title,
-            actions = listOf(PlaceholderAction(R.string.common_back) { navController.popBackStack() }),
-        )
+        MemoryFeatureRoute(onBack = { navController.popBackStack() })
     }
     composable<AddMemoryRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.add_memory_title,
-            actions = listOf(
-                PlaceholderAction(R.string.add_memory_send) {
-                    navController.popBackStack()
-                    navController.navigateToTab(TopLevelDestination.Vault)
-                },
-                PlaceholderAction(R.string.common_close) { navController.popBackStack() },
-            ),
+        AddMemoryFeatureRoute(
+            onClose = { navController.popBackStack() },
+            onSent = {
+                navController.popBackStack()
+                navController.navigateToTab(TopLevelDestination.Vault)
+            },
         )
     }
 }
