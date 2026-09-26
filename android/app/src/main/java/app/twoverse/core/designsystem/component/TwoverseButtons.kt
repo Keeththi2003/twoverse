@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -31,6 +32,7 @@ import app.twoverse.core.designsystem.theme.TwoverseTheme
 private val RegularButtonHeight = 56.dp
 private val SmallButtonHeight = 52.dp
 private val ButtonIconSize = 20.dp
+private val AccentBorderWidth = 1.5.dp
 private val ButtonContentPadding = PaddingValues(horizontal = 24.dp)
 
 @Composable
@@ -85,6 +87,10 @@ fun TwoverseSecondaryButton(
     )
 }
 
+/**
+ * Outlined button. Neutral (surface with a 1dp outline, e.g. "Continue with Google") by default;
+ * `accent = true` gives a transparent button with a 1.5dp primary border and primary text (Pair "Connect").
+ */
 @Composable
 fun TwoverseOutlineButton(
     text: String,
@@ -93,17 +99,23 @@ fun TwoverseOutlineButton(
     @DrawableRes leadingIcon: Int? = null,
     small: Boolean = false,
     enabled: Boolean = true,
+    accent: Boolean = false,
 ) {
     val colors = TwoverseTheme.colors
+    val borderColor = when {
+        !enabled -> colors.outline
+        accent -> colors.primary
+        else -> colors.outline
+    }
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = buttonHeight(small)),
         enabled = enabled,
         shape = buttonShape(small),
-        border = BorderStroke(1.dp, colors.outline),
+        border = BorderStroke(if (accent) AccentBorderWidth else 1.dp, borderColor),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = colors.surface,
-            contentColor = colors.onSurface,
+            containerColor = if (accent) Color.Transparent else colors.surface,
+            contentColor = if (accent) colors.primary else colors.onSurface,
             disabledContentColor = colors.onSurfaceVariant,
         ),
         contentPadding = ButtonContentPadding,
@@ -185,6 +197,12 @@ private fun TwoverseButtonsPreview() {
             TwoverseOutlineButton(
                 text = "Continue with Google",
                 onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TwoverseOutlineButton(
+                text = "Connect",
+                onClick = {},
+                accent = true,
                 modifier = Modifier.fillMaxWidth(),
             )
             TwoverseTextButton(text = "I have a couple code", onClick = {})
