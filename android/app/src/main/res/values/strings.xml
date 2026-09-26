@@ -5,4 +5,41 @@
     <string name="nav_your_star">Your Star</string>
     <string name="nav_ours">Ours</string>
     <string name="nav_you_and_her">You &amp; Her</string>
+
+    <string name="welcome_title">Close, no matter the distance.</string>
+    <string name="welcome_get_started">Get started</string>
+    <string name="welcome_have_code">I have a couple code</string>
+
+    <string name="sign_in_title">Welcome back</string>
+    <string name="sign_in_button">Sign in</string>
+
+    <string name="pair_title">Connect your worlds</string>
+    <string name="pair_connect">Connect</string>
+
+    <string name="home_title">Our Universe</string>
+    <string name="home_send_memory">Send a memory</string>
+
+    <string name="compass_title">Your Star</string>
+
+    <string name="countdown_title">Until We Meet</string>
+
+    <string name="vault_title">Ours</string>
+    <string name="vault_add_memory">Add a memory</string>
+    <string name="vault_memory_title">Memory</string>
+
+    <string name="add_memory_title">New memory</string>
+    <string name="add_memory_send">Send to her</string>
+
+    <string name="settings_title">You &amp; Her</string>
+
+    <string name="birthday_title">Happy Birthday</string>
+    <string name="birthday_enter">Enter Twoverse</string>
+
+    <string name="common_back">Back</string>
+    <string name="common_close">Close</string>
+
+    <string name="placeholder_note">Placeholder screen</string>
+    <string name="placeholder_continue">Continue</string>
+    <string name="placeholder_connect_birthday">Connect (birthday recipient)</string>
+    <string name="placeholder_open_memory">Open a memory</string>
 </resources>
