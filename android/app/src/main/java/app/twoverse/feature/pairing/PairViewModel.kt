@@ -3,6 +3,7 @@ package app.twoverse.feature.pairing
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.common.ticks
+import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.model.CoupleCode
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PairViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
+    private val birthdayRepository: BirthdayRepository,
     clock: Clock,
 ) : ViewModel() {
 
@@ -59,11 +62,13 @@ class PairViewModel @Inject constructor(
         form.update { it.copy(isConnecting = true, isInvalidCode = false) }
         viewModelScope.launch {
             val result = coupleRepository.joinWithCode(current.partnerCode)
+            val welcome = if (result.isSuccess) birthdayRepository.welcome.first() else null
             form.update {
                 it.copy(
                     isConnecting = false,
                     isConnected = result.isSuccess,
                     isInvalidCode = result.isFailure,
+                    hasBirthdayWelcome = welcome != null && !welcome.seen,
                 )
             }
         }
