@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New memory</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 24px 32px; background: {{t.bg}}; color: {{t.ink}}; font-family: 'Manrope', system-ui, sans-serif; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<a href="Vault.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 50%; background: {{t.surface}}; border: {{t.cardBorder}}; box-shadow: {{t.shadow}}; display: flex; align-items: center; justify-content: center; color: {{t.ink}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12 M18 6L6 18"></path></svg>
+</a>
+<h1 style="margin: 0; font-size: 17px; font-weight: 700">New memory</h1>
+<div style="width: 44px"></div>
+</div>
+<button type="button" style="margin-top: 20px; height: 200px; border-radius: 24px; border: 2px dashed {{t.line}}; background: {{t.surface}}; color: {{t.ink}}; font-family: 'Manrope', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+<span style="width: 56px; height: 56px; border-radius: 50%; background: {{t.chip}}; color: {{t.primary}}; display: flex; align-items: center; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z M4 16l5-5l4 4l3-3l4 4 M15 8a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3z"></path></svg>
+</span>
+<span style="font-size: 16px; font-weight: 700">Choose a photo</span>
+<span style="font-size: 13px; color: {{t.muted}}">It stays inside Ours, never in your gallery.</span>
+</button>
+<label for="caption" style="margin-top: 20px; font-size: 13px; font-weight: 600; color: {{t.muted}}">Caption</label>
+<textarea id="caption" placeholder="Write something for her…" style="margin-top: 8px; height: 92px; box-sizing: border-box; border-radius: 18px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.ink}}; padding: 14px 16px; font-family: 'Manrope', system-ui, sans-serif; font-size: 15px; resize: none"></textarea>
+<span style="margin-top: 18px; font-size: 13px; font-weight: 600; color: {{t.muted}}">Disappears after</span>
+<div style="margin-top: 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{o.pressed}}" style="height: 44px; border-radius: 14px; border: {{o.border}}; background: {{o.bg}}; color: {{o.color}}; font-family: 'Manrope', system-ui, sans-serif; font-size: 13px; font-weight: 700">{{o.label}}</button>
+</sc-for>
+</div>
+<div style="margin-top: 16px; background: {{t.surface}}; border: {{t.cardBorder}}; box-shadow: {{t.shadow}}; border-radius: 18px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div>
+<div style="font-size: 15px; font-weight: 700">Let her keep it forever</div>
+<div style="font-size: 12px; color: {{t.muted}}; margin-top: 2px">She can save it in Ours permanently.</div>
+</div>
+<button type="button" role="switch" aria-checked="true" aria-label="Let her keep it forever" style="width: 52px; height: 32px; border-radius: 16px; border: none; background: {{t.primary}}; position: relative; padding: 0; flex-shrink: 0">
+<span style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF"></span>
+</button>
+</div>
+<div style="flex-grow: 1"></div>
+<a href="Vault.dc.html" style="height: 56px; border-radius: 28px; background: {{t.primary}}; color: {{t.onPrimary}}; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 700; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8l-6 16l-3-7z"></path></svg>
+Send to her</a>
+<p style="margin: 10px 0 0; text-align: center; font-size: 12px; color: {{t.muted}}">She gets a notification, never a preview of the photo.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var d = this.props.dark ?? false;
+    var t = d ? {bg:'#120E24',surface:'#1C1733',surface2:'#231D3E',ink:'#F6ECF1',muted:'#B8AECF',line:'#2E2650',primary:'#F07C98',onPrimary:'#2A0F1C',accent:'#F07C98',gold:'#F2C46D',goldInk:'#F2C46D',chip:'#2A2247',danger:'#FF9494'} : {bg:'#F6ECF1',surface:'#FFFFFF',surface2:'#FBF4F7',ink:'#2B1633',muted:'#6B5572',line:'#EAD9E2',primary:'#C4466A',onPrimary:'#FFFFFF',accent:'#E0607E',gold:'#E8B04A',goldInk:'#8A5A0B',chip:'#F3E1EA',danger:'#B3261E'};
+    t.shadow = d ? 'none' : '0 8px 24px rgba(43,22,51,0.07)';
+    t.cardBorder = d ? '1px solid #2E2650' : '1px solid transparent';
+    var opts = ['Never', '24 h', '7 days', '30 days'].map(function (l, i) {
+      var on = i === 2;
+      return { label: l, pressed: on ? 'true' : 'false', bg: on ? t.primary : t.surface, color: on ? t.onPrimary : t.ink, border: on ? '1px solid ' + t.primary : '1px solid ' + t.line };
+    });
+    return { t: t, opts: opts };
+  }
+}
+</script>
+</body>
+</html>
