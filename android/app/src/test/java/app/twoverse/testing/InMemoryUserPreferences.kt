@@ -1,0 +1,20 @@
+package app.twoverse.testing
+
+import app.twoverse.core.data.local.UserPreferences
+import app.twoverse.core.model.AppearanceMode
+import app.twoverse.core.model.DistanceUnit
+import kotlinx.coroutines.flow.MutableStateFlow
+
+/** [UserPreferences] without DataStore, for JVM tests. */
+class InMemoryUserPreferences : UserPreferences {
+    override val appearance = MutableStateFlow(AppearanceMode.System)
+    override val distanceUnit = MutableStateFlow(DistanceUnit.Kilometres)
+
+    override suspend fun setAppearance(appearance: AppearanceMode) {
+        this.appearance.value = appearance
+    }
+
+    override suspend fun setDistanceUnit(unit: DistanceUnit) {
+        distanceUnit.value = unit
+    }
+}

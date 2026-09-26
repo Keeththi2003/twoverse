@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PairRoute(
     onBack: () -> Unit,
-    onConnected: () -> Unit,
+    onConnected: (showBirthday: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PairViewModel = hiltViewModel(),
 ) {
@@ -34,7 +34,7 @@ fun PairRoute(
     val shareMessage = uiState.coupleCode?.let { stringResource(R.string.pair_share_message, it) }
 
     LaunchedEffect(uiState.isConnected) {
-        if (uiState.isConnected) currentOnConnected()
+        if (uiState.isConnected) currentOnConnected(uiState.hasBirthdayWelcome)
     }
 
     PairScreen(

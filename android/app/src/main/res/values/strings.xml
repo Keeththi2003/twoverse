@@ -159,16 +159,102 @@
     <string name="countdown_set_date">Set a date</string>
 
     <string name="vault_title">Ours</string>
+    <string name="vault_subtitle">%1$s · only you two can open these</string>
+    <string name="vault_filter_all">All</string>
+    <string name="vault_filter_from_you">From you</string>
+    <string name="vault_filter_from_her">From her</string>
+    <string name="vault_filter_expiring">Expiring</string>
+    <string name="vault_empty">Nothing here yet. Send your first memory.</string>
+    <string name="vault_filter_empty">No memories here yet.</string>
     <string name="vault_add_memory">Add a memory</string>
-    <string name="vault_memory_title">Memory</string>
+    <string name="vault_badge_hours">%dh</string>
+    <string name="vault_badge_days">%dd</string>
+    <string name="vault_tile_from_you">Memory from you</string>
+    <string name="vault_tile_from_her">Memory from her</string>
+    <string name="vault_tile_new">new</string>
+    <string name="vault_tile_expires_in">expires in %1$s</string>
+
+    <string name="memory_photo_placeholder">Photo</string>
+    <string name="memory_photo_from_you">Photo you sent</string>
+    <string name="memory_photo_from_her">Photo from her</string>
+    <string name="memory_more_options">More options</string>
+    <string name="memory_expires_in">Expires in %1$s</string>
+    <string name="memory_from_her">From Her</string>
+    <string name="memory_from_you">From you</string>
+    <string name="memory_date_time">%1$s · %2$s</string>
+    <string name="memory_keep_forever">Keep forever</string>
+    <string name="memory_delete">Delete</string>
+    <string name="memory_screenshots_blocked">Screenshots are blocked inside Ours.</string>
+    <string name="memory_delete_title">Delete this memory?</string>
+    <string name="memory_delete_message">It will be removed for both of you, including the photo. This can\'t be undone.</string>
+    <string name="memory_expired">This memory has expired.</string>
 
     <string name="add_memory_title">New memory</string>
+    <string name="add_memory_choose_photo">Choose a photo</string>
+    <string name="add_memory_change_photo">Change photo</string>
+    <string name="add_memory_photo_note">It stays inside Ours, never in your gallery.</string>
+    <string name="add_memory_chosen_photo">Chosen photo</string>
+    <string name="add_memory_caption_label">Caption</string>
+    <string name="add_memory_caption_placeholder">Write something for her…</string>
+    <string name="add_memory_caption_count">%1$d/%2$d</string>
+    <string name="add_memory_expiry_label">Disappears after</string>
+    <string name="add_memory_expiry_never">Never</string>
+    <string name="add_memory_expiry_24h">24 h</string>
+    <string name="add_memory_expiry_7d">7 days</string>
+    <string name="add_memory_expiry_30d">30 days</string>
+    <string name="add_memory_keep_title">Let her keep it forever</string>
+    <string name="add_memory_keep_subtitle">She can save it in Ours permanently.</string>
     <string name="add_memory_send">Send to her</string>
+    <string name="add_memory_send_note">She gets a notification, never a preview of the photo.</string>
+    <string name="add_memory_upload_failed">Couldn\'t send your memory. Try again.</string>
 
     <string name="settings_title">You &amp; Her</string>
+    <string name="settings_connected">Connected</string>
+    <string name="settings_not_connected">Not connected</string>
+    <string name="settings_connected_since">Together in Twoverse since %1$s</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_share_location">Share my location</string>
+    <string name="settings_share_location_subtitle">Only used for distance and your star</string>
+    <string name="settings_location_precision">Location precision</string>
+    <string name="settings_precision_approximate">Approximate</string>
+    <string name="settings_precision_precise">Precise</string>
+    <string name="settings_lock_ours">Lock Ours</string>
+    <string name="settings_lock_ours_subtitle">Fingerprint or device PIN</string>
+    <string name="settings_preferences">Preferences</string>
+    <string name="settings_distance_unit">Distance unit</string>
+    <string name="settings_unit_kilometres">Kilometres</string>
+    <string name="settings_unit_miles">Miles</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_system">System</string>
+    <string name="settings_appearance_light">Light</string>
+    <string name="settings_appearance_dark">Dark</string>
+    <string name="settings_log_out">Log out</string>
+    <string name="settings_log_out_title">Log out?</string>
+    <string name="settings_log_out_message">You can sign back in any time. Your universe will be waiting.</string>
+    <string name="settings_disconnect">Disconnect from partner</string>
+    <string name="settings_disconnect_title">Disconnect from your partner?</string>
+    <string name="settings_disconnect_message">Location sharing stops right away. Your shared memories, countdown and birthday message are deleted for both of you.</string>
+    <string name="settings_disconnect_confirm">Disconnect</string>
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_delete_account_title">Delete your account?</string>
+    <string name="settings_delete_account_message">Your account and all of your data will be removed. This can\'t be undone.</string>
+    <string name="settings_debug_birthday">Show birthday welcome (debug)</string>
 
+    <string name="birthday_for_you">For you</string>
     <string name="birthday_title">Happy Birthday</string>
     <string name="birthday_enter">Enter Twoverse</string>
+
+    <string name="offline_banner">You\'re offline. Showing the latest saved information.</string>
+
+    <string name="widget_name">Twoverse</string>
+    <string name="widget_description">Distance, freshness and days until you meet</string>
+    <string name="widget_distance_label">Distance between you</string>
+    <string name="widget_distance">%1$s %2$s</string>
+    <plurals name="widget_days_until">
+        <item quantity="one">%d day until we meet</item>
+        <item quantity="other">%d days until we meet</item>
+    </plurals>
+    <string name="widget_no_date">No reunion date yet</string>
 
     <string name="common_back">Back</string>
     <string name="common_close">Close</string>
@@ -176,6 +262,4 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
 
-    <string name="placeholder_note">Placeholder screen</string>
-    <string name="placeholder_open_memory">Open a memory</string>
 </resources>

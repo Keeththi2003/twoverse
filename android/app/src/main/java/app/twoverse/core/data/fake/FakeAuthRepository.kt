@@ -25,6 +25,10 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
         user.value = null
     }
 
+    override suspend fun requestAccountDeletion() {
+        user.value = null
+    }
+
     private fun signIn(): Result<UserProfile> {
         user.value = SampleData.me
         return Result.success(SampleData.me)

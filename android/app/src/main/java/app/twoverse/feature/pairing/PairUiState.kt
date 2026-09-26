@@ -8,6 +8,8 @@ data class PairUiState(
     val isConnecting: Boolean = false,
     val isInvalidCode: Boolean = false,
     val isConnected: Boolean = false,
+    /** After connecting, whether an unseen birthday welcome is waiting (FR-BDY-3). */
+    val hasBirthdayWelcome: Boolean = false,
 ) {
     val canConnect: Boolean get() = partnerCode.isNotBlank() && !isConnecting
 }
