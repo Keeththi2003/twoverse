@@ -89,7 +89,8 @@ fun TwoverseSecondaryButton(
 
 /**
  * Outlined button. Neutral (surface with a 1dp outline, e.g. "Continue with Google") by default;
- * `accent = true` gives a transparent button with a 1.5dp primary border and primary text (Pair "Connect").
+ * an [accentColor] gives a transparent button with a 1.5dp border and text in that colour
+ * (primary for Pair "Connect", error for Memory "Delete").
  */
 @Composable
 fun TwoverseOutlineButton(
@@ -99,14 +100,11 @@ fun TwoverseOutlineButton(
     @DrawableRes leadingIcon: Int? = null,
     small: Boolean = false,
     enabled: Boolean = true,
-    accent: Boolean = false,
+    accentColor: Color? = null,
 ) {
     val colors = TwoverseTheme.colors
-    val borderColor = when {
-        !enabled -> colors.outline
-        accent -> colors.primary
-        else -> colors.outline
-    }
+    val accent = accentColor != null
+    val borderColor = if (enabled && accentColor != null) accentColor else colors.outline
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = buttonHeight(small)),
@@ -115,7 +113,7 @@ fun TwoverseOutlineButton(
         border = BorderStroke(if (accent) AccentBorderWidth else 1.dp, borderColor),
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = if (accent) Color.Transparent else colors.surface,
-            contentColor = if (accent) colors.primary else colors.onSurface,
+            contentColor = accentColor ?: colors.onSurface,
             disabledContentColor = colors.onSurfaceVariant,
         ),
         contentPadding = ButtonContentPadding,
@@ -130,12 +128,13 @@ fun TwoverseTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    color: Color = TwoverseTheme.colors.primary,
 ) {
     TextButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = TwoverseTheme.spacing.minTouchTarget),
         enabled = enabled,
-        colors = ButtonDefaults.textButtonColors(contentColor = TwoverseTheme.colors.primary),
+        colors = ButtonDefaults.textButtonColors(contentColor = color),
     ) {
         Text(text = text, style = MaterialTheme.typography.titleSmall)
     }
@@ -202,7 +201,7 @@ private fun TwoverseButtonsPreview() {
             TwoverseOutlineButton(
                 text = "Connect",
                 onClick = {},
-                accent = true,
+                accentColor = TwoverseTheme.colors.primary,
                 modifier = Modifier.fillMaxWidth(),
             )
             TwoverseTextButton(text = "I have a couple code", onClick = {})
