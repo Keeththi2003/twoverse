@@ -13,6 +13,7 @@ data class TwoverseShapes(
     val buttonSmall: Shape = RoundedCornerShape(26.dp),
     val card: Shape = RoundedCornerShape(24.dp),
     val cardLarge: Shape = RoundedCornerShape(28.dp),
+    val cardSmall: Shape = RoundedCornerShape(18.dp),
     val group: Shape = RoundedCornerShape(20.dp),
     val input: Shape = RoundedCornerShape(16.dp),
     val chip: Shape = RoundedCornerShape(18.dp),

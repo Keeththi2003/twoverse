@@ -43,6 +43,9 @@ object TwoverseGradients {
         centerY = 0.35f,
     )
     val GoldGlow = Color(0xFFE8B04A)
+
+    /** Specular highlight on the compass needle tip. */
+    val Shine = Color(0xFFFFFFFF)
     val RoseShadow = Color(0xFF9E3552)
     val LavenderShadow = Color(0xFF5E4A94)
 }

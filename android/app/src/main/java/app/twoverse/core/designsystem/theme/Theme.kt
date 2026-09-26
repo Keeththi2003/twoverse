@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.text.TextStyle
 
 private val LocalTwoverseColors = staticCompositionLocalOf { LightTwoverseColors }
 private val LocalTwoverseShapes = staticCompositionLocalOf { TwoverseShapes() }
 private val LocalTwoverseSpacing = staticCompositionLocalOf { TwoverseSpacing() }
+private val LocalTwoverseTextStyles = staticCompositionLocalOf { TwoverseTextStyles() }
 
 @Composable
 fun TwoverseTheme(
@@ -22,6 +22,7 @@ fun TwoverseTheme(
         LocalTwoverseColors provides colors,
         LocalTwoverseShapes provides TwoverseShapes(),
         LocalTwoverseSpacing provides TwoverseSpacing(),
+        LocalTwoverseTextStyles provides TwoverseTextStyles(),
     ) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(),
@@ -32,7 +33,7 @@ fun TwoverseTheme(
     }
 }
 
-/** Brand tokens that Material 3 has no slot for. Text styles come from `MaterialTheme.typography`. */
+/** Brand tokens that Material 3 has no slot for. Standard text styles come from `MaterialTheme.typography`. */
 object TwoverseTheme {
     val colors: TwoverseColors
         @Composable @ReadOnlyComposable get() = LocalTwoverseColors.current
@@ -43,6 +44,6 @@ object TwoverseTheme {
     val spacing: TwoverseSpacing
         @Composable @ReadOnlyComposable get() = LocalTwoverseSpacing.current
 
-    val sectionHeader: TextStyle
-        @Composable @ReadOnlyComposable get() = SectionHeaderStyle
+    val textStyles: TwoverseTextStyles
+        @Composable @ReadOnlyComposable get() = LocalTwoverseTextStyles.current
 }

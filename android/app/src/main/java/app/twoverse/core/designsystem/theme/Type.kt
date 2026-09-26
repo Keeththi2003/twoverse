@@ -1,6 +1,7 @@
 package app.twoverse.core.designsystem.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -69,8 +70,20 @@ internal val TwoverseTypography = Typography(
     labelSmall = sans(12.sp, 600, lineHeight = 1.35f, letterSpacing = 0.sp),
 )
 
-/** Uppercase section header style ("PRIVACY"), labelSmall with 1.2 letter-spacing. */
-internal val SectionHeaderStyle = TwoverseTypography.labelSmall.copy(
-    fontWeight = FontWeight.Bold,
-    letterSpacing = 1.2.sp,
+/** Text styles Material 3 has no slot for. */
+@Immutable
+data class TwoverseTextStyles(
+    /** Uppercase section header ("PRIVACY", "YOUR COUPLE CODE"). */
+    val sectionHeader: TextStyle = TwoverseTypography.labelSmall.copy(
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.2.sp,
+    ),
+    /** The couple code shown on Pair ("AB72-KP91"). */
+    val coupleCode: TextStyle = sans(36.sp, 700, lineHeight = 1.2f, letterSpacing = 4.sp),
+    /** Text typed into the partner-code field. */
+    val coupleCodeInput: TextStyle = sans(18.sp, 600, lineHeight = 1.3f, letterSpacing = 3.sp),
+    /** Hours, minutes and seconds values on Until We Meet. */
+    val countdownUnitValue: TextStyle = sans(26.sp, 700, lineHeight = 1.2f),
+    /** Uppercase unit labels under countdown values ("HOURS"). */
+    val countdownUnitLabel: TextStyle = sans(11.sp, 700, lineHeight = 1.3f, letterSpacing = 1.sp),
 )
