@@ -15,4 +15,7 @@ interface AuthRepository {
     suspend fun sendPasswordReset(email: String): Result<Unit>
 
     suspend fun signOut()
+
+    /** Asks the backend to delete the account and all its data, then signs out (FR-SET-6). */
+    suspend fun requestAccountDeletion()
 }
