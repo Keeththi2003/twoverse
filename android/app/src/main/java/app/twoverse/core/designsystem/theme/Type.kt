@@ -86,4 +86,10 @@ data class TwoverseTextStyles(
     val countdownUnitValue: TextStyle = sans(26.sp, 700, lineHeight = 1.2f),
     /** Uppercase unit labels under countdown values ("HOURS"). */
     val countdownUnitLabel: TextStyle = sans(11.sp, 700, lineHeight = 1.3f, letterSpacing = 1.sp),
+    /** Small badges on vault tiles ("24h"). */
+    val badge: TextStyle = sans(11.sp, 700, lineHeight = 1.3f),
+    /** Eyebrow above the birthday title ("FOR YOU"). */
+    val eyebrow: TextStyle = sans(13.sp, 700, lineHeight = 1.3f, letterSpacing = 2.sp),
+    /** Personal birthday message. */
+    val birthdayMessage: TextStyle = serif(21.sp, 500, lineHeight = 1.45f, letterSpacing = 0.sp),
 )
