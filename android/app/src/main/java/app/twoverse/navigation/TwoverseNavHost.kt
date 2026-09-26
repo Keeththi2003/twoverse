@@ -4,8 +4,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -21,13 +26,22 @@ import app.twoverse.core.data.sample.SampleData
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import app.twoverse.feature.auth.SignInRoute as SignInFeatureRoute
+import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
+import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
+import app.twoverse.feature.home.HomeRoute as HomeFeatureRoute
 import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
+import app.twoverse.feature.pairing.PairRoute as PairFeatureRoute
 import app.twoverse.feature.splash.SplashDestination
 import app.twoverse.feature.splash.SplashRoute as SplashFeatureRoute
+import kotlinx.coroutines.launch
 
 @Composable
 fun TwoverseNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val connectedMessage = stringResource(R.string.pair_connected)
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
     val selectedTab = TopLevelDestination.entries.indexOfFirst { tab ->
@@ -38,6 +52,7 @@ fun TwoverseNavHost(modifier: Modifier = Modifier) {
         modifier = modifier,
         containerColor = TwoverseTheme.colors.background,
         contentWindowInsets = WindowInsets(0),
+        snackbarHost = { TwoverseSnackbarHost(snackbarHostState) },
         bottomBar = {
             if (selectedTab >= 0) {
                 TwoverseBottomBar(
@@ -57,13 +72,16 @@ fun TwoverseNavHost(modifier: Modifier = Modifier) {
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),
         ) {
-            onboardingGraph(navController)
+            onboardingGraph(
+                navController = navController,
+                onConnected = { scope.launch { snackbarHostState.showSnackbar(connectedMessage) } },
+            )
             tabsGraph(navController)
         }
     }
 }
 
-private fun NavGraphBuilder.onboardingGraph(navController: NavHostController) {
+private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, onConnected: () -> Unit) {
     composable<SplashRoute> {
         SplashFeatureRoute(
             onNavigate = { destination -> navController.navigateClearingBackStack(destination.toRoute()) },
@@ -76,22 +94,18 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController) {
         )
     }
     composable<SignInRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.sign_in_title,
-            actions = listOf(
-                PlaceholderAction(R.string.sign_in_button) { navController.navigate(PairRoute) },
-            ),
+        SignInFeatureRoute(
+            onSignedIn = { navController.navigate(PairRoute) { launchSingleTop = true } },
+            onCreateAccount = { navController.navigate(PairRoute) { launchSingleTop = true } },
         )
     }
     composable<PairRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.pair_title,
-            actions = listOf(
-                PlaceholderAction(R.string.pair_connect) { navController.navigateClearingBackStack(HomeRoute) },
-                PlaceholderAction(R.string.placeholder_connect_birthday) {
-                    navController.navigateClearingBackStack(BirthdayRoute)
-                },
-            ),
+        PairFeatureRoute(
+            onBack = { navController.popBackStack() },
+            onConnected = {
+                navController.navigateClearingBackStack(HomeRoute)
+                onConnected()
+            },
         )
     }
     composable<BirthdayRoute> {
@@ -106,18 +120,15 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController) {
 
 private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
     composable<HomeRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.home_title,
-            actions = listOf(
-                PlaceholderAction(R.string.compass_title) { navController.navigateToTab(TopLevelDestination.Compass) },
-                PlaceholderAction(R.string.countdown_title) { navController.navigate(CountdownRoute) },
-                PlaceholderAction(R.string.vault_title) { navController.navigateToTab(TopLevelDestination.Vault) },
-                PlaceholderAction(R.string.home_send_memory) { navController.navigate(AddMemoryRoute) },
-            ),
+        HomeFeatureRoute(
+            onOpenCompass = { navController.navigateToTab(TopLevelDestination.Compass) },
+            onOpenCountdown = { navController.navigate(CountdownRoute) },
+            onOpenVault = { navController.navigateToTab(TopLevelDestination.Vault) },
+            onSendMemory = { navController.navigate(AddMemoryRoute) },
         )
     }
     composable<CompassRoute> {
-        PlaceholderScreen(titleRes = R.string.compass_title, actions = emptyList())
+        CompassFeatureRoute()
     }
     composable<VaultRoute> {
         PlaceholderScreen(
@@ -134,10 +145,7 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
         PlaceholderScreen(titleRes = R.string.settings_title, actions = emptyList())
     }
     composable<CountdownRoute> {
-        PlaceholderScreen(
-            titleRes = R.string.countdown_title,
-            actions = listOf(PlaceholderAction(R.string.common_back) { navController.popBackStack() }),
-        )
+        CountdownFeatureRoute(onBack = { navController.popBackStack() })
     }
     composable<MemoryRoute> {
         PlaceholderScreen(
@@ -155,6 +163,19 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
                 },
                 PlaceholderAction(R.string.common_close) { navController.popBackStack() },
             ),
+        )
+    }
+}
+
+@Composable
+private fun TwoverseSnackbarHost(hostState: SnackbarHostState) {
+    val colors = TwoverseTheme.colors
+    SnackbarHost(hostState = hostState) { data ->
+        Snackbar(
+            snackbarData = data,
+            shape = TwoverseTheme.shapes.input,
+            containerColor = colors.onSurface,
+            contentColor = colors.background,
         )
     }
 }
