@@ -16,17 +16,147 @@
     <string name="welcome_have_code">I have a couple code</string>
 
     <string name="sign_in_title">Welcome back</string>
+    <string name="sign_in_subtitle">Sign in to return to your little universe.</string>
+    <string name="sign_in_google">Continue with Google</string>
+    <string name="sign_in_email_label">Email</string>
+    <string name="sign_in_email_placeholder">you@example.com</string>
+    <string name="sign_in_password_label">Password</string>
+    <string name="sign_in_password_placeholder">Your password</string>
+    <string name="sign_in_show_password">Show password</string>
+    <string name="sign_in_hide_password">Hide password</string>
+    <string name="sign_in_forgot_password">Forgot password?</string>
+    <string name="sign_in_reset_sent">We\'ve sent a password reset link to your email.</string>
+    <string name="sign_in_reset_needs_email">Enter your email above to reset your password.</string>
+    <string name="sign_in_error">Couldn\'t sign you in. Try again.</string>
     <string name="sign_in_button">Sign in</string>
+    <string name="sign_in_new_to_twoverse">New to Twoverse?</string>
+    <string name="sign_in_create_account">Create an account</string>
 
     <string name="pair_title">Connect your worlds</string>
+    <string name="pair_body">Share your code with your partner, or enter theirs. Once you\'re connected, it\'s just the two of you.</string>
+    <string name="pair_your_code">Your couple code</string>
+    <plurals name="pair_expires_in_hours">
+        <item quantity="one">Expires in %d hour</item>
+        <item quantity="other">Expires in %d hours</item>
+    </plurals>
+    <string name="pair_share">Share code</string>
+    <string name="pair_share_message">Join me on Twoverse. Our couple code is %1$s</string>
+    <string name="pair_copy">Copy</string>
+    <string name="pair_copied">Code copied</string>
+    <string name="pair_waiting">Waiting for your partner to join…</string>
+    <string name="pair_partner_code_label">Your partner\'s code</string>
+    <string name="pair_partner_code_placeholder">XXXX-XXXX</string>
+    <string name="pair_invalid_code">This couple code is invalid or has expired.</string>
     <string name="pair_connect">Connect</string>
+    <string name="pair_connected">You\'re connected</string>
 
     <string name="home_title">Our Universe</string>
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <string name="home_location_on">Location on</string>
+    <string name="home_location_off">Location off</string>
+    <string name="home_distance_label">Distance between you</string>
+    <string name="home_freshness_live">Live</string>
+    <string name="home_freshness_recent">Recent</string>
+    <string name="home_freshness_outdated">Outdated</string>
+    <string name="home_km_apart">km apart</string>
+    <string name="home_miles_apart">miles apart</string>
+    <string name="home_distance_unavailable">Distance unavailable</string>
+    <string name="home_you">You</string>
+    <string name="home_her">Her</string>
+    <string name="home_city_separator">" · "</string>
+    <string name="home_updated_ago">Updated %1$s ago</string>
+    <string name="home_last_seen">Last seen %1$s ago</string>
+    <string name="home_star_direction">She\'s %1$s</string>
+    <string name="home_direction_unavailable">Direction unavailable</string>
+    <plurals name="home_countdown_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="home_until_we_meet">Until we meet</string>
+    <string name="home_set_date">Set a date</string>
+    <plurals name="home_memory_count">
+        <item quantity="one">%d memory</item>
+        <item quantity="other">%d memories</item>
+    </plurals>
+    <plurals name="home_memories_new">
+        <item quantity="one">%1$s · %2$d new</item>
+        <item quantity="other">%1$s · %2$d new</item>
+    </plurals>
     <string name="home_send_memory">Send a memory</string>
 
     <string name="compass_title">Your Star</string>
+    <string name="compass_subtitle">Turn with your phone. The star always points to her.</string>
+    <string name="compass_distance">%1$s %2$s</string>
+    <string name="compass_direction_bearing">%1$s · %2$d°</string>
+    <string name="compass_calibrated">Compass calibrated</string>
+    <string name="compass_calibrate_hint">Move your phone in a figure-8 to calibrate.</string>
+    <string name="compass_partner_location">Her location · %1$s</string>
+    <string name="compass_last_known_direction">Last known direction</string>
+    <string name="compass_tip">Hold your phone flat and away from metal for the most accurate direction.</string>
+    <string name="compass_dial_description">Compass pointing %1$s toward your partner</string>
+    <string name="compass_dial_no_direction">Compass without a direction to your partner</string>
+
+    <string name="direction_north">North</string>
+    <string name="direction_north_east">North-east</string>
+    <string name="direction_east">East</string>
+    <string name="direction_south_east">South-east</string>
+    <string name="direction_south">South</string>
+    <string name="direction_south_west">South-west</string>
+    <string name="direction_west">West</string>
+    <string name="direction_north_west">North-west</string>
+    <string name="direction_letter_north">N</string>
+    <string name="direction_letter_east">E</string>
+    <string name="direction_letter_south">S</string>
+    <string name="direction_letter_west">W</string>
+
+    <string name="unit_km">km</string>
+    <string name="unit_miles">mi</string>
+
+    <string name="location_sharing_off">Location sharing is off.</string>
+    <string name="location_partner_unavailable">Your partner\'s location isn\'t available right now.</string>
+
+    <plurals name="time_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <plurals name="time_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="time_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="time_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="time_short_seconds">%ds ago</string>
+    <string name="time_short_minutes">%d min ago</string>
+    <string name="time_short_hours">%d h ago</string>
+    <string name="time_short_days">%d d ago</string>
 
     <string name="countdown_title">Until We Meet</string>
+    <plurals name="countdown_days_to_go">
+        <item quantity="one">day to go</item>
+        <item quantity="other">days to go</item>
+    </plurals>
+    <string name="countdown_hours">Hours</string>
+    <string name="countdown_minutes">Minutes</string>
+    <string name="countdown_seconds">Seconds</string>
+    <string name="countdown_getting_closer">Getting closer</string>
+    <string name="countdown_planets_meet">Your planets meet on the day.</string>
+    <string name="countdown_date">Date</string>
+    <string name="countdown_place">Place</string>
+    <string name="countdown_time">Time</string>
+    <string name="countdown_time_around">Around %1$s</string>
+    <string name="countdown_change_date">Change date</string>
+    <string name="countdown_shared_note">You both see the same countdown.</string>
+    <string name="countdown_empty">When will you see each other next?</string>
+    <string name="countdown_next_time">When\'s the next time?</string>
+    <string name="countdown_set_date">Set a date</string>
 
     <string name="vault_title">Ours</string>
     <string name="vault_add_memory">Add a memory</string>
@@ -42,8 +172,10 @@
 
     <string name="common_back">Back</string>
     <string name="common_close">Close</string>
+    <string name="common_or">or</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
 
     <string name="placeholder_note">Placeholder screen</string>
-    <string name="placeholder_connect_birthday">Connect (birthday recipient)</string>
     <string name="placeholder_open_memory">Open a memory</string>
 </resources>
