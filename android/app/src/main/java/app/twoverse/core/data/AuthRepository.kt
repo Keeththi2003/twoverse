@@ -11,5 +11,8 @@ interface AuthRepository {
 
     suspend fun signInWithEmail(email: String, password: String): Result<UserProfile>
 
+    /** Sends a password-reset email (FR-AUTH-3). */
+    suspend fun sendPasswordReset(email: String): Result<Unit>
+
     suspend fun signOut()
 }

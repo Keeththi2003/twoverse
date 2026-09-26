@@ -19,6 +19,8 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
 
     override suspend fun signInWithEmail(email: String, password: String): Result<UserProfile> = signIn()
 
+    override suspend fun sendPasswordReset(email: String): Result<Unit> = Result.success(Unit)
+
     override suspend fun signOut() {
         user.value = null
     }
