@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
@@ -24,8 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -51,14 +55,22 @@ fun TwoverseTextField(
     placeholder: String? = null,
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: (@Composable () -> Unit)? = null,
+    errorText: String? = null,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
     val colors = TwoverseTheme.colors
     val shape = TwoverseTheme.shapes.input
     val interactionSource = remember { MutableInteractionSource() }
     val focused by interactionSource.collectIsFocusedAsState()
-    val textStyle = MaterialTheme.typography.bodyLarge.copy(color = colors.onSurface)
+    val fieldTextStyle = textStyle.copy(color = colors.onSurface)
+    val borderColor = when {
+        errorText != null -> colors.error
+        focused -> colors.primary
+        else -> colors.outline
+    }
 
     Column(
         modifier = modifier,
@@ -75,10 +87,11 @@ fun TwoverseTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .semantics { contentDescription = label },
-            textStyle = textStyle,
+            textStyle = fieldTextStyle,
             singleLine = singleLine,
             minLines = if (singleLine) 1 else 3,
             keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             visualTransformation = visualTransformation,
             interactionSource = interactionSource,
             cursorBrush = SolidColor(colors.primary),
@@ -87,7 +100,7 @@ fun TwoverseTextField(
                     modifier = Modifier
                         .heightIn(min = if (singleLine) SingleLineMinHeight else MultiLineMinHeight)
                         .background(colors.surface, shape)
-                        .border(1.dp, if (focused) colors.primary else colors.outline, shape)
+                        .border(1.dp, borderColor, shape)
                         .padding(start = FieldHorizontalPadding),
                     verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top,
                 ) {
@@ -101,7 +114,7 @@ fun TwoverseTextField(
                             ),
                     ) {
                         if (value.isEmpty() && placeholder != null) {
-                            Text(text = placeholder, style = textStyle, color = colors.onSurfaceVariant)
+                            Text(text = placeholder, style = fieldTextStyle, color = colors.onSurfaceVariant)
                         }
                         innerTextField()
                     }
@@ -111,6 +124,14 @@ fun TwoverseTextField(
                 }
             },
         )
+        if (errorText != null) {
+            Text(
+                text = errorText,
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.error,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+            )
+        }
     }
 }
 
@@ -139,6 +160,12 @@ private fun TwoverseTextFieldPreview() {
                         )
                     }
                 },
+            )
+            TwoverseTextField(
+                value = "",
+                onValueChange = {},
+                label = "Your partner's code",
+                errorText = "This couple code is invalid or has expired.",
             )
             TwoverseTextField(
                 value = "",
