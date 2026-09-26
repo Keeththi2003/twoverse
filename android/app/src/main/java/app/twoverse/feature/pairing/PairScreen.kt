@@ -124,7 +124,7 @@ fun PairScreen(
                 text = stringResource(R.string.pair_connect),
                 onClick = onConnect,
                 enabled = uiState.canConnect,
-                accent = true,
+                accentColor = colors.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = spacing.xl),
