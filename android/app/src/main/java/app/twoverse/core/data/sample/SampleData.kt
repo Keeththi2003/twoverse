@@ -25,7 +25,7 @@ import java.time.ZoneId
 object SampleData {
     private val now: Instant = Instant.now()
 
-    const val SUNSET_MEMORY_ID = "memory-9"
+    private const val SUNSET_MEMORY_ID = "memory-9"
 
     val me = UserProfile(id = "user-me", displayName = "You")
     val partner = UserProfile(id = "user-partner", displayName = "Her")
