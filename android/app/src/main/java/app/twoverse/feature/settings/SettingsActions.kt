@@ -17,4 +17,6 @@ data class SettingsActions(
     val onDisconnectConfirmed: () -> Unit = {},
     val onDeleteAccountConfirmed: () -> Unit = {},
     val onShowBirthday: () -> Unit = {},
+    /** Turning sharing on goes through the permission flow (FR-LOC-1). */
+    val onOpenLocationSetup: () -> Unit = {},
 )
