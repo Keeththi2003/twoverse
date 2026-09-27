@@ -47,8 +47,9 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsUiState(),
     )
 
+    /** Turning sharing off; turning it on goes through the location setup flow. */
     fun onShareLocationChange(enabled: Boolean) {
-        viewModelScope.launch { settingsRepository.setShareLocation(enabled) }
+        viewModelScope.launch { showFailure(settingsRepository.setShareLocation(enabled)) }
     }
 
     fun onLockOursChange(enabled: Boolean) {
@@ -64,7 +65,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onLocationPrecisionSelected(precision: LocationPrecision) {
-        closeDialogThen { settingsRepository.setLocationPrecision(precision) }
+        closeDialogThen { showFailure(settingsRepository.setLocationPrecision(precision)) }
     }
 
     fun onDistanceUnitSelected(unit: DistanceUnit) {
@@ -90,6 +91,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onDeleteAccountConfirmed() {
         closeDialogThen { exitOnSuccess(authRepository.deleteAccount(), SettingsExit.SignedOut) }
+    }
+
+    private fun showFailure(result: DataResult<Unit>) {
+        interaction.update { it.copy(error = (result as? DataResult.Failure)?.error) }
     }
 
     private fun exitOnSuccess(result: DataResult<Unit>, exit: SettingsExit) {

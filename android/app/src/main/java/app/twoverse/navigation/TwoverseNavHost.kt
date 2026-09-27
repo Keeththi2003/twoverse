@@ -35,6 +35,7 @@ import app.twoverse.feature.birthday.BirthdayRoute as BirthdayFeatureRoute
 import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
 import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
 import app.twoverse.feature.home.HomeRoute as HomeFeatureRoute
+import app.twoverse.feature.location.LocationSetupRoute as LocationSetupFeatureRoute
 import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
 import app.twoverse.feature.pairing.PairRoute as PairFeatureRoute
 import app.twoverse.feature.settings.SettingsRoute as SettingsFeatureRoute
@@ -174,7 +175,11 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onOpenCountdown = { navController.navigate(CountdownRoute) },
             onOpenVault = { navController.navigateToTab(TopLevelDestination.Vault) },
             onSendMemory = { navController.navigate(AddMemoryRoute) },
+            onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
         )
+    }
+    composable<LocationSetupRoute> {
+        LocationSetupFeatureRoute(onDone = { navController.popBackStack() })
     }
     composable<CompassRoute> {
         CompassFeatureRoute()
@@ -190,6 +195,7 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onSignedOut = { navController.navigateClearingBackStack(WelcomeRoute) },
             onDisconnected = { navController.navigateClearingBackStack(PairRoute) },
             onShowBirthday = { navController.navigate(BirthdayRoute) },
+            onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
         )
     }
     composable<CountdownRoute> {

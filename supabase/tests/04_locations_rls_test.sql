@@ -43,8 +43,11 @@ update public.locations set lat = 0;
 delete from public.locations;
 
 select tests.clear_authentication();
-select is((select lat from public.locations where user_id = tests.user_id('b@test.dev')), 7.5::double precision,
-    'a user cannot change their partner''s location');
+select results_eq(
+    format('select sharing_enabled, lat from public.locations where user_id = %L', tests.user_id('b@test.dev')),
+    $$values (false, null::double precision)$$,
+    'a user cannot change their partner''s location (not stored while unshared)'
+);
 select is((select count(*)::int from public.locations), 2, 'no one can delete someone else''s location');
 
 select tests.authenticate_as('b@test.dev');

@@ -81,6 +81,7 @@
     <string name="home_greeting_evening">Good evening</string>
     <string name="home_location_on">Location on</string>
     <string name="home_location_off">Location off</string>
+    <string name="home_location_permission_needed">Allow location</string>
     <string name="home_distance_label">Distance between you</string>
     <string name="home_freshness_live">Live</string>
     <string name="home_freshness_recent">Recent</string>
@@ -268,6 +269,27 @@
     <string name="birthday_for_you">For you</string>
     <string name="birthday_title">Happy Birthday</string>
     <string name="birthday_enter">Enter Twoverse</string>
+
+    <string name="location_setup_explain_title">Share your location with her</string>
+    <string name="location_setup_explain_body">Twoverse uses your location only to show the distance between you and to point Your Star. Only your latest position is kept, never a history, and you can turn sharing off any time in You &amp; Her.</string>
+    <string name="location_setup_explain_note">If you choose \"Only this time\", sharing pauses the next time you open Twoverse until you allow it again.</string>
+    <string name="location_setup_continue">Continue</string>
+    <string name="location_setup_not_now">Not now</string>
+    <string name="location_setup_denied_title">Location is off</string>
+    <string name="location_setup_denied_body">Without location permission, Twoverse can\'t show how far apart you are. You can try again, or keep sharing off for now.</string>
+    <string name="location_setup_denied_settings_body">Location is blocked for Twoverse. To share it, open your phone\'s settings and allow location for Twoverse.</string>
+    <string name="location_setup_try_again">Try again</string>
+    <string name="location_setup_open_settings">Open settings</string>
+    <string name="location_setup_background_title">Keep your distance fresh</string>
+    <string name="location_setup_background_body">To update your distance while Twoverse is closed, choose \"Allow all the time\" on the next screen. Twoverse checks in at most every 15 minutes, or when you move about 1 km, so battery use stays low.</string>
+    <string name="location_setup_allow_all_the_time">Allow all the time</string>
+    <string name="location_setup_while_using">Only while using the app</string>
+    <string name="location_setup_enabling">Turning on sharing…</string>
+    <string name="location_setup_battery_title">One more step for Samsung phones</string>
+    <string name="location_setup_battery_body">Samsung phones can pause Twoverse in the background to save battery, and then your distance stops updating. Set Twoverse\'s battery use to Unrestricted.</string>
+    <string name="location_setup_battery_steps">Settings › Apps › Twoverse › Battery › Unrestricted</string>
+    <string name="location_setup_open_battery_settings">Open app settings</string>
+    <string name="location_setup_done">Done</string>
 
     <string name="offline_banner">You\'re offline. Showing the latest saved information.</string>
 

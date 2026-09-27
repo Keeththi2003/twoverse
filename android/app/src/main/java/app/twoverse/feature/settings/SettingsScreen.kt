@@ -99,7 +99,9 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_share_location),
                 subtitle = stringResource(R.string.settings_share_location_subtitle),
                 checked = settings.shareLocation,
-                onCheckedChange = actions.onShareLocationChange,
+                onCheckedChange = { share ->
+                    if (share) actions.onOpenLocationSetup() else actions.onShareLocationChange(false)
+                },
             )
             GroupDivider()
             SettingsValueRow(

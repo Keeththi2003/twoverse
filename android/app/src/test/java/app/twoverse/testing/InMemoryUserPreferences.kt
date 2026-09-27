@@ -10,6 +10,8 @@ class InMemoryUserPreferences : UserPreferences {
     override val appearance = MutableStateFlow(AppearanceMode.System)
     override val distanceUnit = MutableStateFlow(DistanceUnit.Kilometres)
     override val birthdayWelcomeSeen = MutableStateFlow(false)
+    override val lockOurs = MutableStateFlow(true)
+    override val batteryGuideShown = MutableStateFlow(false)
 
     override suspend fun setAppearance(appearance: AppearanceMode) {
         this.appearance.value = appearance
@@ -21,5 +23,13 @@ class InMemoryUserPreferences : UserPreferences {
 
     override suspend fun setBirthdayWelcomeSeen() {
         birthdayWelcomeSeen.value = true
+    }
+
+    override suspend fun setLockOurs(enabled: Boolean) {
+        lockOurs.value = enabled
+    }
+
+    override suspend fun setBatteryGuideShown() {
+        batteryGuideShown.value = true
     }
 }

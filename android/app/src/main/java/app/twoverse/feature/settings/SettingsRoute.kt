@@ -14,6 +14,7 @@ fun SettingsRoute(
     onSignedOut: () -> Unit,
     onDisconnected: () -> Unit,
     onShowBirthday: () -> Unit,
+    onOpenLocationSetup: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -43,6 +44,7 @@ fun SettingsRoute(
             onDisconnectConfirmed = viewModel::onDisconnectConfirmed,
             onDeleteAccountConfirmed = viewModel::onDeleteAccountConfirmed,
             onShowBirthday = onShowBirthday,
+            onOpenLocationSetup = onOpenLocationSetup,
         ),
         showDebugOptions = BuildConfig.DEBUG,
         modifier = modifier,

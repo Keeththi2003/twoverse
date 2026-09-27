@@ -34,6 +34,12 @@ class FreshnessTest {
     }
 
     @Test
+    fun thresholdsAreTheSrsValues() {
+        assertEquals(Duration.ofMinutes(2), FreshnessThresholds.Live)
+        assertEquals(Duration.ofMinutes(30), FreshnessThresholds.Recent)
+    }
+
+    @Test
     fun futureTimestampCountsAsLive() {
         assertEquals(LocationFreshness.Live, locationFreshness(now + Duration.ofSeconds(5), now))
     }

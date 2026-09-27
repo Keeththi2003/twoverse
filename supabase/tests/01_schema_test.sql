@@ -39,7 +39,7 @@ select throws_ok(
 );
 
 -- One location row per user, approximate positions rounded to about 1 km (FR-LOC-6, FR-LOC-7)
-insert into public.locations (user_id, lat, lng, precision) values (tests.user_id('email@test.dev'), 6.927123, 79.861244, 'approximate');
+insert into public.locations (user_id, lat, lng, precision, sharing_enabled) values (tests.user_id('email@test.dev'), 6.927123, 79.861244, 'approximate', true);
 select results_eq(
     format('select lat, lng from public.locations where user_id = %L', tests.user_id('email@test.dev')),
     $$values (6.93::double precision, 79.86::double precision)$$,
@@ -51,7 +51,7 @@ select throws_ok(
     'only one location row per user'
 );
 select throws_ok(
-    format($$insert into public.locations (user_id, lat, lng) values (%L, 91, 1)$$, tests.user_id('google@test.dev')),
+    format($$insert into public.locations (user_id, lat, lng, sharing_enabled) values (%L, 91, 1, true)$$, tests.user_id('google@test.dev')),
     '23514', null,
     'latitude must be valid'
 );

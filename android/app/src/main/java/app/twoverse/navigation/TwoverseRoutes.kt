@@ -36,6 +36,9 @@ data object VaultRoute
 data object SettingsRoute
 
 @Serializable
+data object LocationSetupRoute
+
+@Serializable
 data object CountdownRoute
 
 /** [memoryId] is read by `MemoryViewModel` under the same name (`MemoryIdKey`). */

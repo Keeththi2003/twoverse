@@ -8,6 +8,7 @@ import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
 import app.twoverse.core.common.partnerPosition
 import app.twoverse.core.common.ticks
+import app.twoverse.core.data.LocationPermissionChecker
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
 import app.twoverse.core.data.ReunionRepository
@@ -32,6 +33,7 @@ class HomeViewModel @Inject constructor(
     settingsRepository: SettingsRepository,
     reunionRepository: ReunionRepository,
     memoryRepository: MemoryRepository,
+    private val permissions: LocationPermissionChecker,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -65,7 +67,11 @@ class HomeViewModel @Inject constructor(
         val position = partnerPosition(mine, partner, settings.shareLocation, now)
         return HomeUiState.Success(
             dayPeriod = DayPeriod.of(now.atZone(clock.zone).toLocalTime()),
-            isSharingLocation = settings.shareLocation,
+            sharingStatus = when {
+                !settings.shareLocation -> SharingStatus.Off
+                !permissions.status().foreground -> SharingStatus.PermissionNeeded
+                else -> SharingStatus.On
+            },
             distance = position.distanceKm?.let { formatDistance(it, settings.distanceUnit) },
             distanceUnit = settings.distanceUnit,
             unavailableReason = position.unavailableReason,
