@@ -1,10 +1,8 @@
 package app.twoverse.feature.compass
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
@@ -57,11 +55,12 @@ private const val FullCircle = 360f
 
 /**
  * Compass dial with 72 ticks, N/E/S/W and a needle rotated by [needleRotation] degrees
- * (clockwise from the top). A null rotation hides the needle.
+ * (clockwise from the top). The angle is read while drawing, so live sensor updates redraw
+ * only the dial (NFR-PRF-2). A null rotation hides the needle.
  */
 @Composable
 internal fun CompassDial(
-    needleRotation: Float?,
+    needleRotation: () -> Float?,
     contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
@@ -73,7 +72,6 @@ internal fun CompassDial(
     val east = stringResource(R.string.direction_letter_east)
     val south = stringResource(R.string.direction_letter_south)
     val west = stringResource(R.string.direction_letter_west)
-    val rotation by animateFloatAsState(targetValue = needleRotation ?: 0f, label = "needleRotation")
 
     Canvas(modifier = modifier.semantics { this.contentDescription = contentDescription }) {
         val scale = size.minDimension / Viewport
@@ -112,7 +110,8 @@ internal fun CompassDial(
         drawLabel(textMeasurer, south, p(Center, SouthBaselineY), cardinalStyle)
         drawLabel(textMeasurer, west, p(WestX, SideBaselineY), cardinalStyle)
 
-        if (needleRotation != null) {
+        val rotation = needleRotation()
+        if (rotation != null) {
             rotate(degrees = rotation, pivot = center) {
                 drawPath(needleHalf(scale, tipY = NeedleTipY, notchY = Center - NeedleNotch), color = colors.accent)
                 drawPath(needleHalf(scale, tipY = NeedleTailY, notchY = Center + NeedleNotch), color = colors.outline)

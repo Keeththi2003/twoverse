@@ -16,8 +16,12 @@ sealed interface CompassUiState {
         val direction: CompassDirection?,
         /** Bearing to the partner in whole degrees from true north (FR-CMP-4). */
         val bearingDegrees: Int?,
-        /** Needle angle on screen: bearing minus device heading. Null hides the needle (FR-CMP-6). */
-        val needleRotation: Float?,
+        /** False when the needle is hidden: no direction to the partner (FR-CMP-6). */
+        val showsNeedle: Boolean,
+        /** Phones without a compass sensor show the direction as text only (FR-CMP-8). */
+        val hasCompassSensor: Boolean,
+        /** The phone points at the partner within ±5° (FR-CMP-7). */
+        val isPointingAtPartner: Boolean,
         val freshness: LocationFreshness,
         val partnerUpdatedAgo: ElapsedTime?,
         val unavailableReason: LocationUnavailableReason?,
