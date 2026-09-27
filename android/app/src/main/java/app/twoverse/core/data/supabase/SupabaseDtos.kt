@@ -3,6 +3,7 @@ package app.twoverse.core.data.supabase
 import app.twoverse.core.model.CoupleCode
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.LocationSharing
+import app.twoverse.core.model.Reunion
 import app.twoverse.core.model.UserLocation
 import app.twoverse.core.model.UserProfile
 import kotlinx.serialization.SerialName
@@ -61,6 +62,24 @@ internal data class LocationDto(
             updatedAt = parseTimestamp(updatedAt),
         )
     }
+}
+
+@Serializable
+internal data class ReunionDto(
+    @SerialName("couple_id") val coupleId: String,
+    @SerialName("meet_at") val meetAt: String,
+    @SerialName("has_time") val hasTime: Boolean,
+    val place: String? = null,
+    val note: String? = null,
+    @SerialName("date_set_at") val dateSetAt: String,
+) {
+    fun toModel() = Reunion(
+        meetAt = parseTimestamp(meetAt),
+        hasTime = hasTime,
+        place = place,
+        note = note,
+        dateSetAt = parseTimestamp(dateSetAt),
+    )
 }
 
 internal const val PrecisionApproximate = "approximate"
