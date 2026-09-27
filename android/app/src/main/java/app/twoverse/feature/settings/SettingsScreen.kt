@@ -27,8 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -39,6 +41,7 @@ import app.twoverse.core.designsystem.component.SettingsSwitchRow
 import app.twoverse.core.designsystem.component.SettingsValueRow
 import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoverseConfirmDialog
+import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.DistanceUnit
@@ -136,6 +139,16 @@ fun SettingsScreen(
             ActionRow(R.string.settings_delete_account, colors.error) {
                 actions.onOpenDialog(SettingsDialog.DeleteAccount)
             }
+        }
+        uiState.error?.let { error ->
+            Text(
+                text = stringResource(error.messageRes()),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.error,
+                modifier = Modifier
+                    .padding(horizontal = SectionHeaderInset, vertical = spacing.xs)
+                    .semantics { liveRegion = LiveRegionMode.Polite },
+            )
         }
         if (showDebugOptions) {
             SettingsGroup(modifier = Modifier.padding(top = spacing.md)) {
