@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.CoupleRepository
+import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.CoupleStatus
@@ -26,6 +27,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val coupleRepository: CoupleRepository,
     private val authRepository: AuthRepository,
+    private val pushRepository: PushRepository,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -76,8 +78,12 @@ class SettingsViewModel @Inject constructor(
         closeDialogThen { settingsRepository.setAppearance(appearance) }
     }
 
+    /** Removes this device's push token first, while still signed in, so pushes stop here. */
     fun onLogOutConfirmed() {
-        closeDialogThen { exitOnSuccess(authRepository.signOut(), SettingsExit.SignedOut) }
+        closeDialogThen {
+            pushRepository.unregisterThisDevice()
+            exitOnSuccess(authRepository.signOut(), SettingsExit.SignedOut)
+        }
     }
 
     /** The server ends location sharing and hides shared data (BR-9, FR-PAIR-7). */

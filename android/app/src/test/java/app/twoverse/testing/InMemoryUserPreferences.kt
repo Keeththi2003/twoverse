@@ -12,6 +12,7 @@ class InMemoryUserPreferences : UserPreferences {
     override val birthdayWelcomeSeen = MutableStateFlow(false)
     override val lockOurs = MutableStateFlow(true)
     override val batteryGuideShown = MutableStateFlow(false)
+    override val notificationPermissionAsked = MutableStateFlow(false)
 
     override suspend fun setAppearance(appearance: AppearanceMode) {
         this.appearance.value = appearance
@@ -31,5 +32,9 @@ class InMemoryUserPreferences : UserPreferences {
 
     override suspend fun setBatteryGuideShown() {
         batteryGuideShown.value = true
+    }
+
+    override suspend fun setNotificationPermissionAsked() {
+        notificationPermissionAsked.value = true
     }
 }
