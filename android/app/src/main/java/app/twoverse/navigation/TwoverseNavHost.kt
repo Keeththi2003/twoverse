@@ -8,9 +8,11 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -25,7 +27,10 @@ import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import app.twoverse.feature.auth.ResetPasswordRoute as ResetPasswordFeatureRoute
 import app.twoverse.feature.auth.SignInRoute as SignInFeatureRoute
+import app.twoverse.feature.auth.SignUpRoute as SignUpFeatureRoute
+import app.twoverse.feature.auth.SignedInDestination
 import app.twoverse.feature.birthday.BirthdayRoute as BirthdayFeatureRoute
 import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
 import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
@@ -43,14 +48,24 @@ import kotlinx.coroutines.launch
 /**
  * App navigation (DESIGN.md §7). [openHome] starts on Our Universe instead of the splash, for
  * widget taps (FR-WGT-4). [isOffline] shows the offline banner above every screen.
+ * [isPasswordRecovery] opens Reset password after a reset link (FR-AUTH-3).
  */
 @Composable
 fun TwoverseNavHost(
     modifier: Modifier = Modifier,
     openHome: Boolean = false,
     isOffline: Boolean = false,
+    isPasswordRecovery: Boolean = false,
+    onPasswordRecoveryShown: () -> Unit = {},
 ) {
     val navController = rememberNavController()
+    val currentOnPasswordRecoveryShown by rememberUpdatedState(onPasswordRecoveryShown)
+    LaunchedEffect(isPasswordRecovery) {
+        if (isPasswordRecovery) {
+            navController.navigate(ResetPasswordRoute) { launchSingleTop = true }
+            currentOnPasswordRecoveryShown()
+        }
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val connectedMessage = stringResource(R.string.pair_connected)
@@ -104,18 +119,39 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
     composable<WelcomeRoute> {
         WelcomeFeatureRoute(
             onGetStarted = { navController.navigate(SignInRoute) },
-            onHaveCoupleCode = { navController.navigate(PairRoute) },
+            // Pairing needs an account, so the couple code is entered after signing in.
+            onHaveCoupleCode = { navController.navigate(SignInRoute) },
         )
     }
     composable<SignInRoute> {
         SignInFeatureRoute(
-            onSignedIn = { navController.navigate(PairRoute) { launchSingleTop = true } },
-            onCreateAccount = { navController.navigate(PairRoute) { launchSingleTop = true } },
+            onSignedIn = { destination ->
+                navController.navigateClearingBackStack(
+                    when (destination) {
+                        SignedInDestination.Pair -> PairRoute
+                        SignedInDestination.Home -> HomeRoute
+                    },
+                )
+            },
+            onCreateAccount = { navController.navigate(SignUpRoute) },
         )
+    }
+    composable<SignUpRoute> {
+        SignUpFeatureRoute(
+            onBack = { navController.popBackStack() },
+            onSignedUp = { navController.navigateClearingBackStack(PairRoute) },
+        )
+    }
+    composable<ResetPasswordRoute> {
+        ResetPasswordFeatureRoute(onSaved = { navController.navigateClearingBackStack(SplashRoute) })
     }
     composable<PairRoute> {
         PairFeatureRoute(
-            onBack = { navController.popBackStack() },
+            onBack = if (navController.previousBackStackEntry != null) {
+                { navController.popBackStack() }
+            } else {
+                null
+            },
             onConnected = { showBirthday ->
                 if (showBirthday) {
                     navController.navigateClearingBackStack(BirthdayRoute)
