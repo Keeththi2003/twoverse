@@ -2,6 +2,7 @@ package app.twoverse.core.data.local
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import app.twoverse.core.model.AppearanceMode
@@ -25,6 +26,10 @@ class DataStoreUserPreferences @Inject constructor(
         .map { prefs -> enumOrDefault(prefs[DistanceUnitKey], DistanceUnit.Kilometres) }
         .distinctUntilChanged()
 
+    override val birthdayWelcomeSeen: Flow<Boolean> = dataStore.data
+        .map { prefs -> prefs[BirthdayWelcomeSeenKey] ?: false }
+        .distinctUntilChanged()
+
     override suspend fun setAppearance(appearance: AppearanceMode) {
         dataStore.edit { it[AppearanceKey] = appearance.name }
     }
@@ -33,11 +38,16 @@ class DataStoreUserPreferences @Inject constructor(
         dataStore.edit { it[DistanceUnitKey] = unit.name }
     }
 
+    override suspend fun setBirthdayWelcomeSeen() {
+        dataStore.edit { it[BirthdayWelcomeSeenKey] = true }
+    }
+
     private inline fun <reified T : Enum<T>> enumOrDefault(name: String?, default: T): T =
         enumValues<T>().firstOrNull { it.name == name } ?: default
 
     private companion object {
         val AppearanceKey = stringPreferencesKey("appearance")
         val DistanceUnitKey = stringPreferencesKey("distance_unit")
+        val BirthdayWelcomeSeenKey = booleanPreferencesKey("birthday_welcome_seen")
     }
 }

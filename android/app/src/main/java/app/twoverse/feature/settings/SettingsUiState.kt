@@ -1,5 +1,6 @@
 package app.twoverse.feature.settings
 
+import app.twoverse.core.model.DataError
 import app.twoverse.core.model.UserSettings
 import java.time.LocalDate
 
@@ -10,6 +11,8 @@ data class SettingsUiState(
     /** When the couple connected, in the user's local time zone (FR-SET-1). */
     val connectedSince: LocalDate? = null,
     val openDialog: SettingsDialog? = null,
+    /** Log out, disconnect or account deletion failed on the server. */
+    val error: DataError? = null,
     /** Set when the user left their account or couple, so the app can navigate away. */
     val exit: SettingsExit? = null,
 )

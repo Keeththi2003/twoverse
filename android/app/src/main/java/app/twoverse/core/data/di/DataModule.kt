@@ -5,16 +5,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import app.twoverse.core.data.AuthDeepLinkHandler
 import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
+import app.twoverse.core.data.ProfileRepository
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
-import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeBirthdayRepository
-import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeMemoryRepository
 import app.twoverse.core.data.fake.FakeReunionRepository
@@ -23,6 +23,10 @@ import app.twoverse.core.data.local.DataStoreUserPreferences
 import app.twoverse.core.data.local.UserPreferences
 import app.twoverse.core.data.network.ConnectivityNetworkMonitor
 import app.twoverse.core.data.network.NetworkMonitor
+import app.twoverse.core.data.supabase.SupabaseAuthDeepLinkHandler
+import app.twoverse.core.data.supabase.SupabaseAuthRepository
+import app.twoverse.core.data.supabase.SupabaseCoupleRepository
+import app.twoverse.core.data.supabase.SupabaseProfileRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -31,17 +35,28 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/** Binds the fake repositories (until Supabase is added) and device-local data sources. */
+/**
+ * Auth, pairing and profiles use Supabase; the other features still use fakes until they are
+ * connected. Device-local preferences and connectivity are real.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 internal interface DataModule {
     @Binds
     @Singleton
-    fun bindAuthRepository(impl: FakeAuthRepository): AuthRepository
+    fun bindAuthRepository(impl: SupabaseAuthRepository): AuthRepository
 
     @Binds
     @Singleton
-    fun bindCoupleRepository(impl: FakeCoupleRepository): CoupleRepository
+    fun bindCoupleRepository(impl: SupabaseCoupleRepository): CoupleRepository
+
+    @Binds
+    @Singleton
+    fun bindProfileRepository(impl: SupabaseProfileRepository): ProfileRepository
+
+    @Binds
+    @Singleton
+    fun bindAuthDeepLinkHandler(impl: SupabaseAuthDeepLinkHandler): AuthDeepLinkHandler
 
     @Binds
     @Singleton

@@ -4,6 +4,8 @@ import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakeSettingsRepository
 import app.twoverse.core.model.AppearanceMode
+import app.twoverse.core.model.AuthState
+import app.twoverse.core.model.DataError
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.testing.InMemoryUserPreferences
@@ -46,7 +48,7 @@ class SettingsViewModelTest {
 
     @Test
     fun showsSettingsAndCouple() = runTest(mainDispatcherRule.testDispatcher) {
-        coupleRepository.joinWithCode("AB12-CD34")
+        coupleRepository.join("AB12-CD34")
         val state = createViewModel().uiState.value
 
         assertEquals(true, state.settings?.shareLocation)
@@ -108,19 +110,19 @@ class SettingsViewModelTest {
 
     @Test
     fun logOutSignsOut() = runTest(mainDispatcherRule.testDispatcher) {
-        authRepository.signInWithGoogle()
+        authRepository.signInWithGoogle("token", "nonce")
         val viewModel = createViewModel()
 
         viewModel.onLogOutConfirmed()
         runCurrent()
 
-        assertNull(authRepository.currentUser.value)
+        assertEquals(AuthState.SignedOut, authRepository.authState.value)
         assertEquals(SettingsExit.SignedOut, viewModel.uiState.value.exit)
     }
 
     @Test
     fun disconnectEndsCoupleAndLocationSharing() = runTest(mainDispatcherRule.testDispatcher) {
-        coupleRepository.joinWithCode("AB12-CD34")
+        coupleRepository.join("AB12-CD34")
         val viewModel = createViewModel()
 
         viewModel.onDisconnectConfirmed()
@@ -134,13 +136,41 @@ class SettingsViewModelTest {
 
     @Test
     fun deleteAccountSignsOut() = runTest(mainDispatcherRule.testDispatcher) {
-        authRepository.signInWithGoogle()
+        authRepository.signInWithGoogle("token", "nonce")
         val viewModel = createViewModel()
 
         viewModel.onDeleteAccountConfirmed()
         runCurrent()
 
-        assertNull(authRepository.currentUser.value)
+        assertEquals(AuthState.SignedOut, authRepository.authState.value)
         assertEquals(SettingsExit.SignedOut, viewModel.uiState.value.exit)
+    }
+
+    @Test
+    fun failedDisconnectStaysAndShowsTheError() = runTest(mainDispatcherRule.testDispatcher) {
+        coupleRepository.join("AB12-CD34")
+        coupleRepository.failNextWith = DataError.Network
+        val viewModel = createViewModel()
+
+        viewModel.onDisconnectConfirmed()
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.isConnected)
+        assertEquals(true, viewModel.uiState.value.settings?.shareLocation)
+        assertEquals(DataError.Network, viewModel.uiState.value.error)
+        assertNull(viewModel.uiState.value.exit)
+    }
+
+    @Test
+    fun failedAccountDeletionShowsTheError() = runTest(mainDispatcherRule.testDispatcher) {
+        authRepository.signInWithGoogle("token", "nonce")
+        authRepository.failNextWith = DataError.Unknown
+        val viewModel = createViewModel()
+
+        viewModel.onDeleteAccountConfirmed()
+        runCurrent()
+
+        assertEquals(DataError.Unknown, viewModel.uiState.value.error)
+        assertNull(viewModel.uiState.value.exit)
     }
 }

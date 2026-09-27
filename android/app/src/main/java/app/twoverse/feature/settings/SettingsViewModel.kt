@@ -7,6 +7,7 @@ import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.CoupleStatus
+import app.twoverse.core.model.DataResult
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,30 +76,31 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onLogOutConfirmed() {
-        closeDialogThen {
-            authRepository.signOut()
-            interaction.update { it.copy(exit = SettingsExit.SignedOut) }
-        }
+        closeDialogThen { exitOnSuccess(authRepository.signOut(), SettingsExit.SignedOut) }
     }
 
-    /** Disconnecting ends location sharing immediately (BR-9, FR-PAIR-7). */
+    /** The server ends location sharing and hides shared data (BR-9, FR-PAIR-7). */
     fun onDisconnectConfirmed() {
         closeDialogThen {
-            settingsRepository.setShareLocation(false)
-            coupleRepository.disconnect()
-            interaction.update { it.copy(exit = SettingsExit.Disconnected) }
+            val result = coupleRepository.disconnect()
+            if (result is DataResult.Success) settingsRepository.setShareLocation(false)
+            exitOnSuccess(result, SettingsExit.Disconnected)
         }
     }
 
     fun onDeleteAccountConfirmed() {
-        closeDialogThen {
-            authRepository.requestAccountDeletion()
-            interaction.update { it.copy(exit = SettingsExit.SignedOut) }
+        closeDialogThen { exitOnSuccess(authRepository.deleteAccount(), SettingsExit.SignedOut) }
+    }
+
+    private fun exitOnSuccess(result: DataResult<Unit>, exit: SettingsExit) {
+        when (result) {
+            is DataResult.Success -> interaction.update { it.copy(exit = exit) }
+            is DataResult.Failure -> interaction.update { it.copy(error = result.error) }
         }
     }
 
     private fun closeDialogThen(action: suspend () -> Unit) {
-        interaction.update { it.copy(openDialog = null) }
+        interaction.update { it.copy(openDialog = null, error = null) }
         viewModelScope.launch { action() }
     }
 

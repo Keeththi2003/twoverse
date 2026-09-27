@@ -1,10 +1,14 @@
 package app.twoverse.feature.splash
 
+import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeBirthdayRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
+import app.twoverse.core.model.AuthState
+import app.twoverse.testing.InMemoryUserPreferences
 import app.twoverse.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -23,7 +27,7 @@ class SplashViewModelTest {
 
     private val authRepository = FakeAuthRepository()
     private val coupleRepository = FakeCoupleRepository()
-    private val birthdayRepository = FakeBirthdayRepository()
+    private val birthdayRepository = FakeBirthdayRepository(InMemoryUserPreferences())
 
     private fun createViewModel() = SplashViewModel(authRepository, coupleRepository, birthdayRepository)
 
@@ -43,6 +47,19 @@ class SplashViewModelTest {
     }
 
     @Test
+    fun waitsWhileTheSavedSessionIsRestored() = runTest(mainDispatcherRule.testDispatcher) {
+        val restoring = object : AuthRepository by authRepository {
+            override val authState = MutableStateFlow<AuthState>(AuthState.Loading)
+        }
+        val viewModel = SplashViewModel(restoring, coupleRepository, birthdayRepository)
+        collectState(viewModel)
+        advanceTimeBy(SplashViewModel.MinimumDisplayMillis * 5)
+        runCurrent()
+
+        assertEquals(SplashUiState.Loading, viewModel.uiState.value)
+    }
+
+    @Test
     fun signedOutUserGoesToWelcome() = runTest(mainDispatcherRule.testDispatcher) {
         val viewModel = createViewModel()
         collectState(viewModel)
@@ -53,7 +70,7 @@ class SplashViewModelTest {
 
     @Test
     fun signedInUnpairedUserGoesToPair() = runTest(mainDispatcherRule.testDispatcher) {
-        authRepository.signInWithGoogle()
+        authRepository.signInWithGoogle("token", "nonce")
         val viewModel = createViewModel()
         collectState(viewModel)
         advanceUntilIdle()
@@ -63,8 +80,8 @@ class SplashViewModelTest {
 
     @Test
     fun pairedUserWithUnseenBirthdayWelcomeGoesToBirthday() = runTest(mainDispatcherRule.testDispatcher) {
-        authRepository.signInWithGoogle()
-        coupleRepository.joinWithCode("AB72-KP91")
+        authRepository.signInWithGoogle("token", "nonce")
+        coupleRepository.join("AB72-KP91")
         val viewModel = createViewModel()
         collectState(viewModel)
         advanceUntilIdle()
@@ -74,8 +91,8 @@ class SplashViewModelTest {
 
     @Test
     fun pairedUserWithSeenBirthdayWelcomeGoesToHome() = runTest(mainDispatcherRule.testDispatcher) {
-        authRepository.signInWithGoogle()
-        coupleRepository.joinWithCode("AB72-KP91")
+        authRepository.signInWithGoogle("token", "nonce")
+        coupleRepository.join("AB72-KP91")
         birthdayRepository.markSeen()
         val viewModel = createViewModel()
         collectState(viewModel)

@@ -367,6 +367,6 @@ Notes on the partner's widget, "thinking of you" tap, time-locked memories and
 reminders, end-to-end encrypted memories, iOS app.
 
 ## 12. Open questions
-- Should disconnect keep a short grace period (e.g. 7 days) before deleting shared memories?
-- Should the recipient be allowed to delete memories the partner sent, or only hide them?
-- Approximate location as the default: confirm after testing compass accuracy on real devices.
+- Should disconnect keep a short grace period (e.g. 7 days) before deleting shared memories?Yes, to allow accidental disconnects to be reversed.
+- Should the recipient be allowed to delete memories the partner sent, or only hide them?Only hide them; the sender controls the memory's lifetime.
+- Approximate location as the default: confirm after testing compass accuracy on real devices.su
