@@ -3,6 +3,7 @@ package app.twoverse.feature.settings
 import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakeLocationRepository
+import app.twoverse.core.data.fake.FakePushRepository
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.AuthState
@@ -39,10 +40,11 @@ class SettingsViewModelTest {
     private val settingsRepository = DefaultSettingsRepository(locationRepository, preferences)
     private val coupleRepository = FakeCoupleRepository()
     private val authRepository = FakeAuthRepository()
+    private val pushRepository = FakePushRepository()
     private val clock = Clock.fixed(Instant.parse("2026-09-26T12:00:00Z"), ZoneId.of("Asia/Colombo"))
 
     private fun TestScope.createViewModel(): SettingsViewModel {
-        val viewModel = SettingsViewModel(settingsRepository, coupleRepository, authRepository, clock)
+        val viewModel = SettingsViewModel(settingsRepository, coupleRepository, authRepository, pushRepository, clock)
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         runCurrent()
         return viewModel
@@ -120,6 +122,7 @@ class SettingsViewModelTest {
 
         assertEquals(AuthState.SignedOut, authRepository.authState.value)
         assertEquals(SettingsExit.SignedOut, viewModel.uiState.value.exit)
+        assertEquals(listOf("unregister"), pushRepository.calls)
     }
 
     @Test

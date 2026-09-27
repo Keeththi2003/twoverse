@@ -41,6 +41,7 @@ class HomeViewModelTest {
             reunionRepository = FakeReunionRepository(),
             memoryRepository = FakeMemoryRepository(),
             permissions = permissions,
+            preferences = preferences,
             clock = Clock.fixed(Instant.now(), ZoneOffset.UTC),
         )
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }

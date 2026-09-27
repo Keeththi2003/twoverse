@@ -2,6 +2,7 @@ package app.twoverse.feature.pairing
 
 import app.twoverse.core.data.fake.FakeBirthdayRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
+import app.twoverse.core.data.fake.FakePushRepository
 import app.twoverse.core.model.DataError
 import app.twoverse.testing.InMemoryUserPreferences
 import app.twoverse.testing.MainDispatcherRule
@@ -27,11 +28,12 @@ class PairViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val coupleRepository = FakeCoupleRepository()
+    private val pushRepository = FakePushRepository()
     private val preferences = InMemoryUserPreferences()
     private val clock = Clock.fixed(Instant.now(), ZoneOffset.UTC)
 
     private fun TestScope.createViewModel(): PairViewModel {
-        val viewModel = PairViewModel(coupleRepository, FakeBirthdayRepository(preferences), clock)
+        val viewModel = PairViewModel(coupleRepository, pushRepository, FakeBirthdayRepository(preferences), clock)
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         runCurrent()
         return viewModel
@@ -82,6 +84,7 @@ class PairViewModelTest {
         assertEquals("AB12-CD34", viewModel.uiState.value.partnerCode)
         assertTrue(viewModel.uiState.value.isConnected)
         assertTrue(viewModel.uiState.value.hasBirthdayWelcome)
+        assertEquals(listOf("send:PartnerJoined"), pushRepository.calls)
     }
 
     @Test
@@ -95,6 +98,7 @@ class PairViewModelTest {
 
         assertEquals(DataError.InvalidCoupleCode, viewModel.uiState.value.joinError)
         assertFalse(viewModel.uiState.value.isConnected)
+        assertTrue(pushRepository.calls.isEmpty())
 
         viewModel.onPartnerCodeChange("ZZZZ-ZZZY")
         runCurrent()
