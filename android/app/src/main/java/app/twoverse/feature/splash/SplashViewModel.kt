@@ -5,25 +5,26 @@ import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
-import app.twoverse.core.model.BirthdayWelcome
-import app.twoverse.core.model.Couple
-import app.twoverse.core.model.UserProfile
+import app.twoverse.core.model.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
+/** Chooses the first screen from the saved session and couple status (FR-ONB-3). */
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     authRepository: AuthRepository,
-    coupleRepository: CoupleRepository,
-    birthdayRepository: BirthdayRepository,
+    private val coupleRepository: CoupleRepository,
+    private val birthdayRepository: BirthdayRepository,
 ) : ViewModel() {
 
     private val minimumDisplay = flow {
@@ -31,12 +32,11 @@ class SplashViewModel @Inject constructor(
         emit(Unit)
     }
 
-    val uiState: StateFlow<SplashUiState> = combine(
-        authRepository.currentUser,
-        coupleRepository.couple,
-        birthdayRepository.welcome,
-        minimumDisplay,
-    ) { user, couple, welcome, _ -> destinationFor(user, couple, welcome) }
+    private val destination = authRepository.authState
+        .filterNot { it is AuthState.Loading }
+        .map { state -> if (state is AuthState.SignedIn) signedInDestination() else SplashDestination.Welcome }
+
+    val uiState: StateFlow<SplashUiState> = combine(destination, minimumDisplay) { destination, _ -> destination }
         .take(1)
         .map<SplashDestination, SplashUiState> { SplashUiState.Ready(it) }
         .stateIn(
@@ -45,15 +45,10 @@ class SplashViewModel @Inject constructor(
             initialValue = SplashUiState.Loading,
         )
 
-    private fun destinationFor(
-        user: UserProfile?,
-        couple: Couple?,
-        welcome: BirthdayWelcome?,
-    ): SplashDestination = when {
-        user == null -> SplashDestination.Welcome
-        couple == null -> SplashDestination.Pair
-        welcome != null && !welcome.seen -> SplashDestination.Birthday
-        else -> SplashDestination.Home
+    private suspend fun signedInDestination(): SplashDestination {
+        if (coupleRepository.couple.first() == null) return SplashDestination.Pair
+        val welcome = birthdayRepository.welcome.first()
+        return if (welcome != null && !welcome.seen) SplashDestination.Birthday else SplashDestination.Home
     }
 
     companion object {
