@@ -9,23 +9,25 @@ import app.twoverse.core.data.AuthDeepLinkHandler
 import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
+import app.twoverse.core.data.LocationPermissionChecker
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
 import app.twoverse.core.data.ProfileRepository
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.data.fake.FakeBirthdayRepository
-import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeMemoryRepository
 import app.twoverse.core.data.fake.FakeReunionRepository
-import app.twoverse.core.data.fake.FakeSettingsRepository
 import app.twoverse.core.data.local.DataStoreUserPreferences
+import app.twoverse.core.data.location.AndroidLocationPermissionChecker
 import app.twoverse.core.data.local.UserPreferences
 import app.twoverse.core.data.network.ConnectivityNetworkMonitor
 import app.twoverse.core.data.network.NetworkMonitor
+import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.data.supabase.SupabaseAuthDeepLinkHandler
 import app.twoverse.core.data.supabase.SupabaseAuthRepository
 import app.twoverse.core.data.supabase.SupabaseCoupleRepository
+import app.twoverse.core.data.supabase.SupabaseLocationRepository
 import app.twoverse.core.data.supabase.SupabaseProfileRepository
 import dagger.Binds
 import dagger.Module
@@ -36,8 +38,8 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Auth, pairing and profiles use Supabase; the other features still use fakes until they are
- * connected. Device-local preferences and connectivity are real.
+ * Auth, pairing, profiles and location use Supabase; the other features still use fakes until
+ * they are connected. Device-local preferences, permissions and connectivity are real.
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -60,7 +62,10 @@ internal interface DataModule {
 
     @Binds
     @Singleton
-    fun bindLocationRepository(impl: FakeLocationRepository): LocationRepository
+    fun bindLocationRepository(impl: SupabaseLocationRepository): LocationRepository
+
+    @Binds
+    fun bindLocationPermissionChecker(impl: AndroidLocationPermissionChecker): LocationPermissionChecker
 
     @Binds
     @Singleton
@@ -72,7 +77,7 @@ internal interface DataModule {
 
     @Binds
     @Singleton
-    fun bindSettingsRepository(impl: FakeSettingsRepository): SettingsRepository
+    fun bindSettingsRepository(impl: DefaultSettingsRepository): SettingsRepository
 
     @Binds
     @Singleton
