@@ -120,6 +120,7 @@
     <string name="compass_calibrate_hint">Move your phone in a figure-8 to calibrate.</string>
     <string name="compass_partner_location">Her location · %1$s</string>
     <string name="compass_last_known_direction">Last known direction</string>
+    <string name="compass_no_sensor">This phone has no compass sensor, so Twoverse shows her direction as text.</string>
     <string name="compass_tip">Hold your phone flat and away from metal for the most accurate direction.</string>
     <string name="compass_dial_description">Compass pointing %1$s toward your partner</string>
     <string name="compass_dial_no_direction">Compass without a direction to your partner</string>
@@ -183,6 +184,26 @@
     <string name="countdown_empty">When will you see each other next?</string>
     <string name="countdown_next_time">When\'s the next time?</string>
     <string name="countdown_set_date">Set a date</string>
+    <string name="countdown_note">Note</string>
+    <string name="countdown_celebration_title">Today\'s the day</string>
+    <string name="countdown_celebration_body">You\'re together today. Enjoy every moment.</string>
+
+    <string name="edit_reunion_title">Plan your reunion</string>
+    <string name="edit_reunion_date">Date</string>
+    <string name="edit_reunion_choose_date">Choose a date</string>
+    <string name="edit_reunion_add_time">Add a time</string>
+    <string name="edit_reunion_time">Time</string>
+    <string name="edit_reunion_choose_time">Choose a time</string>
+    <string name="edit_reunion_place_label">Place</string>
+    <string name="edit_reunion_place_placeholder">Where will you meet?</string>
+    <string name="edit_reunion_note_label">Note</string>
+    <string name="edit_reunion_note_placeholder">Anything to remember</string>
+    <string name="edit_reunion_save">Save</string>
+    <string name="edit_reunion_clear">Clear date</string>
+    <string name="edit_reunion_clear_title">Clear the reunion date?</string>
+    <string name="edit_reunion_clear_message">The countdown disappears for both of you until someone sets a new date.</string>
+    <string name="edit_reunion_date_missing">Choose a date.</string>
+    <string name="edit_reunion_in_past">Choose a date and time that haven\'t passed yet.</string>
 
     <string name="vault_title">Ours</string>
     <string name="vault_subtitle">%1$s · only you two can open these</string>
