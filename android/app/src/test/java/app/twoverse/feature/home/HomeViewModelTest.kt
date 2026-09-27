@@ -2,12 +2,15 @@ package app.twoverse.feature.home
 
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.common.LocationUnavailableReason
+import app.twoverse.core.data.fake.FakeHeadingSource
 import app.twoverse.core.data.fake.FakeLocationPermissionChecker
 import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeMemoryRepository
 import app.twoverse.core.data.fake.FakeReunionRepository
+import app.twoverse.core.data.sensors.CompassHeading
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.DistanceUnit
+import app.twoverse.core.model.HeadingReading
 import app.twoverse.core.model.LocationPermissionStatus
 import app.twoverse.testing.InMemoryUserPreferences
 import app.twoverse.testing.MainDispatcherRule
@@ -33,6 +36,7 @@ class HomeViewModelTest {
     private val locationRepository = FakeLocationRepository()
     private val preferences = InMemoryUserPreferences()
     private val permissions = FakeLocationPermissionChecker()
+    private val headingSource = FakeHeadingSource()
 
     private fun TestScope.state(): HomeUiState.Success {
         val viewModel = HomeViewModel(
@@ -42,11 +46,26 @@ class HomeViewModelTest {
             memoryRepository = FakeMemoryRepository(),
             permissions = permissions,
             preferences = preferences,
+            compassHeading = CompassHeading(headingSource, Clock.systemUTC()),
             clock = Clock.fixed(Instant.now(), ZoneOffset.UTC),
         )
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
+        backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.miniNeedleRotation.collect { miniNeedle = it } }
         runCurrent()
         return viewModel.uiState.value as HomeUiState.Success
+    }
+
+    private var miniNeedle: Float? = null
+
+    @Test
+    fun miniCompassFollowsThePhone() = runTest(mainDispatcherRule.testDispatcher) {
+        state()
+        assertEquals(42f, miniNeedle ?: 0f, 0.2f)
+
+        headingSource.readings.emit(HeadingReading(magneticDegrees = 42.0, isAccurate = true))
+        runCurrent()
+
+        assertEquals(0f, miniNeedle ?: 99f, 0.2f)
     }
 
     @Test
