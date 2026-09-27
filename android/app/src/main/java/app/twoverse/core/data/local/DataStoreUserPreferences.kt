@@ -30,6 +30,14 @@ class DataStoreUserPreferences @Inject constructor(
         .map { prefs -> prefs[BirthdayWelcomeSeenKey] ?: false }
         .distinctUntilChanged()
 
+    override val lockOurs: Flow<Boolean> = dataStore.data
+        .map { prefs -> prefs[LockOursKey] ?: true }
+        .distinctUntilChanged()
+
+    override val batteryGuideShown: Flow<Boolean> = dataStore.data
+        .map { prefs -> prefs[BatteryGuideShownKey] ?: false }
+        .distinctUntilChanged()
+
     override suspend fun setAppearance(appearance: AppearanceMode) {
         dataStore.edit { it[AppearanceKey] = appearance.name }
     }
@@ -42,6 +50,14 @@ class DataStoreUserPreferences @Inject constructor(
         dataStore.edit { it[BirthdayWelcomeSeenKey] = true }
     }
 
+    override suspend fun setLockOurs(enabled: Boolean) {
+        dataStore.edit { it[LockOursKey] = enabled }
+    }
+
+    override suspend fun setBatteryGuideShown() {
+        dataStore.edit { it[BatteryGuideShownKey] = true }
+    }
+
     private inline fun <reified T : Enum<T>> enumOrDefault(name: String?, default: T): T =
         enumValues<T>().firstOrNull { it.name == name } ?: default
 
@@ -49,5 +65,9 @@ class DataStoreUserPreferences @Inject constructor(
         val AppearanceKey = stringPreferencesKey("appearance")
         val DistanceUnitKey = stringPreferencesKey("distance_unit")
         val BirthdayWelcomeSeenKey = booleanPreferencesKey("birthday_welcome_seen")
+
+        /** Lock Ours is on by default (FR-VLT-5). */
+        val LockOursKey = booleanPreferencesKey("lock_ours")
+        val BatteryGuideShownKey = booleanPreferencesKey("battery_guide_shown")
     }
 }
