@@ -18,13 +18,16 @@ private val NeedleSize = 30.dp
 /** Needle path from Home.dc.html, in a 24 × 24 viewport: tip half and tail half. */
 private const val NeedleViewport = 24f
 
-/** Small compass on the Your Star tile; the needle points toward the partner. */
+/**
+ * Small compass on the Your Star tile; the needle points toward the partner. The angle is read
+ * while drawing, so live sensor updates only redraw this needle.
+ */
 @Composable
-internal fun MiniCompass(bearingDegrees: Float?, modifier: Modifier = Modifier) {
+internal fun MiniCompass(needleRotation: () -> Float?, modifier: Modifier = Modifier) {
     val colors = TwoverseTheme.colors
     Box(modifier = modifier.size(DialSize), contentAlignment = Alignment.Center) {
-        if (bearingDegrees == null) return@Box
         Canvas(modifier = Modifier.size(NeedleSize)) {
+            val rotation = needleRotation() ?: return@Canvas
             val scale = size.width / NeedleViewport
             fun needleHalf(tipY: Float, innerY: Float) = Path().apply {
                 moveTo(12f * scale, tipY * scale)
@@ -33,7 +36,7 @@ internal fun MiniCompass(bearingDegrees: Float?, modifier: Modifier = Modifier) 
                 lineTo(9f * scale, 12f * scale)
                 close()
             }
-            rotate(bearingDegrees) {
+            rotate(rotation) {
                 drawPath(needleHalf(tipY = 3f, innerY = 10.5f), color = colors.accent)
                 drawPath(needleHalf(tipY = 21f, innerY = 13.5f), color = colors.outline)
             }
