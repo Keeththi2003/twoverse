@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import app.twoverse.R
@@ -45,8 +46,11 @@ import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoverseOutlineButton
 import app.twoverse.core.designsystem.component.TwoversePrimaryButton
 import app.twoverse.core.designsystem.component.TwoverseSecondaryButton
+import app.twoverse.core.designsystem.component.TwoverseTextButton
 import app.twoverse.core.designsystem.component.TwoverseTextField
+import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import app.twoverse.core.model.DataError
 
 private val ExpiryIconSize = 16.dp
 private val WaitingHerSize = 14.dp
@@ -59,9 +63,10 @@ private val WaitingDash = 4.dp
 @Composable
 fun PairScreen(
     uiState: PairUiState,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
     onShareCode: (String) -> Unit,
     onCopyCode: (String) -> Unit,
+    onRetryCode: () -> Unit,
     onPartnerCodeChange: (String) -> Unit,
     onConnect: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,8 +90,10 @@ fun PairScreen(
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Column {
-                TwoverseBackButton(onClick = onBack)
-                Spacer(modifier = Modifier.height(spacing.md))
+                if (onBack != null) {
+                    TwoverseBackButton(onClick = onBack)
+                    Spacer(modifier = Modifier.height(spacing.md))
+                }
                 Text(
                     text = stringResource(R.string.pair_title),
                     style = MaterialTheme.typography.headlineMedium,
@@ -100,7 +107,12 @@ fun PairScreen(
                     color = colors.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(spacing.xl))
-                CoupleCodeCard(uiState = uiState, onShareCode = onShareCode, onCopyCode = onCopyCode)
+                CoupleCodeCard(
+                    uiState = uiState,
+                    onShareCode = onShareCode,
+                    onCopyCode = onCopyCode,
+                    onRetryCode = onRetryCode,
+                )
                 if (uiState.isWaitingForPartner) {
                     WaitingForPartner(modifier = Modifier.padding(top = spacing.lg))
                 }
@@ -117,7 +129,7 @@ fun PairScreen(
                         imeAction = ImeAction.Done,
                     ),
                     keyboardActions = KeyboardActions(onDone = { onConnect() }),
-                    errorText = if (uiState.isInvalidCode) stringResource(R.string.pair_invalid_code) else null,
+                    errorText = uiState.joinError?.let { stringResource(it.messageRes()) },
                 )
             }
             TwoverseOutlineButton(
@@ -138,6 +150,7 @@ private fun CoupleCodeCard(
     uiState: PairUiState,
     onShareCode: (String) -> Unit,
     onCopyCode: (String) -> Unit,
+    onRetryCode: () -> Unit,
 ) {
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
@@ -160,6 +173,16 @@ private fun CoupleCodeCard(
                 style = TwoverseTheme.textStyles.coupleCode,
                 color = if (code != null) colors.onSurface else colors.outline,
             )
+            uiState.codeError?.let { error ->
+                Text(
+                    text = stringResource(error.messageRes()),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.error,
+                    textAlign = TextAlign.Center,
+                )
+                TwoverseTextButton(text = stringResource(R.string.common_retry), onClick = onRetryCode)
+                return@Column
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.xs),
@@ -246,6 +269,7 @@ private fun PairScreenPreview() {
             onBack = {},
             onShareCode = {},
             onCopyCode = {},
+            onRetryCode = {},
             onPartnerCodeChange = {},
             onConnect = {},
         )
@@ -261,11 +285,12 @@ private fun PairScreenInvalidCodePreview() {
                 coupleCode = "AB72-KP91",
                 codeExpiresInHours = 23,
                 partnerCode = "ZZ00-0000",
-                isInvalidCode = true,
+                joinError = DataError.InvalidCoupleCode,
             ),
-            onBack = {},
+            onBack = null,
             onShareCode = {},
             onCopyCode = {},
+            onRetryCode = {},
             onPartnerCodeChange = {},
             onConnect = {},
         )

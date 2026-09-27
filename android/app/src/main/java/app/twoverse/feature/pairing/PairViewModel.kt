@@ -6,12 +6,12 @@ import app.twoverse.core.common.ticks
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.model.CoupleCode
+import app.twoverse.core.model.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PairViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
-    private val birthdayRepository: BirthdayRepository,
+    birthdayRepository: BirthdayRepository,
     clock: Clock,
 ) : ViewModel() {
 
@@ -34,12 +34,15 @@ class PairViewModel @Inject constructor(
         form,
         coupleCode,
         coupleRepository.couple,
+        birthdayRepository.welcome,
         clock.ticks(ExpiryRefreshMillis),
-    ) { form, code, couple, now ->
+    ) { form, code, couple, welcome, now ->
         form.copy(
             coupleCode = code?.code,
             codeExpiresInHours = code?.let { hoursUntil(it.expiresAt, now) } ?: 0,
             isWaitingForPartner = couple == null,
+            isConnected = couple != null,
+            hasBirthdayWelcome = welcome != null && !welcome.seen,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -48,28 +51,34 @@ class PairViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch { coupleCode.value = coupleRepository.generateCode() }
+        loadCode()
+    }
+
+    /** Creates this user's code (FR-PAIR-1); also used to retry after an error. */
+    fun loadCode() {
+        form.update { it.copy(codeError = null) }
+        viewModelScope.launch {
+            when (val result = coupleRepository.createCode()) {
+                is DataResult.Success -> coupleCode.value = result.value
+                is DataResult.Failure -> form.update { it.copy(codeError = result.error) }
+            }
+        }
     }
 
     fun onPartnerCodeChange(input: String) {
         val code = input.uppercase().filter { it.isLetterOrDigit() || it == '-' }.take(CodeLength)
-        form.update { it.copy(partnerCode = code, isInvalidCode = false) }
+        form.update { it.copy(partnerCode = code, joinError = null) }
     }
 
+    /** Joins the partner's code (FR-PAIR-3); the couple stream then reports the connection. */
     fun onConnect() {
         val current = form.value
         if (!current.canConnect) return
-        form.update { it.copy(isConnecting = true, isInvalidCode = false) }
+        form.update { it.copy(isConnecting = true, joinError = null) }
         viewModelScope.launch {
-            val result = coupleRepository.joinWithCode(current.partnerCode)
-            val welcome = if (result.isSuccess) birthdayRepository.welcome.first() else null
+            val result = coupleRepository.join(current.partnerCode)
             form.update {
-                it.copy(
-                    isConnecting = false,
-                    isConnected = result.isSuccess,
-                    isInvalidCode = result.isFailure,
-                    hasBirthdayWelcome = welcome != null && !welcome.seen,
-                )
+                it.copy(isConnecting = false, joinError = (result as? DataResult.Failure)?.error)
             }
         }
     }

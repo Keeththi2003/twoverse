@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun PairRoute(
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
     onConnected: (showBirthday: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PairViewModel = hiltViewModel(),
@@ -55,6 +55,7 @@ fun PairRoute(
                 Toast.makeText(context, R.string.pair_copied, Toast.LENGTH_SHORT).show()
             }
         },
+        onRetryCode = viewModel::loadCode,
         onPartnerCodeChange = viewModel::onPartnerCodeChange,
         onConnect = viewModel::onConnect,
         modifier = modifier,
