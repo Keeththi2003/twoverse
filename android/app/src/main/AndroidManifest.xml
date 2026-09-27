@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:name=".TwoverseApplication"
@@ -38,6 +41,22 @@
                     android:scheme="app.twoverse" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".core.data.location.SignificantMovementReceiver"
+            android:exported="false" />
+
+        <!-- WorkManager is initialised by TwoverseApplication so workers can use Hilt. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <receiver
             android:name=".widget.TwoverseWidgetReceiver"
