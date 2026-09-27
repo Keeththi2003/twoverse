@@ -27,10 +27,35 @@
     <string name="sign_in_forgot_password">Forgot password?</string>
     <string name="sign_in_reset_sent">We\'ve sent a password reset link to your email.</string>
     <string name="sign_in_reset_needs_email">Enter your email above to reset your password.</string>
-    <string name="sign_in_error">Couldn\'t sign you in. Try again.</string>
+    <string name="sign_in_google_failed">Couldn\'t sign in with Google. Try again.</string>
     <string name="sign_in_button">Sign in</string>
     <string name="sign_in_new_to_twoverse">New to Twoverse?</string>
     <string name="sign_in_create_account">Create an account</string>
+
+    <string name="sign_up_title">Create your account</string>
+    <string name="sign_up_subtitle">Your partner will see this name.</string>
+    <string name="sign_up_name_label">Your name</string>
+    <string name="sign_up_name_placeholder">What should she call you?</string>
+    <string name="sign_up_password_placeholder">At least 6 characters</string>
+    <string name="sign_up_button">Create account</string>
+    <string name="sign_up_have_account">Already have an account?</string>
+    <string name="sign_up_confirm_email">Check your email to confirm your account, then sign in.</string>
+    <string name="sign_up_name_missing">Enter your name.</string>
+    <string name="sign_up_email_invalid">Enter a valid email address.</string>
+
+    <string name="reset_password_title">Choose a new password</string>
+    <string name="reset_password_subtitle">You\'ll use it the next time you sign in.</string>
+    <string name="reset_password_label">New password</string>
+    <string name="reset_password_button">Save password</string>
+
+    <string name="error_already_paired">You\'re already connected to a partner.</string>
+    <string name="error_not_paired">You\'re not connected to a partner.</string>
+    <string name="error_invalid_credentials">Email or password is incorrect.</string>
+    <string name="error_email_not_confirmed">Confirm your email first, then sign in.</string>
+    <string name="error_email_in_use">An account with this email already exists.</string>
+    <string name="error_weak_password">Use a password with at least 6 characters.</string>
+    <string name="error_rate_limited">Too many attempts. Wait a moment and try again.</string>
+    <string name="error_unknown">Something went wrong. Try again.</string>
 
     <string name="pair_title">Connect your worlds</string>
     <string name="pair_body">Share your code with your partner, or enter theirs. Once you\'re connected, it\'s just the two of you.</string>
@@ -260,6 +285,7 @@
     <string name="common_close">Close</string>
     <string name="common_or">or</string>
     <string name="common_ok">OK</string>
+    <string name="common_retry">Try again</string>
     <string name="common_cancel">Cancel</string>
 
 </resources>
