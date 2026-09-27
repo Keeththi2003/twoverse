@@ -2,6 +2,7 @@ package app.twoverse.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,13 +21,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -65,6 +69,7 @@ fun HomeScreen(
     onOpenCountdown: () -> Unit,
     onOpenVault: () -> Unit,
     onSendMemory: () -> Unit,
+    onOpenLocationSetup: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val spacing = TwoverseTheme.spacing
@@ -82,7 +87,11 @@ fun HomeScreen(
                 .padding(horizontal = spacing.screenHorizontal)
                 .padding(bottom = spacing.md),
         ) {
-            HomeHeader(dayPeriod = uiState.dayPeriod, isSharingLocation = uiState.isSharingLocation)
+            HomeHeader(
+                dayPeriod = uiState.dayPeriod,
+                sharingStatus = uiState.sharingStatus,
+                onOpenLocationSetup = onOpenLocationSetup,
+            )
             Spacer(modifier = Modifier.height(spacing.lg))
             DistanceCard(uiState = uiState)
             Spacer(modifier = Modifier.height(spacing.smd))
@@ -124,7 +133,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeHeader(dayPeriod: DayPeriod, isSharingLocation: Boolean) {
+private fun HomeHeader(dayPeriod: DayPeriod, sharingStatus: SharingStatus, onOpenLocationSetup: () -> Unit) {
     val colors = TwoverseTheme.colors
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -144,9 +153,24 @@ private fun HomeHeader(dayPeriod: DayPeriod, isSharingLocation: Boolean) {
                 modifier = Modifier.semantics { heading() },
             )
         }
+        val isOn = sharingStatus == SharingStatus.On
         TwoverseStatusChip(
-            text = stringResource(if (isSharingLocation) R.string.home_location_on else R.string.home_location_off),
-            dotColor = if (isSharingLocation) colors.gold else colors.onSurfaceVariant,
+            text = stringResource(
+                when (sharingStatus) {
+                    SharingStatus.On -> R.string.home_location_on
+                    SharingStatus.Off -> R.string.home_location_off
+                    SharingStatus.PermissionNeeded -> R.string.home_location_permission_needed
+                },
+            ),
+            dotColor = if (isOn) colors.gold else colors.onSurfaceVariant,
+            modifier = if (isOn) {
+                Modifier
+            } else {
+                Modifier
+                    .minimumInteractiveComponentSize()
+                    .clip(TwoverseTheme.shapes.circle)
+                    .clickable(role = Role.Button, onClick = onOpenLocationSetup)
+            },
         )
     }
 }
@@ -435,6 +459,7 @@ private fun HomeScreenPreview() {
             onOpenCountdown = {},
             onOpenVault = {},
             onSendMemory = {},
+            onOpenLocationSetup = {},
         )
     }
 }
@@ -445,7 +470,7 @@ private fun HomeScreenUnavailablePreview() {
     TwoverseTheme {
         HomeScreen(
             uiState = PreviewHomeState.copy(
-                isSharingLocation = false,
+                sharingStatus = SharingStatus.Off,
                 distance = null,
                 unavailableReason = LocationUnavailableReason.SharingOff,
                 freshness = LocationFreshness.Unavailable,
@@ -459,13 +484,14 @@ private fun HomeScreenUnavailablePreview() {
             onOpenCountdown = {},
             onOpenVault = {},
             onSendMemory = {},
+            onOpenLocationSetup = {},
         )
     }
 }
 
 private val PreviewHomeState = HomeUiState.Success(
     dayPeriod = DayPeriod.Evening,
-    isSharingLocation = true,
+    sharingStatus = SharingStatus.On,
     distance = "94.6",
     distanceUnit = DistanceUnit.Kilometres,
     unavailableReason = null,

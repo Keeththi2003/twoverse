@@ -12,6 +12,7 @@ fun HomeRoute(
     onOpenCountdown: () -> Unit,
     onOpenVault: () -> Unit,
     onSendMemory: () -> Unit,
+    onOpenLocationSetup: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -22,6 +23,7 @@ fun HomeRoute(
         onOpenCountdown = onOpenCountdown,
         onOpenVault = onOpenVault,
         onSendMemory = onSendMemory,
+        onOpenLocationSetup = onOpenLocationSetup,
         modifier = modifier,
     )
 }
