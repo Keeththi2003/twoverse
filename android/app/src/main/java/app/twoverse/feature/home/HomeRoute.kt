@@ -26,6 +26,7 @@ fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val shouldAskNotifications by viewModel.shouldAskNotificationPermission.collectAsStateWithLifecycle()
+    val miniNeedleRotation by viewModel.miniNeedleRotation.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
@@ -44,6 +45,7 @@ fun HomeRoute(
         onOpenVault = onOpenVault,
         onSendMemory = onSendMemory,
         onOpenLocationSetup = onOpenLocationSetup,
+        miniNeedleRotation = { miniNeedleRotation },
         modifier = modifier,
     )
 }
