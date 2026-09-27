@@ -116,6 +116,21 @@ Each feature has:
 - No unused code, commented-out code, leftover debug logs or unintentional TODOs.
 - New ViewModel logic gets unit tests.
 
+
+## Backend (Supabase)
+
+- All schema changes are SQL migrations in `supabase/migrations/`, created with
+  `supabase migration new <name>`. Never edit a migration that has already been applied.
+- Every table has Row Level Security enabled, with policies so users can only access
+  their own couple's data (NFR-SEC-1). No table without RLS.
+- Multi-step rules (pairing, disconnect, deletion) are Postgres functions called via RPC,
+  so they run atomically on the server (NFR-SEC-3).
+- Test migrations locally with `supabase start` / `supabase db reset` when Docker is available.
+- NEVER run `supabase db push` or change the remote project without asking me first.
+- The app uses only the publishable key (SUPABASE_PUBLISHABLE_KEY). The service-role key is never used in the Android app.
+- Android talks to Supabase only through repository implementations in `core/data/`;
+  keep the Fake repositories for previews and tests.
+
 **Security**
 - No secrets in code, resources or Git. Config goes in `local.properties` → `BuildConfig`.
 - Never commit `local.properties`, keystores or `google-services.json`.
