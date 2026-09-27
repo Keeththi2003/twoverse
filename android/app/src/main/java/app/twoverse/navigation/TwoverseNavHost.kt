@@ -35,6 +35,7 @@ import app.twoverse.feature.auth.SignedInDestination
 import app.twoverse.feature.birthday.BirthdayRoute as BirthdayFeatureRoute
 import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
 import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
+import app.twoverse.feature.countdown.EditReunionRoute as EditReunionFeatureRoute
 import app.twoverse.feature.home.HomeRoute as HomeFeatureRoute
 import app.twoverse.feature.location.LocationSetupRoute as LocationSetupFeatureRoute
 import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
@@ -213,7 +214,13 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
         )
     }
     composable<CountdownRoute> {
-        CountdownFeatureRoute(onBack = { navController.popBackStack() })
+        CountdownFeatureRoute(
+            onBack = { navController.popBackStack() },
+            onEditPlan = { navController.navigate(EditReunionRoute) },
+        )
+    }
+    composable<EditReunionRoute> {
+        EditReunionFeatureRoute(onDone = { navController.popBackStack() })
     }
     composable<MemoryRoute> {
         MemoryFeatureRoute(onBack = { navController.popBackStack() })
