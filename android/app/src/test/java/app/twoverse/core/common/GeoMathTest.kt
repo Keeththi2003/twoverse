@@ -26,6 +26,16 @@ class GeoMathTest {
     }
 
     @Test
+    fun oneDegreeOfLongitudeAtTheEquatorIsAbout111Km() {
+        assertEquals(111.19, distanceKm(location(0.0, 0.0), location(0.0, 1.0)), 0.01)
+    }
+
+    @Test
+    fun oppositeSidesOfTheEarthAreHalfItsCircumferenceApart() {
+        assertEquals(20_015.1, distanceKm(location(0.0, 0.0), location(0.0, 180.0)), 0.5)
+    }
+
+    @Test
     fun bearingDueWestIs270Degrees() {
         assertEquals(270.0, initialBearingDegrees(location(0.0, 10.0), location(0.0, 9.0)), 1e-6)
     }
