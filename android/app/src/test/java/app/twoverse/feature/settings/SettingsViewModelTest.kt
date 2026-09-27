@@ -2,7 +2,8 @@ package app.twoverse.feature.settings
 
 import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
-import app.twoverse.core.data.fake.FakeSettingsRepository
+import app.twoverse.core.data.fake.FakeLocationRepository
+import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.AuthState
 import app.twoverse.core.model.DataError
@@ -34,7 +35,8 @@ class SettingsViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val preferences = InMemoryUserPreferences()
-    private val settingsRepository = FakeSettingsRepository(preferences)
+    private val locationRepository = FakeLocationRepository()
+    private val settingsRepository = DefaultSettingsRepository(locationRepository, preferences)
     private val coupleRepository = FakeCoupleRepository()
     private val authRepository = FakeAuthRepository()
     private val clock = Clock.fixed(Instant.parse("2026-09-26T12:00:00Z"), ZoneId.of("Asia/Colombo"))
@@ -132,6 +134,22 @@ class SettingsViewModelTest {
         assertFalse(viewModel.uiState.value.isConnected)
         assertEquals(false, viewModel.uiState.value.settings?.shareLocation)
         assertEquals(SettingsExit.Disconnected, viewModel.uiState.value.exit)
+    }
+
+    @Test
+    fun turningSharingOffIsSavedAndFailuresAreShown() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+
+        locationRepository.failNextWith = DataError.Network
+        viewModel.onShareLocationChange(false)
+        runCurrent()
+        assertEquals(DataError.Network, viewModel.uiState.value.error)
+        assertEquals(true, viewModel.uiState.value.settings?.shareLocation)
+
+        viewModel.onShareLocationChange(false)
+        runCurrent()
+        assertNull(viewModel.uiState.value.error)
+        assertEquals(false, viewModel.uiState.value.settings?.shareLocation)
     }
 
     @Test
