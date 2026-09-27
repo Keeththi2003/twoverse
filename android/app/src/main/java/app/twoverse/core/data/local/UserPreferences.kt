@@ -8,8 +8,11 @@ import kotlinx.coroutines.flow.Flow
 interface UserPreferences {
     val appearance: Flow<AppearanceMode>
     val distanceUnit: Flow<DistanceUnit>
+    val birthdayWelcomeSeen: Flow<Boolean>
 
     suspend fun setAppearance(appearance: AppearanceMode)
 
     suspend fun setDistanceUnit(unit: DistanceUnit)
+
+    suspend fun setBirthdayWelcomeSeen()
 }
