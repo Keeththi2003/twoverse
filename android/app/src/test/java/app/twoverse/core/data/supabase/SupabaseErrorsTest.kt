@@ -39,6 +39,13 @@ class SupabaseErrorsTest {
     }
 
     @Test
+    fun sendPushStatusesMapToErrors() {
+        assertEquals(DataError.NotPaired, SupabaseErrors.fromFunctionStatus(403))
+        assertEquals(DataError.RateLimited, SupabaseErrors.fromFunctionStatus(429))
+        assertEquals(DataError.Unknown, SupabaseErrors.fromFunctionStatus(503))
+    }
+
+    @Test
     fun connectionProblemsAreNetworkErrors() {
         assertEquals(DataError.Network, SupabaseErrors.from(IOException("no route")))
         assertEquals(DataError.Unknown, SupabaseErrors.from(IllegalStateException("bug")))
