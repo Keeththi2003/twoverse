@@ -9,10 +9,12 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import app.twoverse.MainActivity
+import app.twoverse.core.common.EXTRA_LAUNCH_SCREEN
 import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
 import app.twoverse.core.common.partnerPosition
 import app.twoverse.core.common.ticks
+import app.twoverse.core.model.LaunchScreen
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -23,7 +25,7 @@ class TwoverseWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val state = widgetState(EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java))
         val openHome = Intent(context, MainActivity::class.java)
-            .putExtra(MainActivity.EXTRA_OPEN_HOME, true)
+            .putExtra(EXTRA_LAUNCH_SCREEN, LaunchScreen.Home.name)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         provideContent {
             val current by state.collectAsState(initial = null)

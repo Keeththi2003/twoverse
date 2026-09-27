@@ -291,6 +291,19 @@
     <string name="location_setup_open_battery_settings">Open app settings</string>
     <string name="location_setup_done">Done</string>
 
+    <string name="notification_channel_partner">Your partner</string>
+    <string name="notification_channel_partner_description">When your partner joins you in Twoverse</string>
+    <string name="notification_channel_reunion">Until We Meet</string>
+    <string name="notification_channel_reunion_description">On the day you meet</string>
+    <string name="notification_channel_memories">Ours</string>
+    <string name="notification_channel_memories_description">When you receive a new memory</string>
+    <string name="notification_partner_joined_title">You\'re connected</string>
+    <string name="notification_partner_joined_body">Your partner joined your universe.</string>
+    <string name="notification_reunion_day_title">Today\'s the day</string>
+    <string name="notification_reunion_day_body">You\'re meeting today. Enjoy every moment together.</string>
+    <string name="notification_new_memory_title">Ours</string>
+    <string name="notification_new_memory_body">You received a new memory</string>
+
     <string name="offline_banner">You\'re offline. Showing the latest saved information.</string>
 
     <string name="widget_name">Twoverse</string>

@@ -12,9 +12,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.twoverse.core.common.EXTRA_LAUNCH_SCREEN
 import app.twoverse.core.data.AuthDeepLinkHandler
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.AppearanceMode
+import app.twoverse.core.model.LaunchScreen
 import app.twoverse.navigation.TwoverseNavHost
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -31,11 +33,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         handleAuthDeepLink(intent)
-        val openHome = intent.getBooleanExtra(EXTRA_OPEN_HOME, false)
+        val startsOnScreen = launchScreen(intent)
+        startsOnScreen?.let(viewModel::onLaunchScreen)
         setContent {
             val appearance by viewModel.appearance.collectAsStateWithLifecycle()
             val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
             val isPasswordRecovery by viewModel.isPasswordRecovery.collectAsStateWithLifecycle()
+            val requestedScreen by viewModel.requestedScreen.collectAsStateWithLifecycle()
             val darkTheme = when (appearance) {
                 AppearanceMode.System -> isSystemInDarkTheme()
                 AppearanceMode.Light -> false
@@ -48,7 +52,9 @@ class MainActivity : ComponentActivity() {
             }
             TwoverseTheme(darkTheme = darkTheme) {
                 TwoverseNavHost(
-                    openHome = openHome,
+                    startsSignedIn = startsOnScreen != null,
+                    requestedScreen = requestedScreen,
+                    onRequestedScreenShown = viewModel::onLaunchScreenShown,
                     isOffline = isOffline,
                     isPasswordRecovery = isPasswordRecovery,
                     onPasswordRecoveryShown = viewModel::onPasswordRecoveryShown,
@@ -61,15 +67,15 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleAuthDeepLink(intent)
+        launchScreen(intent)?.let(viewModel::onLaunchScreen)
     }
+
+    /** The screen a notification or the widget opened the app for (FR-NOT, FR-WGT-4). */
+    private fun launchScreen(intent: Intent): LaunchScreen? =
+        intent.getStringExtra(EXTRA_LAUNCH_SCREEN)?.let { name -> LaunchScreen.entries.firstOrNull { it.name == name } }
 
     /** Password-reset emails return through app.twoverse://auth-callback (FR-AUTH-3). */
     private fun handleAuthDeepLink(intent: Intent) {
         authDeepLinkHandler.handle(intent, onPasswordRecovery = viewModel::onPasswordRecovery)
-    }
-
-    companion object {
-        /** Set by the home-screen widget so a tap opens Our Universe directly (FR-WGT-4). */
-        const val EXTRA_OPEN_HOME = "app.twoverse.extra.OPEN_HOME"
     }
 }

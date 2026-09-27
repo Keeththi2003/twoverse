@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
 }
 
 /** Config from local.properties (never committed); empty when missing, e.g. on CI. */
@@ -77,6 +78,9 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.realtime)
     implementation(libs.supabase.storage)
+    implementation(libs.supabase.functions)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

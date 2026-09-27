@@ -13,4 +13,12 @@ class FakeProfileRepository @Inject constructor() : ProfileRepository {
         listOf(SampleData.me, SampleData.partner).firstOrNull { it.id == userId }
             ?.let { DataResult.Success(it) }
             ?: DataResult.Failure(DataError.Unknown)
+
+    /** Every time zone saved, for tests. */
+    val savedTimeZones = mutableListOf<String>()
+
+    override suspend fun updateTimeZone(zoneId: String): DataResult<Unit> {
+        savedTimeZones += zoneId
+        return DataResult.Success(Unit)
+    }
 }

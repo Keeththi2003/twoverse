@@ -27,6 +27,7 @@ import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import app.twoverse.core.model.LaunchScreen
 import app.twoverse.feature.auth.ResetPasswordRoute as ResetPasswordFeatureRoute
 import app.twoverse.feature.auth.SignInRoute as SignInFeatureRoute
 import app.twoverse.feature.auth.SignUpRoute as SignUpFeatureRoute
@@ -47,20 +48,33 @@ import app.twoverse.feature.vault.VaultRoute as VaultFeatureRoute
 import kotlinx.coroutines.launch
 
 /**
- * App navigation (DESIGN.md §7). [openHome] starts on Our Universe instead of the splash, for
- * widget taps (FR-WGT-4). [isOffline] shows the offline banner above every screen.
+ * App navigation (DESIGN.md §7). [startsSignedIn] starts on Our Universe instead of the splash,
+ * when a notification or the widget opened the app; [requestedScreen] then opens the screen it
+ * asked for (FR-NOT, FR-WGT-4). [isOffline] shows the offline banner above every screen.
  * [isPasswordRecovery] opens Reset password after a reset link (FR-AUTH-3).
  */
 @Composable
 fun TwoverseNavHost(
     modifier: Modifier = Modifier,
-    openHome: Boolean = false,
+    startsSignedIn: Boolean = false,
+    requestedScreen: LaunchScreen? = null,
+    onRequestedScreenShown: () -> Unit = {},
     isOffline: Boolean = false,
     isPasswordRecovery: Boolean = false,
     onPasswordRecoveryShown: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     val currentOnPasswordRecoveryShown by rememberUpdatedState(onPasswordRecoveryShown)
+    val currentOnRequestedScreenShown by rememberUpdatedState(onRequestedScreenShown)
+    LaunchedEffect(requestedScreen) {
+        when (requestedScreen) {
+            null -> return@LaunchedEffect
+            LaunchScreen.Home -> navController.navigateToTab(TopLevelDestination.Home)
+            LaunchScreen.Vault -> navController.navigateToTab(TopLevelDestination.Vault)
+            LaunchScreen.Countdown -> navController.navigate(CountdownRoute) { launchSingleTop = true }
+        }
+        currentOnRequestedScreenShown()
+    }
     LaunchedEffect(isPasswordRecovery) {
         if (isPasswordRecovery) {
             navController.navigate(ResetPasswordRoute) { launchSingleTop = true }
@@ -96,7 +110,7 @@ fun TwoverseNavHost(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = if (openHome) HomeRoute else SplashRoute,
+            startDestination = if (startsSignedIn) HomeRoute else SplashRoute,
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),

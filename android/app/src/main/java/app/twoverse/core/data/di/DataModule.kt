@@ -13,6 +13,8 @@ import app.twoverse.core.data.LocationPermissionChecker
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
 import app.twoverse.core.data.ProfileRepository
+import app.twoverse.core.data.PushRepository
+import app.twoverse.core.data.PushTokenSource
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.data.fake.FakeBirthdayRepository
@@ -23,12 +25,14 @@ import app.twoverse.core.data.location.AndroidLocationPermissionChecker
 import app.twoverse.core.data.local.UserPreferences
 import app.twoverse.core.data.network.ConnectivityNetworkMonitor
 import app.twoverse.core.data.network.NetworkMonitor
+import app.twoverse.core.data.push.FirebaseTokenSource
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.data.supabase.SupabaseAuthDeepLinkHandler
 import app.twoverse.core.data.supabase.SupabaseAuthRepository
 import app.twoverse.core.data.supabase.SupabaseCoupleRepository
 import app.twoverse.core.data.supabase.SupabaseLocationRepository
 import app.twoverse.core.data.supabase.SupabaseProfileRepository
+import app.twoverse.core.data.supabase.SupabasePushRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -82,6 +86,13 @@ internal interface DataModule {
     @Binds
     @Singleton
     fun bindBirthdayRepository(impl: FakeBirthdayRepository): BirthdayRepository
+
+    @Binds
+    @Singleton
+    fun bindPushRepository(impl: SupabasePushRepository): PushRepository
+
+    @Binds
+    fun bindPushTokenSource(impl: FirebaseTokenSource): PushTokenSource
 
     @Binds
     @Singleton

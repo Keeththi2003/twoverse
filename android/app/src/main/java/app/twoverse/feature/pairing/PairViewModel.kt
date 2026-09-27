@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import app.twoverse.core.common.ticks
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
+import app.twoverse.core.data.PushRepository
 import app.twoverse.core.model.CoupleCode
 import app.twoverse.core.model.DataResult
+import app.twoverse.core.model.PartnerPush
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PairViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
+    private val pushRepository: PushRepository,
     birthdayRepository: BirthdayRepository,
     clock: Clock,
 ) : ViewModel() {
@@ -77,6 +80,8 @@ class PairViewModel @Inject constructor(
         form.update { it.copy(isConnecting = true, joinError = null) }
         viewModelScope.launch {
             val result = coupleRepository.join(current.partnerCode)
+            // Tells the partner who shared the code that they are connected (FR-NOT-2).
+            if (result is DataResult.Success) pushRepository.sendToPartner(PartnerPush.PartnerJoined)
             form.update {
                 it.copy(isConnecting = false, joinError = (result as? DataResult.Failure)?.error)
             }

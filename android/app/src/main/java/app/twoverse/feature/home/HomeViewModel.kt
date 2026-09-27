@@ -13,6 +13,7 @@ import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
+import app.twoverse.core.data.local.UserPreferences
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.Reunion
@@ -22,7 +23,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
@@ -34,8 +37,18 @@ class HomeViewModel @Inject constructor(
     reunionRepository: ReunionRepository,
     memoryRepository: MemoryRepository,
     private val permissions: LocationPermissionChecker,
+    private val preferences: UserPreferences,
     private val clock: Clock,
 ) : ViewModel() {
+
+    /** True until the notification permission has been asked for once (Android 13+). */
+    val shouldAskNotificationPermission: StateFlow<Boolean> = preferences.notificationPermissionAsked
+        .map { asked -> !asked }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(StopTimeoutMillis), false)
+
+    fun onNotificationPermissionAsked() {
+        viewModelScope.launch { preferences.setNotificationPermissionAsked() }
+    }
 
     private val locations = combine(
         locationRepository.myLocation,
