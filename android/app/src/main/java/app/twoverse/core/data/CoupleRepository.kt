@@ -2,18 +2,19 @@ package app.twoverse.core.data
 
 import app.twoverse.core.model.Couple
 import app.twoverse.core.model.CoupleCode
+import app.twoverse.core.model.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface CoupleRepository {
-    /** The active couple, or null when the user isn't paired. */
+    /** The active couple, or null when unpaired. Updates live when the partner joins (FR-PAIR-6). */
     val couple: Flow<Couple?>
 
-    suspend fun generateCode(): CoupleCode
+    /** A fresh one-time code valid for 24 hours (FR-PAIR-1). */
+    suspend fun createCode(): DataResult<CoupleCode>
 
-    /** Fails with [InvalidCoupleCodeException] for invalid, expired or used codes (FR-PAIR-5). */
-    suspend fun joinWithCode(code: String): Result<Couple>
+    /** Joins the partner's couple (FR-PAIR-3); invalid, expired or used codes fail (FR-PAIR-5). */
+    suspend fun join(code: String): DataResult<Unit>
 
-    suspend fun disconnect()
+    /** Ends the couple (FR-PAIR-7, BR-9). */
+    suspend fun disconnect(): DataResult<Unit>
 }
-
-class InvalidCoupleCodeException : IllegalArgumentException("Invalid, expired or used couple code")
