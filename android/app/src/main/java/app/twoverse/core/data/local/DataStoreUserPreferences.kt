@@ -38,6 +38,10 @@ class DataStoreUserPreferences @Inject constructor(
         .map { prefs -> prefs[BatteryGuideShownKey] ?: false }
         .distinctUntilChanged()
 
+    override val notificationPermissionAsked: Flow<Boolean> = dataStore.data
+        .map { prefs -> prefs[NotificationPermissionAskedKey] ?: false }
+        .distinctUntilChanged()
+
     override suspend fun setAppearance(appearance: AppearanceMode) {
         dataStore.edit { it[AppearanceKey] = appearance.name }
     }
@@ -58,6 +62,10 @@ class DataStoreUserPreferences @Inject constructor(
         dataStore.edit { it[BatteryGuideShownKey] = true }
     }
 
+    override suspend fun setNotificationPermissionAsked() {
+        dataStore.edit { it[NotificationPermissionAskedKey] = true }
+    }
+
     private inline fun <reified T : Enum<T>> enumOrDefault(name: String?, default: T): T =
         enumValues<T>().firstOrNull { it.name == name } ?: default
 
@@ -69,5 +77,6 @@ class DataStoreUserPreferences @Inject constructor(
         /** Lock Ours is on by default (FR-VLT-5). */
         val LockOursKey = booleanPreferencesKey("lock_ours")
         val BatteryGuideShownKey = booleanPreferencesKey("battery_guide_shown")
+        val NotificationPermissionAskedKey = booleanPreferencesKey("notification_permission_asked")
     }
 }

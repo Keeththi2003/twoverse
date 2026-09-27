@@ -23,4 +23,9 @@ interface UserPreferences {
     suspend fun setLockOurs(enabled: Boolean)
 
     suspend fun setBatteryGuideShown()
+
+    /** Android 13+ asks once for notification permission (FR-NOT). */
+    val notificationPermissionAsked: Flow<Boolean>
+
+    suspend fun setNotificationPermissionAsked()
 }
