@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.data.network.NetworkMonitor
 import app.twoverse.core.model.AppearanceMode
+import app.twoverse.core.model.LaunchScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,6 +26,11 @@ class MainActivityViewModel @Inject constructor(
         .map { it.appearance }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppearanceMode.System)
 
+    private val launchScreen = MutableStateFlow<LaunchScreen?>(null)
+
+    /** A notification or the widget asked to open this screen. */
+    val requestedScreen: StateFlow<LaunchScreen?> = launchScreen.asStateFlow()
+
     private val passwordRecovery = MutableStateFlow(false)
 
     /** A password-reset link was opened; the app shows Reset password once (FR-AUTH-3). */
@@ -33,6 +39,14 @@ class MainActivityViewModel @Inject constructor(
     val isOffline: StateFlow<Boolean> = networkMonitor.isOnline
         .map { !it }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(StopTimeoutMillis), false)
+
+    fun onLaunchScreen(screen: LaunchScreen) {
+        launchScreen.value = screen
+    }
+
+    fun onLaunchScreenShown() {
+        launchScreen.value = null
+    }
 
     fun onPasswordRecovery() {
         passwordRecovery.value = true
