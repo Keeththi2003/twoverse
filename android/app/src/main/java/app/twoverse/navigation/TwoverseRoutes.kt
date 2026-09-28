@@ -20,12 +20,20 @@ data object ResetPasswordRoute
 @Serializable
 data object PairRoute
 
-/** [replay] shows the welcome again from Settings (FR-BDY-4) and returns there afterwards. */
+/**
+ * Shows every waiting Shooting Star, oldest first (FR-STAR-12), or with [starId] one received star
+ * again (FR-STAR-13). [starId] is read by `ShootingStarViewModel` under the same name (`StarIdKey`).
+ */
 @Serializable
-data class BirthdayRoute(val replay: Boolean = false)
+data class ShootingStarRoute(val starId: String? = null)
 
+/** Sends a new Shooting Star, or with [starId] edits an unseen one (`StarIdKey`). */
 @Serializable
-data object BirthdayMessageRoute
+data class StarComposerRoute(val starId: String? = null)
+
+/** Sent and received Shooting Stars (FR-STAR-9, FR-STAR-13). */
+@Serializable
+data object ShootingStarsRoute
 
 @Serializable
 data object ReconnectRoute

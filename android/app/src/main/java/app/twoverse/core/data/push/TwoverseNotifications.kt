@@ -31,6 +31,7 @@ class TwoverseNotifications @Inject constructor(
         Partner("partner", R.string.notification_channel_partner, R.string.notification_channel_partner_description, NotificationManager.IMPORTANCE_DEFAULT),
         Reunion("reunion", R.string.notification_channel_reunion, R.string.notification_channel_reunion_description, NotificationManager.IMPORTANCE_HIGH),
         Memories("memories", R.string.notification_channel_memories, R.string.notification_channel_memories_description, NotificationManager.IMPORTANCE_HIGH),
+        Stars("shooting_stars", R.string.notification_channel_stars, R.string.notification_channel_stars_description, NotificationManager.IMPORTANCE_HIGH),
     }
 
     fun createChannels() {
@@ -51,6 +52,7 @@ class TwoverseNotifications @Inject constructor(
             IncomingPush.PartnerJoined -> Triple(Channel.Partner, R.string.notification_partner_joined_title, R.string.notification_partner_joined_body)
             IncomingPush.ReunionDay -> Triple(Channel.Reunion, R.string.notification_reunion_day_title, R.string.notification_reunion_day_body)
             IncomingPush.NewMemory -> Triple(Channel.Memories, R.string.notification_new_memory_title, R.string.notification_new_memory_body)
+            IncomingPush.ShootingStar -> Triple(Channel.Stars, R.string.notification_star_title, R.string.notification_star_body)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED

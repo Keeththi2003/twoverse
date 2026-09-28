@@ -23,7 +23,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
@@ -33,8 +32,6 @@ import app.twoverse.feature.auth.ResetPasswordRoute as ResetPasswordFeatureRoute
 import app.twoverse.feature.auth.SignInRoute as SignInFeatureRoute
 import app.twoverse.feature.auth.SignUpRoute as SignUpFeatureRoute
 import app.twoverse.feature.auth.SignedInDestination
-import app.twoverse.feature.birthday.BirthdayMessageRoute as BirthdayMessageFeatureRoute
-import app.twoverse.feature.birthday.BirthdayRoute as BirthdayFeatureRoute
 import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
 import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
 import app.twoverse.feature.countdown.EditReunionRoute as EditReunionFeatureRoute
@@ -46,6 +43,9 @@ import app.twoverse.feature.pairing.ReconnectRoute as ReconnectFeatureRoute
 import app.twoverse.feature.settings.SettingsRoute as SettingsFeatureRoute
 import app.twoverse.feature.splash.SplashDestination
 import app.twoverse.feature.splash.SplashRoute as SplashFeatureRoute
+import app.twoverse.feature.star.ShootingStarRoute as ShootingStarFeatureRoute
+import app.twoverse.feature.star.ShootingStarsRoute as ShootingStarsFeatureRoute
+import app.twoverse.feature.star.StarComposerRoute as StarComposerFeatureRoute
 import app.twoverse.feature.vault.AddMemoryRoute as AddMemoryFeatureRoute
 import app.twoverse.feature.vault.MemoryRoute as MemoryFeatureRoute
 import app.twoverse.feature.vault.VaultRoute as VaultFeatureRoute
@@ -76,6 +76,7 @@ fun TwoverseNavHost(
             LaunchScreen.Home -> navController.navigateToTab(TopLevelDestination.Home)
             LaunchScreen.Vault -> navController.navigateToTab(TopLevelDestination.Vault)
             LaunchScreen.Countdown -> navController.navigate(CountdownRoute) { launchSingleTop = true }
+            LaunchScreen.ShootingStar -> navController.navigate(ShootingStarRoute()) { launchSingleTop = true }
         }
         currentOnRequestedScreenShown()
     }
@@ -128,7 +129,7 @@ fun TwoverseNavHost(
     }
 }
 
-/** [onConnected] confirms pairing (FR-PAIR-6); the birthday welcome is its own confirmation. */
+/** [onConnected] confirms pairing (FR-PAIR-6); a waiting Shooting Star is its own confirmation. */
 private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, onConnected: () -> Unit) {
     composable<SplashRoute> {
         SplashFeatureRoute(
@@ -171,9 +172,9 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
             } else {
                 null
             },
-            onConnected = { showBirthday ->
-                if (showBirthday) {
-                    navController.navigateClearingBackStack(BirthdayRoute())
+            onConnected = { showShootingStar ->
+                if (showShootingStar) {
+                    navController.navigateClearingBackStack(ShootingStarRoute())
                 } else {
                     navController.navigateClearingBackStack(HomeRoute)
                     onConnected()
@@ -192,11 +193,15 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
             },
         )
     }
-    composable<BirthdayRoute> { entry ->
-        val replay = entry.toRoute<BirthdayRoute>().replay
-        BirthdayFeatureRoute(
-            onEnter = {
-                if (replay) navController.popBackStack() else navController.navigateClearingBackStack(HomeRoute)
+    composable<ShootingStarRoute> {
+        ShootingStarFeatureRoute(
+            onDone = {
+                // Opened from the splash or pairing it is the root; from a list or notification it returns.
+                if (navController.previousBackStackEntry != null) {
+                    navController.popBackStack()
+                } else {
+                    navController.navigateClearingBackStack(HomeRoute)
+                }
             },
         )
     }
@@ -209,6 +214,7 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onOpenCountdown = { navController.navigate(CountdownRoute) },
             onOpenVault = { navController.navigateToTab(TopLevelDestination.Vault) },
             onSendMemory = { navController.navigate(AddMemoryRoute) },
+            onSendShootingStar = { navController.navigate(StarComposerRoute()) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
         )
     }
@@ -228,13 +234,21 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
         SettingsFeatureRoute(
             onSignedOut = { navController.navigateClearingBackStack(WelcomeRoute) },
             onDisconnected = { navController.navigateClearingBackStack(PairRoute) },
-            onEditBirthdayMessage = { navController.navigate(BirthdayMessageRoute) },
-            onShowBirthday = { navController.navigate(BirthdayRoute(replay = true)) },
+            onSendShootingStar = { navController.navigate(StarComposerRoute()) },
+            onOpenShootingStars = { navController.navigate(ShootingStarsRoute) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
         )
     }
-    composable<BirthdayMessageRoute> {
-        BirthdayMessageFeatureRoute(onDone = { navController.popBackStack() })
+    composable<StarComposerRoute> {
+        StarComposerFeatureRoute(onDone = { navController.popBackStack() })
+    }
+    composable<ShootingStarsRoute> {
+        ShootingStarsFeatureRoute(
+            onBack = { navController.popBackStack() },
+            onCompose = { navController.navigate(StarComposerRoute()) },
+            onEdit = { id -> navController.navigate(StarComposerRoute(starId = id)) },
+            onOpenReceived = { id -> navController.navigate(ShootingStarRoute(starId = id)) },
+        )
     }
     composable<CountdownRoute> {
         CountdownFeatureRoute(
@@ -275,7 +289,7 @@ private fun TwoverseSnackbarHost(hostState: SnackbarHostState) {
 private fun SplashDestination.toRoute(): Any = when (this) {
     SplashDestination.Welcome -> WelcomeRoute
     SplashDestination.Pair -> PairRoute
-    SplashDestination.Birthday -> BirthdayRoute()
+    SplashDestination.ShootingStar -> ShootingStarRoute()
     SplashDestination.Home -> HomeRoute
 }
 
