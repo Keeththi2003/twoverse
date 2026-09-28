@@ -1,5 +1,6 @@
 package app.twoverse.core.common
 
+import app.twoverse.core.model.MemoryExpiry
 import java.time.Duration
 import java.time.Instant
 
@@ -12,6 +13,9 @@ sealed interface ExpiryBadge {
 }
 
 private const val HoursPerDay = 24L
+
+/** When a memory sent at [sentAt] with this expiry disappears; null for Never (FR-MEM-4). */
+fun MemoryExpiry.expiresAt(sentAt: Instant): Instant? = duration?.let { sentAt + it }
 
 /** Whether a memory with this expiry can no longer be opened (BR-6). */
 fun isExpired(expiresAt: Instant?, now: Instant): Boolean = expiresAt != null && !expiresAt.isAfter(now)
