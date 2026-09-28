@@ -1,7 +1,6 @@
 package app.twoverse.core.data.sample
 
 import app.twoverse.core.model.AppearanceMode
-import app.twoverse.core.model.BirthdayWelcome
 import app.twoverse.core.model.Couple
 import app.twoverse.core.model.CoupleCode
 import app.twoverse.core.model.CoupleStatus
@@ -94,13 +93,6 @@ object SampleData {
             viewedAt = if (index == 0 || index == 2) null else createdAt + Duration.ofMinutes(30),
         )
     }
-
-    val birthdayWelcome = BirthdayWelcome(
-        message = "I built a little universe,\njust for the two of us.",
-        fromName = me.displayName,
-        photoUrl = null,
-        seen = false,
-    )
 
     val settings = UserSettings(
         shareLocation = true,
