@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="window_background">#FFF6ECF1</color>
+    <!-- Brand primary (LightTwoverseColors.primary); tints notification icons. -->
+    <color name="brand_primary">#FFC4466A</color>
 </resources>
