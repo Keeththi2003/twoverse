@@ -88,8 +88,12 @@ data class TwoverseTextStyles(
     val countdownUnitLabel: TextStyle = sans(11.sp, 700, lineHeight = 1.3f, letterSpacing = 1.sp),
     /** Small badges on vault tiles ("24h"). */
     val badge: TextStyle = sans(11.sp, 700, lineHeight = 1.3f),
-    /** Eyebrow above the birthday title ("FOR YOU"). */
+    /** Eyebrow above a Shooting Star title ("FOR YOU"). */
     val eyebrow: TextStyle = sans(13.sp, 700, lineHeight = 1.3f, letterSpacing = 2.sp),
-    /** Personal birthday message. */
-    val birthdayMessage: TextStyle = serif(21.sp, 500, lineHeight = 1.45f, letterSpacing = 0.sp),
+    /** Personal Shooting Star message. */
+    val starMessage: TextStyle = serif(21.sp, 500, lineHeight = 1.45f, letterSpacing = 0.sp),
+    /** Title of a Message only Shooting Star, larger because there is no photo. */
+    val starTitleLarge: TextStyle = serif(52.sp, 600, lineHeight = 1.1f, letterSpacing = (-0.5).sp),
+    /** Message of a Message only Shooting Star. */
+    val starMessageLarge: TextStyle = serif(24.sp, 500, lineHeight = 1.45f, letterSpacing = 0.sp),
 )
