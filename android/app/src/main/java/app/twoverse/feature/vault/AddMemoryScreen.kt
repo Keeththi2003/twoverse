@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +53,7 @@ import app.twoverse.core.designsystem.component.TwoverseTextField
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.MemoryExpiry
 import coil3.compose.AsyncImage
+import kotlin.math.roundToInt
 
 private val PhotoAreaHeight = 200.dp
 private val PhotoBorderWidth = 2.dp
@@ -63,6 +65,8 @@ private val PickerIconCircle = 56.dp
 private val PickerIconSize = 24.dp
 private val HeaderButtonSpace = 48.dp
 private const val CaptionCounterFrom = 400
+private val UploadTrackHeight = 6.dp
+private const val PercentMax = 100
 
 /** New memory (FR-MEM-1 to FR-MEM-6). */
 @Composable
@@ -165,8 +169,11 @@ fun AddMemoryScreen(
                             .semantics { liveRegion = LiveRegionMode.Polite },
                     )
                 }
+                if (uiState.isSending) {
+                    UploadProgress(progress = uiState.uploadProgress, modifier = Modifier.padding(bottom = spacing.sm))
+                }
                 TwoversePrimaryButton(
-                    text = stringResource(R.string.add_memory_send),
+                    text = stringResource(if (uiState.sendFailed) R.string.add_memory_retry else R.string.add_memory_send),
                     onClick = onSend,
                     enabled = uiState.canSend,
                     leadingIcon = R.drawable.ic_send,
@@ -183,6 +190,35 @@ fun AddMemoryScreen(
                 )
             }
         }
+    }
+}
+
+/** Upload progress (FR-MEM-6), announced to screen readers as it changes. */
+@Composable
+private fun UploadProgress(progress: Float, modifier: Modifier = Modifier) {
+    val colors = TwoverseTheme.colors
+    val percent = (progress * PercentMax).roundToInt()
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.add_memory_sending, percent),
+            style = MaterialTheme.typography.labelMedium,
+            color = colors.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { liveRegion = LiveRegionMode.Polite },
+        )
+        LinearProgressIndicator(
+            progress = { progress },
+            color = colors.primary,
+            trackColor = colors.chip,
+            drawStopIndicator = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = TwoverseTheme.spacing.xs)
+                .height(UploadTrackHeight)
+                .clip(TwoverseTheme.shapes.circle),
+        )
     }
 }
 
@@ -292,6 +328,22 @@ private fun AddMemoryScreenPreview() {
     TwoverseTheme {
         AddMemoryScreen(
             uiState = AddMemoryUiState(expiry = MemoryExpiry.Days7, allowKeep = true),
+            onClose = {},
+            onPickPhoto = {},
+            onCaptionChange = {},
+            onExpirySelected = {},
+            onAllowKeepChange = {},
+            onSend = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun AddMemoryScreenSendingPreview() {
+    TwoverseTheme {
+        AddMemoryScreen(
+            uiState = AddMemoryUiState(photoUri = "content://photo", caption = "Sunset", isSending = true, uploadProgress = 0.45f),
             onClose = {},
             onPickPhoto = {},
             onCaptionChange = {},

@@ -16,3 +16,13 @@ enum class MemoryExpiry(val duration: Duration?) {
     Days7(Duration.ofDays(7)),
     Days30(Duration.ofDays(30)),
 }
+
+/** Progress of sending a memory (FR-MEM-6). */
+sealed interface MemoryUpload {
+    /** [fraction] of the photo uploaded, from 0 to 1. */
+    data class Uploading(val fraction: Float) : MemoryUpload
+
+    data class Sent(val memoryId: String) : MemoryUpload
+
+    data class Failed(val error: DataError) : MemoryUpload
+}

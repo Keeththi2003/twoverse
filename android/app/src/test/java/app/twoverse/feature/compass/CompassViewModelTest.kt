@@ -2,6 +2,7 @@ package app.twoverse.feature.compass
 
 import app.twoverse.core.data.fake.FakeHeadingSource
 import app.twoverse.core.data.fake.FakeLocationRepository
+import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.sensors.CompassHeading
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.HeadingReading
@@ -34,7 +35,7 @@ class CompassViewModelTest {
     private fun TestScope.createViewModel(source: FakeHeadingSource): CompassViewModel {
         val viewModel = CompassViewModel(
             locationRepository,
-            DefaultSettingsRepository(locationRepository, InMemoryUserPreferences()),
+            DefaultSettingsRepository(locationRepository, FakeProfileRepository(), InMemoryUserPreferences()),
             CompassHeading(source, clock),
             clock,
         )

@@ -31,6 +31,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -46,7 +49,9 @@ import app.twoverse.core.designsystem.component.TwoverseOutlineButton
 import app.twoverse.core.designsystem.component.TwoverseSecondaryButton
 import app.twoverse.core.designsystem.component.TwoverseStatusChip
 import app.twoverse.core.designsystem.text.longText
+import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import app.twoverse.core.model.DataError
 import app.twoverse.core.model.MemorySender
 import coil3.compose.AsyncImage
 import java.time.LocalDateTime
@@ -61,19 +66,33 @@ private val DetailsHorizontalPadding = 8.dp
 private val NoteIconSize = 14.dp
 private const val DatePattern = "dMMMy"
 
-/** Memory viewer (FR-VLT-8, FR-DEL-2, FR-DEL-3). */
+/** Memory viewer (FR-VLT-8, FR-DEL-2, FR-DEL-3; the recipient hides instead of deleting, SRS 12). */
 @Composable
 fun MemoryScreen(
     uiState: MemoryUiState,
     onBack: () -> Unit,
+    onUnlock: () -> Unit,
     onKeepForever: () -> Unit,
-    onDelete: () -> Unit,
-    onDeleteConfirmed: () -> Unit,
-    onDeleteDismissed: () -> Unit,
+    onRemove: () -> Unit,
+    onRemoveConfirmed: () -> Unit,
+    onRemoveDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
+    if (uiState.isLocked) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(colors.background)
+                .safeDrawingPadding()
+                .padding(horizontal = spacing.md),
+        ) {
+            TwoverseBackButton(onClick = onBack)
+            OursLocked(onUnlock = onUnlock, modifier = Modifier.weight(1f))
+        }
+        return
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -87,25 +106,45 @@ fun MemoryScreen(
             MemoryContent.Loading -> Unit
             MemoryContent.Expired -> ExpiredMemory(onBack = onBack)
             is MemoryContent.Viewing -> {
-                MemoryPhoto(content = content, onBack = onBack, onDelete = onDelete)
-                MemoryDetails(content = content, onKeepForever = onKeepForever, onDelete = onDelete)
+                MemoryPhoto(content = content, onBack = onBack, onRemove = onRemove)
+                MemoryDetails(
+                    content = content,
+                    error = uiState.error,
+                    onKeepForever = onKeepForever,
+                    onRemove = onRemove,
+                )
             }
         }
     }
-    if (uiState.isDeleteDialogOpen) {
+    val removal = (uiState.content as? MemoryContent.Viewing)?.removal
+    if (uiState.isRemoveDialogOpen && removal != null) {
         TwoverseConfirmDialog(
-            title = stringResource(R.string.memory_delete_title),
-            message = stringResource(R.string.memory_delete_message),
-            confirmLabel = stringResource(R.string.memory_delete),
-            onConfirm = onDeleteConfirmed,
-            onDismiss = onDeleteDismissed,
-            destructive = true,
+            title = stringResource(
+                if (removal == MemoryRemoval.Delete) R.string.memory_delete_title else R.string.memory_hide_title,
+            ),
+            message = stringResource(
+                if (removal == MemoryRemoval.Delete) R.string.memory_delete_message else R.string.memory_hide_message,
+            ),
+            confirmLabel = stringResource(removal.labelRes()),
+            onConfirm = onRemoveConfirmed,
+            onDismiss = onRemoveDismissed,
+            destructive = removal == MemoryRemoval.Delete,
         )
     }
 }
 
+private fun MemoryRemoval.labelRes(): Int = when (this) {
+    MemoryRemoval.Delete -> R.string.memory_delete
+    MemoryRemoval.Hide -> R.string.memory_hide
+}
+
+private fun MemoryRemoval.iconRes(): Int = when (this) {
+    MemoryRemoval.Delete -> R.drawable.ic_trash
+    MemoryRemoval.Hide -> R.drawable.ic_eye_off
+}
+
 @Composable
-private fun MemoryPhoto(content: MemoryContent.Viewing, onBack: () -> Unit, onDelete: () -> Unit) {
+private fun MemoryPhoto(content: MemoryContent.Viewing, onBack: () -> Unit, onRemove: () -> Unit) {
     val colors = TwoverseTheme.colors
     Box(
         modifier = Modifier
@@ -150,7 +189,7 @@ private fun MemoryPhoto(content: MemoryContent.Viewing, onBack: () -> Unit, onDe
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             TwoverseBackButton(onClick = onBack, elevated = false)
-            MoreOptions(onDelete = onDelete)
+            MoreOptions(removal = content.removal, onRemove = onRemove)
         }
         content.expiryBadge?.let { badge ->
             TwoverseStatusChip(
@@ -167,7 +206,7 @@ private fun MemoryPhoto(content: MemoryContent.Viewing, onBack: () -> Unit, onDe
 }
 
 @Composable
-private fun MoreOptions(onDelete: () -> Unit) {
+private fun MoreOptions(removal: MemoryRemoval, onRemove: () -> Unit) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     Box {
         TwoverseCircleIconButton(
@@ -182,10 +221,15 @@ private fun MoreOptions(onDelete: () -> Unit) {
             containerColor = TwoverseTheme.colors.surface,
         ) {
             DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.memory_delete), color = TwoverseTheme.colors.error) },
+                text = {
+                    Text(
+                        text = stringResource(removal.labelRes()),
+                        color = if (removal == MemoryRemoval.Delete) TwoverseTheme.colors.error else TwoverseTheme.colors.onSurface,
+                    )
+                },
                 onClick = {
                     expanded = false
-                    onDelete()
+                    onRemove()
                 },
             )
         }
@@ -193,7 +237,12 @@ private fun MoreOptions(onDelete: () -> Unit) {
 }
 
 @Composable
-private fun MemoryDetails(content: MemoryContent.Viewing, onKeepForever: () -> Unit, onDelete: () -> Unit) {
+private fun MemoryDetails(
+    content: MemoryContent.Viewing,
+    error: DataError?,
+    onKeepForever: () -> Unit,
+    onRemove: () -> Unit,
+) {
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
     Column(modifier = Modifier.padding(start = DetailsHorizontalPadding, end = DetailsHorizontalPadding, top = spacing.lg)) {
@@ -244,12 +293,24 @@ private fun MemoryDetails(content: MemoryContent.Viewing, onKeepForever: () -> U
                 )
             }
             TwoverseOutlineButton(
-                text = stringResource(R.string.memory_delete),
-                onClick = onDelete,
-                leadingIcon = R.drawable.ic_trash,
+                text = stringResource(content.removal.labelRes()),
+                onClick = onRemove,
+                leadingIcon = content.removal.iconRes(),
                 small = true,
-                accentColor = colors.error,
+                accentColor = if (content.removal == MemoryRemoval.Delete) colors.error else colors.onSurfaceVariant,
                 modifier = if (content.canKeepForever) Modifier else Modifier.weight(1f),
+            )
+        }
+        error?.let {
+            Text(
+                text = stringResource(it.messageRes()),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.error,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = spacing.sm)
+                    .semantics { liveRegion = LiveRegionMode.Polite },
             )
         }
         ScreenshotNote(modifier = Modifier.padding(top = spacing.md))
@@ -313,13 +374,15 @@ private fun MemoryScreenPreview() {
                     sentAt = LocalDateTime.of(2026, 9, 24, 21, 12),
                     expiryBadge = ExpiryBadge.Days(2),
                     canKeepForever = true,
+                    removal = MemoryRemoval.Hide,
                 ),
             ),
             onBack = {},
+            onUnlock = {},
             onKeepForever = {},
-            onDelete = {},
-            onDeleteConfirmed = {},
-            onDeleteDismissed = {},
+            onRemove = {},
+            onRemoveConfirmed = {},
+            onRemoveDismissed = {},
         )
     }
 }
@@ -331,10 +394,38 @@ private fun MemoryScreenExpiredPreview() {
         MemoryScreen(
             uiState = MemoryUiState(content = MemoryContent.Expired),
             onBack = {},
+            onUnlock = {},
             onKeepForever = {},
-            onDelete = {},
-            onDeleteConfirmed = {},
-            onDeleteDismissed = {},
+            onRemove = {},
+            onRemoveConfirmed = {},
+            onRemoveDismissed = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun MemoryScreenSentPreview() {
+    TwoverseTheme {
+        MemoryScreen(
+            uiState = MemoryUiState(
+                content = MemoryContent.Viewing(
+                    sender = MemorySender.Me,
+                    imageUrl = null,
+                    caption = null,
+                    sentAt = LocalDateTime.of(2026, 9, 25, 8, 30),
+                    expiryBadge = null,
+                    canKeepForever = false,
+                    removal = MemoryRemoval.Delete,
+                ),
+                error = DataError.Network,
+            ),
+            onBack = {},
+            onUnlock = {},
+            onKeepForever = {},
+            onRemove = {},
+            onRemoveConfirmed = {},
+            onRemoveDismissed = {},
         )
     }
 }

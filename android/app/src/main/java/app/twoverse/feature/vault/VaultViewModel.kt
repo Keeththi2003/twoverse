@@ -6,7 +6,9 @@ import app.twoverse.core.common.expiryBadge
 import app.twoverse.core.common.isExpired
 import app.twoverse.core.common.ticks
 import app.twoverse.core.data.MemoryRepository
-import app.twoverse.core.model.MemorySender
+import app.twoverse.core.data.SettingsRepository
+import app.twoverse.core.data.local.OursLock
+import app.twoverse.core.model.isNew
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,6 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class VaultViewModel @Inject constructor(
     memoryRepository: MemoryRepository,
+    settingsRepository: SettingsRepository,
+    private val oursLock: OursLock,
     clock: Clock,
 ) : ViewModel() {
 
@@ -28,7 +32,9 @@ class VaultViewModel @Inject constructor(
         memoryRepository.memories,
         filter,
         clock.ticks(BadgeRefreshMillis),
-    ) { memories, filter, now ->
+        oursLocked(settingsRepository, oursLock),
+    ) { memories, filter, now, locked ->
+        if (locked) return@combine VaultUiState.Locked
         val accessible = memories
             .filterNot { isExpired(it.expiresAt, now) }
             .sortedByDescending { it.createdAt }
@@ -40,7 +46,7 @@ class VaultViewModel @Inject constructor(
                     id = memory.id,
                     sender = memory.sender,
                     imageUrl = memory.imageUrl,
-                    isNew = memory.sender == MemorySender.Partner && memory.viewedAt == null,
+                    isNew = memory.isNew,
                     expiryBadge = expiryBadge(memory.expiresAt, now),
                 )
             },
@@ -53,6 +59,11 @@ class VaultViewModel @Inject constructor(
 
     fun onFilterSelected(selected: VaultFilter) {
         filter.value = selected
+    }
+
+    /** The user confirmed it's them with biometrics or the device PIN (FR-VLT-5). */
+    fun onUnlocked() {
+        oursLock.unlock()
     }
 
     private companion object {

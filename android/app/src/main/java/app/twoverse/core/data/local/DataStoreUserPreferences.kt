@@ -26,10 +26,6 @@ class DataStoreUserPreferences @Inject constructor(
         .map { prefs -> enumOrDefault(prefs[DistanceUnitKey], DistanceUnit.Kilometres) }
         .distinctUntilChanged()
 
-    override val birthdayWelcomeSeen: Flow<Boolean> = dataStore.data
-        .map { prefs -> prefs[BirthdayWelcomeSeenKey] ?: false }
-        .distinctUntilChanged()
-
     override val lockOurs: Flow<Boolean> = dataStore.data
         .map { prefs -> prefs[LockOursKey] ?: true }
         .distinctUntilChanged()
@@ -50,10 +46,6 @@ class DataStoreUserPreferences @Inject constructor(
         dataStore.edit { it[DistanceUnitKey] = unit.name }
     }
 
-    override suspend fun setBirthdayWelcomeSeen() {
-        dataStore.edit { it[BirthdayWelcomeSeenKey] = true }
-    }
-
     override suspend fun setLockOurs(enabled: Boolean) {
         dataStore.edit { it[LockOursKey] = enabled }
     }
@@ -72,8 +64,6 @@ class DataStoreUserPreferences @Inject constructor(
     private companion object {
         val AppearanceKey = stringPreferencesKey("appearance")
         val DistanceUnitKey = stringPreferencesKey("distance_unit")
-        val BirthdayWelcomeSeenKey = booleanPreferencesKey("birthday_welcome_seen")
-
         /** Lock Ours is on by default (FR-VLT-5). */
         val LockOursKey = booleanPreferencesKey("lock_ours")
         val BatteryGuideShownKey = booleanPreferencesKey("battery_guide_shown")

@@ -8,6 +8,8 @@ data class AddMemoryUiState(
     val expiry: MemoryExpiry = MemoryExpiry.Never,
     val allowKeep: Boolean = false,
     val isSending: Boolean = false,
+    /** Share of the photo uploaded, from 0 to 1, while sending (FR-MEM-6). */
+    val uploadProgress: Float = 0f,
     val sendFailed: Boolean = false,
     val isSent: Boolean = false,
 ) {

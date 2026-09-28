@@ -3,6 +3,7 @@ package app.twoverse.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.AuthRepository
+import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.SettingsRepository
@@ -28,6 +29,7 @@ class SettingsViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
     private val authRepository: AuthRepository,
     private val pushRepository: PushRepository,
+    birthdayRepository: BirthdayRepository,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -37,11 +39,13 @@ class SettingsViewModel @Inject constructor(
         interaction,
         settingsRepository.settings,
         coupleRepository.couple,
-    ) { state, settings, couple ->
+        birthdayRepository.welcome,
+    ) { state, settings, couple, welcome ->
         state.copy(
             settings = settings,
             isConnected = couple?.status == CoupleStatus.Active,
             connectedSince = couple?.connectedAt?.atZone(clock.zone)?.toLocalDate(),
+            hasBirthdayWelcome = welcome != null,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -55,7 +59,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onLockOursChange(enabled: Boolean) {
-        viewModelScope.launch { settingsRepository.setLockOurs(enabled) }
+        viewModelScope.launch { showFailure(settingsRepository.setLockOurs(enabled)) }
     }
 
     fun onOpenDialog(dialog: SettingsDialog) {
@@ -71,11 +75,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onDistanceUnitSelected(unit: DistanceUnit) {
-        closeDialogThen { settingsRepository.setDistanceUnit(unit) }
+        closeDialogThen { showFailure(settingsRepository.setDistanceUnit(unit)) }
     }
 
     fun onAppearanceSelected(appearance: AppearanceMode) {
-        closeDialogThen { settingsRepository.setAppearance(appearance) }
+        closeDialogThen { showFailure(settingsRepository.setAppearance(appearance)) }
     }
 
     /** Removes this device's push token first, while still signed in, so pushes stop here. */

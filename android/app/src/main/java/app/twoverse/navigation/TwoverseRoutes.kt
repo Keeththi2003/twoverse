@@ -20,8 +20,15 @@ data object ResetPasswordRoute
 @Serializable
 data object PairRoute
 
+/** [replay] shows the welcome again from Settings (FR-BDY-4) and returns there afterwards. */
 @Serializable
-data object BirthdayRoute
+data class BirthdayRoute(val replay: Boolean = false)
+
+@Serializable
+data object BirthdayMessageRoute
+
+@Serializable
+data object ReconnectRoute
 
 @Serializable
 data object HomeRoute

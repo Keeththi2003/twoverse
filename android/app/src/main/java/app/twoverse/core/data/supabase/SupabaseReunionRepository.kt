@@ -3,6 +3,8 @@ package app.twoverse.core.data.supabase
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.di.ApplicationScope
+import app.twoverse.core.data.local.OfflineCache
+import app.twoverse.core.data.local.snapshotFor
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.DataResult
 import app.twoverse.core.model.Reunion
@@ -43,6 +45,7 @@ import javax.inject.Singleton
 class SupabaseReunionRepository @Inject constructor(
     private val supabase: SupabaseClient,
     private val coupleRepository: CoupleRepository,
+    private val offlineCache: OfflineCache,
     @ApplicationScope appScope: CoroutineScope,
 ) : ReunionRepository {
 
@@ -87,20 +90,29 @@ class SupabaseReunionRepository @Inject constructor(
     /**
      * Realtime brings the partner's edits (FR-CNT-2). Deletes can't be filtered by couple, so a
      * cleared date also arrives through a re-read every minute and after this user's own changes.
+     * The saved reunion is shown until the server answers (NFR-REL-1).
      */
     private fun liveReunion(coupleId: String): Flow<Reunion?> = channelFlow {
+        val userId = supabase.auth.currentUserOrNull()?.id ?: return@channelFlow
+        suspend fun publish(reunion: Reunion?) {
+            send(reunion)
+            offlineCache.update(userId) { saved -> if (saved.couple?.id == coupleId) saved.copy(reunion = reunion) else saved }
+        }
+        offlineCache.snapshotFor(userId)
+            ?.takeIf { it.couple?.id == coupleId }
+            ?.let { saved -> saved.reunion?.let { send(it) } }
         val channel = supabase.channel("reunions:$coupleId")
         val changes = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
             table = Table
             filter("couple_id", FilterOperator.EQ, coupleId)
         }
         suspend fun reread() {
-            (supabaseCall { fetch(coupleId) } as? DataResult.Success)?.let { send(it.value) }
+            (supabaseCall { fetch(coupleId) } as? DataResult.Success)?.let { publish(it.value) }
         }
         launch { changes.collect { reread() } }
         launch { refresh.collect { reread() } }
         channel.subscribe()
-        send(retryUntilLoaded { fetch(coupleId) })
+        publish(retryUntilLoaded { fetch(coupleId) })
         launch {
             while (true) {
                 delay(RefreshMillis)

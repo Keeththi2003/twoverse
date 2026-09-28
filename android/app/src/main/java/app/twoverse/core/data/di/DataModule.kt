@@ -18,9 +18,9 @@ import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.PushTokenSource
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
-import app.twoverse.core.data.fake.FakeBirthdayRepository
-import app.twoverse.core.data.fake.FakeMemoryRepository
+import app.twoverse.core.data.local.DataStoreOfflineCache
 import app.twoverse.core.data.local.DataStoreUserPreferences
+import app.twoverse.core.data.local.OfflineCache
 import app.twoverse.core.data.location.AndroidLocationPermissionChecker
 import app.twoverse.core.data.local.UserPreferences
 import app.twoverse.core.data.network.ConnectivityNetworkMonitor
@@ -30,8 +30,10 @@ import app.twoverse.core.data.push.FirebaseTokenSource
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.data.supabase.SupabaseAuthDeepLinkHandler
 import app.twoverse.core.data.supabase.SupabaseAuthRepository
+import app.twoverse.core.data.supabase.SupabaseBirthdayRepository
 import app.twoverse.core.data.supabase.SupabaseCoupleRepository
 import app.twoverse.core.data.supabase.SupabaseLocationRepository
+import app.twoverse.core.data.supabase.SupabaseMemoryRepository
 import app.twoverse.core.data.supabase.SupabaseProfileRepository
 import app.twoverse.core.data.supabase.SupabasePushRepository
 import app.twoverse.core.data.supabase.SupabaseReunionRepository
@@ -44,8 +46,8 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Auth, pairing, profiles, location and the reunion use Supabase; the other features still use fakes until
- * they are connected. Device-local preferences, permissions and connectivity are real.
+ * Every repository uses Supabase; fakes are only for previews and tests. Device-local
+ * preferences, the offline cache, permissions and connectivity are real.
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -82,7 +84,7 @@ internal interface DataModule {
 
     @Binds
     @Singleton
-    fun bindMemoryRepository(impl: FakeMemoryRepository): MemoryRepository
+    fun bindMemoryRepository(impl: SupabaseMemoryRepository): MemoryRepository
 
     @Binds
     @Singleton
@@ -90,7 +92,7 @@ internal interface DataModule {
 
     @Binds
     @Singleton
-    fun bindBirthdayRepository(impl: FakeBirthdayRepository): BirthdayRepository
+    fun bindBirthdayRepository(impl: SupabaseBirthdayRepository): BirthdayRepository
 
     @Binds
     @Singleton
@@ -102,6 +104,10 @@ internal interface DataModule {
     @Binds
     @Singleton
     fun bindUserPreferences(impl: DataStoreUserPreferences): UserPreferences
+
+    @Binds
+    @Singleton
+    fun bindOfflineCache(impl: DataStoreOfflineCache): OfflineCache
 
     @Binds
     @Singleton

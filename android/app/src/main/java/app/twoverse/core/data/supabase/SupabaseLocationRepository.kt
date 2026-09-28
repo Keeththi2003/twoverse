@@ -4,6 +4,8 @@ import app.twoverse.core.common.forPrecision
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.di.ApplicationScope
+import app.twoverse.core.data.local.OfflineCache
+import app.twoverse.core.data.local.snapshotFor
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.DataResult
 import app.twoverse.core.model.DevicePosition
@@ -30,12 +32,15 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,6 +56,7 @@ import javax.inject.Singleton
 class SupabaseLocationRepository @Inject constructor(
     private val supabase: SupabaseClient,
     coupleRepository: CoupleRepository,
+    private val offlineCache: OfflineCache,
     @ApplicationScope appScope: CoroutineScope,
 ) : LocationRepository {
 
@@ -62,25 +68,36 @@ class SupabaseLocationRepository @Inject constructor(
         .map { (it as? SessionStatus.Authenticated)?.session?.user?.id }
         .distinctUntilChanged()
 
-    private val own: Flow<OwnRow?> = signedInUserId
+    /** The saved settings and position come first, so Home works offline (NFR-REL-1). */
+    private val own: Flow<OwnState?> = signedInUserId
         .flatMapLatest { userId ->
             if (userId == null) {
-                flowOf<OwnRow?>(null)
+                flowOf<OwnState?>(null)
             } else {
-                flow<OwnRow?> {
+                flow<OwnState?> {
+                    offlineCache.snapshotFor(userId)?.let { saved ->
+                        saved.sharing?.let { emit(OwnState(it, saved.myLocation)) }
+                    }
                     ownRow.value = OwnRow(userId, retryUntilLoaded { fetchRow(userId) })
-                    emitAll(ownRow)
+                    emitAll(
+                        ownRow.filterNotNull()
+                            .filter { it.userId == userId }
+                            .map { OwnState(it.row?.toSharing() ?: LocationSharing(), it.row?.toModel()) }
+                            .onEach { state ->
+                                offlineCache.update(userId) { it.copy(sharing = state.sharing, myLocation = state.location) }
+                            },
+                    )
                 }
             }
         }
         .shareIn(appScope, SharingStarted.WhileSubscribed(StopTimeoutMillis), replay = 1)
 
     override val sharing: Flow<LocationSharing> = own
-        .map { it?.row?.toSharing() ?: LocationSharing() }
+        .map { it?.sharing ?: LocationSharing() }
         .distinctUntilChanged()
 
     override val myLocation: Flow<UserLocation?> = own
-        .map { it?.row?.toModel() }
+        .map { it?.location }
         .distinctUntilChanged()
 
     override val partnerLocation: Flow<UserLocation?> = coupleRepository.couple
@@ -145,18 +162,26 @@ class SupabaseLocationRepository @Inject constructor(
      * can't tell us when the partner stops sharing (their row just becomes invisible to us).
      */
     private fun livePartner(partnerId: String): Flow<UserLocation?> = channelFlow {
+        val userId = awaitUserId() ?: return@channelFlow
+        suspend fun publish(location: UserLocation?) {
+            send(location)
+            offlineCache.update(userId) { it.copy(partnerLocation = location) }
+        }
+        offlineCache.snapshotFor(userId)?.partnerLocation
+            ?.takeIf { it.userId == partnerId }
+            ?.let { send(it) }
         val channel = supabase.channel("locations:$partnerId")
         val changes = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
             table = Table
             filter("user_id", FilterOperator.EQ, partnerId)
         }
-        launch { changes.collect { refreshPartner(partnerId)?.let { send(it.location) } } }
+        launch { changes.collect { refreshPartner(partnerId)?.let { publish(it.location) } } }
         channel.subscribe()
-        send(retryUntilLoaded { fetchRow(partnerId) }?.toModel())
+        publish(retryUntilLoaded { fetchRow(partnerId) }?.toModel())
         launch {
             while (true) {
                 delay(PartnerRefreshMillis)
-                refreshPartner(partnerId)?.let { send(it.location) }
+                refreshPartner(partnerId)?.let { publish(it.location) }
             }
         }
         try {
@@ -184,6 +209,8 @@ class SupabaseLocationRepository @Inject constructor(
     }
 
     private data class OwnRow(val userId: String, val row: LocationDto?)
+
+    private data class OwnState(val sharing: LocationSharing, val location: UserLocation?)
 
     private data class PartnerRead(val location: UserLocation?)
 

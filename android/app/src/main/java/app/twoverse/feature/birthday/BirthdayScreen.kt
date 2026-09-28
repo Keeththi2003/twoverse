@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -31,6 +34,7 @@ import app.twoverse.core.designsystem.component.OrbitRing
 import app.twoverse.core.designsystem.component.StarField
 import app.twoverse.core.designsystem.component.TwoversePrimaryButton
 import app.twoverse.core.designsystem.theme.TwoverseTheme
+import coil3.compose.AsyncImage
 
 private val OrbitTopGap = 44.dp
 private val OrbitSize = 240.dp
@@ -40,7 +44,7 @@ private val StarSize = 40.dp
 private val OrbitToTextGap = 44.dp
 private val TitleGap = 10.dp
 
-/** Birthday welcome (FR-BDY-3). */
+/** Birthday welcome (FR-BDY-3, FR-BDY-4), with the partner's optional photo in place of the orbit. */
 @Composable
 fun BirthdayScreen(uiState: BirthdayUiState, onEnter: () -> Unit, modifier: Modifier = Modifier) {
     val colors = TwoverseTheme.colors
@@ -64,15 +68,27 @@ fun BirthdayScreen(uiState: BirthdayUiState, onEnter: () -> Unit, modifier: Modi
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    OrbitGraphic(
-                        size = OrbitSize,
-                        her = OrbitPosition(angleDegrees = 50f),
-                        you = OrbitPosition(angleDegrees = 240f, ring = OrbitRing.Inner),
-                        herSize = HerSize,
-                        youSize = YouSize,
-                        starSize = StarSize,
-                        modifier = Modifier.padding(top = OrbitTopGap),
-                    )
+                    if (uiState.photoUrl != null) {
+                        AsyncImage(
+                            model = uiState.photoUrl,
+                            contentDescription = stringResource(R.string.birthday_photo_from, uiState.fromName),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .padding(top = OrbitTopGap)
+                                .size(OrbitSize)
+                                .clip(TwoverseTheme.shapes.cardLarge),
+                        )
+                    } else {
+                        OrbitGraphic(
+                            size = OrbitSize,
+                            her = OrbitPosition(angleDegrees = 50f),
+                            you = OrbitPosition(angleDegrees = 240f, ring = OrbitRing.Inner),
+                            herSize = HerSize,
+                            youSize = YouSize,
+                            starSize = StarSize,
+                            modifier = Modifier.padding(top = OrbitTopGap),
+                        )
+                    }
                     Text(
                         text = stringResource(R.string.birthday_for_you).uppercase(LocalConfiguration.current.locales[0]),
                         style = TwoverseTheme.textStyles.eyebrow,

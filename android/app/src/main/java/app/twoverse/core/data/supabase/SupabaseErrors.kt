@@ -26,11 +26,13 @@ internal object SupabaseErrors {
         else -> DataError.Unknown
     }
 
-    /** Error keys raised by the pairing functions in supabase/migrations. */
+    /** Error keys raised by the RPC functions in supabase/migrations. */
     fun fromRpcErrorKey(key: String?): DataError = when (key) {
         "invalid_code", "code_expired", "code_used", "own_code" -> DataError.InvalidCoupleCode
         "already_paired" -> DataError.AlreadyPaired
         "not_paired" -> DataError.NotPaired
+        "memory_not_found" -> DataError.MemoryUnavailable
+        "no_ended_couple" -> DataError.ReconnectUnavailable
         else -> DataError.Unknown
     }
 

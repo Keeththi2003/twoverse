@@ -1,6 +1,7 @@
 package app.twoverse.core.data.settings
 
 import app.twoverse.core.data.fake.FakeLocationRepository
+import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.DataResult
 import app.twoverse.core.model.DevicePosition
@@ -16,7 +17,8 @@ class DefaultSettingsRepositoryTest {
 
     private val locationRepository = FakeLocationRepository()
     private val preferences = InMemoryUserPreferences()
-    private val repository = DefaultSettingsRepository(locationRepository, preferences)
+    private val profileRepository = FakeProfileRepository()
+    private val repository = DefaultSettingsRepository(locationRepository, profileRepository, preferences)
 
     @Test
     fun sharingSettingsComeFromTheLocationRow() = runTest {
@@ -52,10 +54,20 @@ class DefaultSettingsRepositoryTest {
     }
 
     @Test
-    fun lockOursIsADevicePreference() = runTest {
-        repository.setLockOurs(false)
+    fun lockOursIsSavedOnTheServerAndCopiedToTheDevice() = runTest {
+        assertEquals(DataResult.Success(Unit), repository.setLockOurs(false))
 
+        assertEquals(false, profileRepository.serverSettings.lockOurs)
         assertEquals(false, repository.settings.first().lockOurs)
         assertEquals(false, preferences.lockOurs.value)
+    }
+
+    @Test
+    fun lockOursStaysAsItWasWhenTheServerFails() = runTest {
+        profileRepository.failNextWith(DataError.Network)
+
+        assertEquals(DataResult.Failure(DataError.Network), repository.setLockOurs(false))
+        assertEquals(true, profileRepository.serverSettings.lockOurs)
+        assertEquals(true, preferences.lockOurs.value)
     }
 }

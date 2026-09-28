@@ -6,6 +6,7 @@ import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.model.AuthState
+import app.twoverse.core.model.isDue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
+import java.time.Clock
+import java.time.LocalDate
 import javax.inject.Inject
 
 /** Chooses the first screen from the saved session and couple status (FR-ONB-3). */
@@ -25,6 +28,7 @@ class SplashViewModel @Inject constructor(
     authRepository: AuthRepository,
     private val coupleRepository: CoupleRepository,
     private val birthdayRepository: BirthdayRepository,
+    private val clock: Clock,
 ) : ViewModel() {
 
     private val minimumDisplay = flow {
@@ -48,7 +52,7 @@ class SplashViewModel @Inject constructor(
     private suspend fun signedInDestination(): SplashDestination {
         if (coupleRepository.couple.first() == null) return SplashDestination.Pair
         val welcome = birthdayRepository.welcome.first()
-        return if (welcome != null && !welcome.seen) SplashDestination.Birthday else SplashDestination.Home
+        return if (welcome?.isDue(LocalDate.now(clock)) == true) SplashDestination.Birthday else SplashDestination.Home
     }
 
     companion object {

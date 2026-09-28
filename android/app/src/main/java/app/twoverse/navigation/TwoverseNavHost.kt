@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
@@ -32,6 +33,7 @@ import app.twoverse.feature.auth.ResetPasswordRoute as ResetPasswordFeatureRoute
 import app.twoverse.feature.auth.SignInRoute as SignInFeatureRoute
 import app.twoverse.feature.auth.SignUpRoute as SignUpFeatureRoute
 import app.twoverse.feature.auth.SignedInDestination
+import app.twoverse.feature.birthday.BirthdayMessageRoute as BirthdayMessageFeatureRoute
 import app.twoverse.feature.birthday.BirthdayRoute as BirthdayFeatureRoute
 import app.twoverse.feature.compass.CompassRoute as CompassFeatureRoute
 import app.twoverse.feature.countdown.CountdownRoute as CountdownFeatureRoute
@@ -40,6 +42,7 @@ import app.twoverse.feature.home.HomeRoute as HomeFeatureRoute
 import app.twoverse.feature.location.LocationSetupRoute as LocationSetupFeatureRoute
 import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
 import app.twoverse.feature.pairing.PairRoute as PairFeatureRoute
+import app.twoverse.feature.pairing.ReconnectRoute as ReconnectFeatureRoute
 import app.twoverse.feature.settings.SettingsRoute as SettingsFeatureRoute
 import app.twoverse.feature.splash.SplashDestination
 import app.twoverse.feature.splash.SplashRoute as SplashFeatureRoute
@@ -170,16 +173,32 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
             },
             onConnected = { showBirthday ->
                 if (showBirthday) {
-                    navController.navigateClearingBackStack(BirthdayRoute)
+                    navController.navigateClearingBackStack(BirthdayRoute())
                 } else {
                     navController.navigateClearingBackStack(HomeRoute)
                     onConnected()
                 }
             },
+            onReconnect = { navController.navigate(ReconnectRoute) },
+            onSignedOut = { navController.navigateClearingBackStack(WelcomeRoute) },
         )
     }
-    composable<BirthdayRoute> {
-        BirthdayFeatureRoute(onEnter = { navController.navigateClearingBackStack(HomeRoute) })
+    composable<ReconnectRoute> {
+        ReconnectFeatureRoute(
+            onBack = { navController.popBackStack() },
+            onReconnected = {
+                navController.navigateClearingBackStack(HomeRoute)
+                onConnected()
+            },
+        )
+    }
+    composable<BirthdayRoute> { entry ->
+        val replay = entry.toRoute<BirthdayRoute>().replay
+        BirthdayFeatureRoute(
+            onEnter = {
+                if (replay) navController.popBackStack() else navController.navigateClearingBackStack(HomeRoute)
+            },
+        )
     }
 }
 
@@ -209,9 +228,13 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
         SettingsFeatureRoute(
             onSignedOut = { navController.navigateClearingBackStack(WelcomeRoute) },
             onDisconnected = { navController.navigateClearingBackStack(PairRoute) },
-            onShowBirthday = { navController.navigate(BirthdayRoute) },
+            onEditBirthdayMessage = { navController.navigate(BirthdayMessageRoute) },
+            onShowBirthday = { navController.navigate(BirthdayRoute(replay = true)) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
         )
+    }
+    composable<BirthdayMessageRoute> {
+        BirthdayMessageFeatureRoute(onDone = { navController.popBackStack() })
     }
     composable<CountdownRoute> {
         CountdownFeatureRoute(
@@ -252,7 +275,7 @@ private fun TwoverseSnackbarHost(hostState: SnackbarHostState) {
 private fun SplashDestination.toRoute(): Any = when (this) {
     SplashDestination.Welcome -> WelcomeRoute
     SplashDestination.Pair -> PairRoute
-    SplashDestination.Birthday -> BirthdayRoute
+    SplashDestination.Birthday -> BirthdayRoute()
     SplashDestination.Home -> HomeRoute
 }
 

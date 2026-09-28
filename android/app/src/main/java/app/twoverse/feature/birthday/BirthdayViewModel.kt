@@ -23,7 +23,12 @@ class BirthdayViewModel @Inject constructor(
         if (welcome == null) {
             BirthdayUiState.None
         } else {
-            BirthdayUiState.Welcome(message = welcome.message, fromName = welcome.fromName, isEntered = entered)
+            BirthdayUiState.Welcome(
+                message = welcome.message,
+                fromName = welcome.fromName,
+                photoUrl = welcome.photoUrl,
+                isEntered = entered,
+            )
         }
     }.stateIn(
         scope = viewModelScope,
@@ -31,7 +36,10 @@ class BirthdayViewModel @Inject constructor(
         initialValue = BirthdayUiState.Loading,
     )
 
-    /** Marks the welcome as seen so it only shows once (FR-BDY-3). */
+    /**
+     * Marks the welcome as seen so it only shows once (FR-BDY-3). Continues even if that fails
+     * offline; it is then shown once more next time.
+     */
     fun onEnter() {
         viewModelScope.launch {
             birthdayRepository.markSeen()

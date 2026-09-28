@@ -66,7 +66,6 @@ private const val DatePattern = "dMMMy"
 fun SettingsScreen(
     uiState: SettingsUiState,
     actions: SettingsActions,
-    showDebugOptions: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val colors = TwoverseTheme.colors
@@ -117,6 +116,25 @@ fun SettingsScreen(
                 onCheckedChange = actions.onLockOursChange,
             )
         }
+        if (uiState.isConnected) {
+            SectionHeader(R.string.settings_birthday)
+            SettingsGroup {
+                SettingsValueRow(
+                    title = stringResource(R.string.settings_birthday_message),
+                    subtitle = stringResource(R.string.settings_birthday_message_subtitle),
+                    value = "",
+                    onClick = actions.onEditBirthdayMessage,
+                )
+                if (uiState.hasBirthdayWelcome) {
+                    GroupDivider()
+                    SettingsValueRow(
+                        title = stringResource(R.string.settings_birthday_view),
+                        value = "",
+                        onClick = actions.onShowBirthday,
+                    )
+                }
+            }
+        }
         SectionHeader(R.string.settings_preferences)
         SettingsGroup {
             SettingsValueRow(
@@ -151,11 +169,6 @@ fun SettingsScreen(
                     .padding(horizontal = SectionHeaderInset, vertical = spacing.xs)
                     .semantics { liveRegion = LiveRegionMode.Polite },
             )
-        }
-        if (showDebugOptions) {
-            SettingsGroup(modifier = Modifier.padding(top = spacing.md)) {
-                ActionRow(R.string.settings_debug_birthday, colors.onSurfaceVariant, actions.onShowBirthday)
-            }
         }
     }
     if (settings != null) {
@@ -346,9 +359,9 @@ private fun SettingsScreenPreview() {
                 ),
                 isConnected = true,
                 connectedSince = LocalDate.of(2026, 2, 14),
+                hasBirthdayWelcome = true,
             ),
             actions = SettingsActions(),
-            showDebugOptions = false,
         )
     }
 }

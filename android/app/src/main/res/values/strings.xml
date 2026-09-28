@@ -56,6 +56,7 @@
     <string name="error_weak_password">Use a password with at least 6 characters.</string>
     <string name="error_rate_limited">Too many attempts. Wait a moment and try again.</string>
     <string name="error_unknown">Something went wrong. Try again.</string>
+    <string name="error_reconnect_unavailable">The time to reconnect has passed.</string>
 
     <string name="pair_title">Connect your worlds</string>
     <string name="pair_body">Share your code with your partner, or enter theirs. Once you\'re connected, it\'s just the two of you.</string>
@@ -74,6 +75,20 @@
     <string name="pair_invalid_code">This couple code is invalid or has expired.</string>
     <string name="pair_connect">Connect</string>
     <string name="pair_connected">You\'re connected</string>
+    <string name="pair_reconnect_title">Reconnect with her?</string>
+    <string name="pair_reconnect_partner_asked">She wants to reconnect</string>
+    <string name="pair_reconnect_body">Your memories, countdown and birthday message are kept until %1$s.</string>
+    <string name="pair_reconnect_open">Reconnect</string>
+    <string name="pair_log_out">Log out</string>
+    <string name="pair_log_out_title">Log out?</string>
+    <string name="pair_log_out_message">You can sign in again at any time to connect with your partner.</string>
+    <string name="reconnect_title">Reconnect</string>
+    <string name="reconnect_body">Your memories, countdown and birthday message are kept until %1$s. You both need to confirm to reconnect.</string>
+    <string name="reconnect_partner_asked">She wants to reconnect. Confirm by %1$s to bring back your memories, countdown and birthday message.</string>
+    <string name="reconnect_waiting">Waiting for her to confirm…</string>
+    <string name="reconnect_note">Location sharing stays off until you turn it on again. Connecting with someone new instead deletes your shared data for good.</string>
+    <string name="reconnect_ask">Ask to reconnect</string>
+    <string name="reconnect_confirm">Reconnect</string>
 
     <string name="home_title">Our Universe</string>
     <string name="home_greeting_morning">Good morning</string>
@@ -220,6 +235,11 @@
     <string name="vault_tile_from_her">Memory from her</string>
     <string name="vault_tile_new">new</string>
     <string name="vault_tile_expires_in">expires in %1$s</string>
+    <string name="vault_locked_title">Ours is locked</string>
+    <string name="vault_locked_message">Use your fingerprint, face or device PIN to open it.</string>
+    <string name="vault_unlock">Unlock</string>
+    <string name="vault_unlock_prompt_title">Unlock Ours</string>
+    <string name="vault_unlock_prompt_subtitle">Confirm it\'s you</string>
 
     <string name="memory_photo_placeholder">Photo</string>
     <string name="memory_photo_from_you">Photo you sent</string>
@@ -234,6 +254,9 @@
     <string name="memory_screenshots_blocked">Screenshots are blocked inside Ours.</string>
     <string name="memory_delete_title">Delete this memory?</string>
     <string name="memory_delete_message">It will be removed for both of you, including the photo. This can\'t be undone.</string>
+    <string name="memory_hide">Hide</string>
+    <string name="memory_hide_title">Hide this memory?</string>
+    <string name="memory_hide_message">It will disappear from your Ours. She sent it, so she still has it.</string>
     <string name="memory_expired">This memory has expired.</string>
 
     <string name="add_memory_title">New memory</string>
@@ -254,6 +277,8 @@
     <string name="add_memory_send">Send to her</string>
     <string name="add_memory_send_note">She gets a notification, never a preview of the photo.</string>
     <string name="add_memory_upload_failed">Couldn\'t send your memory. Try again.</string>
+    <string name="add_memory_sending">Sending… %1$d%%</string>
+    <string name="add_memory_retry">Try again</string>
 
     <string name="settings_title">You &amp; Her</string>
     <string name="settings_connected">Connected</string>
@@ -280,16 +305,33 @@
     <string name="settings_log_out_message">You can sign back in any time. Your universe will be waiting.</string>
     <string name="settings_disconnect">Disconnect from partner</string>
     <string name="settings_disconnect_title">Disconnect from your partner?</string>
-    <string name="settings_disconnect_message">Location sharing stops right away. Your shared memories, countdown and birthday message are deleted for both of you.</string>
+    <string name="settings_disconnect_message">Location sharing stops right away. Your shared memories, countdown and birthday message are hidden, and deleted for both of you after 7 days unless you both reconnect.</string>
     <string name="settings_disconnect_confirm">Disconnect</string>
     <string name="settings_delete_account">Delete account</string>
     <string name="settings_delete_account_title">Delete your account?</string>
     <string name="settings_delete_account_message">Your account and all of your data will be removed. This can\'t be undone.</string>
-    <string name="settings_debug_birthday">Show birthday welcome (debug)</string>
+    <string name="settings_birthday">Birthday</string>
+    <string name="settings_birthday_message">Birthday message for her</string>
+    <string name="settings_birthday_message_subtitle">A welcome she sees once, with an optional photo</string>
+    <string name="settings_birthday_view">See your birthday welcome</string>
 
     <string name="birthday_for_you">For you</string>
     <string name="birthday_title">Happy Birthday</string>
     <string name="birthday_enter">Enter Twoverse</string>
+    <string name="birthday_photo_from">Photo from %1$s</string>
+    <string name="birthday_message_title">Birthday message</string>
+    <string name="birthday_message_intro">Write a welcome for her. She sees it once: the next time she opens Twoverse, or on the date you choose.</string>
+    <string name="birthday_message_label">Message</string>
+    <string name="birthday_message_placeholder">Happy birthday, my love…</string>
+    <string name="birthday_message_count">%1$d/%2$d</string>
+    <string name="birthday_message_add_photo">Add a photo (optional)</string>
+    <string name="birthday_message_change_photo">Change photo</string>
+    <string name="birthday_message_remove_photo">Remove photo</string>
+    <string name="birthday_message_show_on">Show it on</string>
+    <string name="birthday_message_next_open">The next time she opens Twoverse</string>
+    <string name="birthday_message_clear_date">Show it the next time she opens Twoverse</string>
+    <string name="birthday_message_seen_note">She has already seen it. Saving shows it to her once more.</string>
+    <string name="birthday_message_save">Save</string>
 
     <string name="location_setup_explain_title">Share your location with her</string>
     <string name="location_setup_explain_body">Twoverse uses your location only to show the distance between you and to point Your Star. Only your latest position is kept, never a history, and you can turn sharing off any time in You &amp; Her.</string>

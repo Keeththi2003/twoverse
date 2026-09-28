@@ -1,12 +1,15 @@
 package app.twoverse.feature.settings
 
 import app.twoverse.core.data.fake.FakeAuthRepository
+import app.twoverse.core.data.fake.FakeBirthdayRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakeLocationRepository
+import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.fake.FakePushRepository
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.AuthState
+import app.twoverse.core.model.BirthdayWelcome
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
@@ -37,14 +40,16 @@ class SettingsViewModelTest {
 
     private val preferences = InMemoryUserPreferences()
     private val locationRepository = FakeLocationRepository()
-    private val settingsRepository = DefaultSettingsRepository(locationRepository, preferences)
+    private val profileRepository = FakeProfileRepository()
+    private val settingsRepository = DefaultSettingsRepository(locationRepository, profileRepository, preferences)
     private val coupleRepository = FakeCoupleRepository()
     private val authRepository = FakeAuthRepository()
     private val pushRepository = FakePushRepository()
+    private val birthdayRepository = FakeBirthdayRepository()
     private val clock = Clock.fixed(Instant.parse("2026-09-26T12:00:00Z"), ZoneId.of("Asia/Colombo"))
 
     private fun TestScope.createViewModel(): SettingsViewModel {
-        val viewModel = SettingsViewModel(settingsRepository, coupleRepository, authRepository, pushRepository, clock)
+        val viewModel = SettingsViewModel(settingsRepository, coupleRepository, authRepository, pushRepository, birthdayRepository, clock)
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         runCurrent()
         return viewModel
@@ -70,6 +75,19 @@ class SettingsViewModelTest {
 
         assertEquals(false, viewModel.uiState.value.settings?.shareLocation)
         assertEquals(false, viewModel.uiState.value.settings?.lockOurs)
+        assertFalse(profileRepository.serverSettings.lockOurs)
+    }
+
+    @Test
+    fun lockOursStaysOnWhenSavingFails() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+        profileRepository.failNextWith(DataError.Network)
+
+        viewModel.onLockOursChange(false)
+        runCurrent()
+
+        assertEquals(true, viewModel.uiState.value.settings?.lockOurs)
+        assertEquals(DataError.Network, viewModel.uiState.value.error)
     }
 
     @Test
@@ -86,6 +104,32 @@ class SettingsViewModelTest {
         assertNull(viewModel.uiState.value.openDialog)
         assertEquals(AppearanceMode.Dark, viewModel.uiState.value.settings?.appearance)
         assertEquals(AppearanceMode.Dark, preferences.appearance.value)
+        assertEquals(AppearanceMode.Dark, profileRepository.serverSettings.appearance)
+    }
+
+    @Test
+    fun aDistanceUnitThatCannotBeSavedIsNotChanged() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+        profileRepository.failNextWith(DataError.Network)
+
+        viewModel.onDistanceUnitSelected(DistanceUnit.Miles)
+        runCurrent()
+
+        assertEquals(DistanceUnit.Kilometres, preferences.distanceUnit.value)
+        assertEquals(DataError.Network, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun aReceivedBirthdayWelcomeCanBeViewedAgain() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+        assertFalse(viewModel.uiState.value.hasBirthdayWelcome)
+
+        birthdayRepository.setWelcome(
+            BirthdayWelcome(message = "Happy birthday", fromName = "Her", photoUrl = null, showOn = null, seen = true),
+        )
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.hasBirthdayWelcome)
     }
 
     @Test
@@ -97,6 +141,7 @@ class SettingsViewModelTest {
         runCurrent()
 
         assertEquals(DistanceUnit.Miles, preferences.distanceUnit.value)
+        assertEquals(DistanceUnit.Miles, profileRepository.serverSettings.distanceUnit)
         assertEquals(LocationPrecision.Precise, settingsRepository.settings.first().locationPrecision)
     }
 
