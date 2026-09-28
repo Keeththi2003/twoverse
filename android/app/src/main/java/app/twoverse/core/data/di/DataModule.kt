@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import app.twoverse.core.data.AuthDeepLinkHandler
 import app.twoverse.core.data.AuthRepository
-import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.HeadingSource
 import app.twoverse.core.data.LocationPermissionChecker
@@ -18,6 +17,7 @@ import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.PushTokenSource
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
+import app.twoverse.core.data.ShootingStarRepository
 import app.twoverse.core.data.local.DataStoreOfflineCache
 import app.twoverse.core.data.local.DataStoreUserPreferences
 import app.twoverse.core.data.local.OfflineCache
@@ -30,13 +30,13 @@ import app.twoverse.core.data.push.FirebaseTokenSource
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.data.supabase.SupabaseAuthDeepLinkHandler
 import app.twoverse.core.data.supabase.SupabaseAuthRepository
-import app.twoverse.core.data.supabase.SupabaseBirthdayRepository
 import app.twoverse.core.data.supabase.SupabaseCoupleRepository
 import app.twoverse.core.data.supabase.SupabaseLocationRepository
 import app.twoverse.core.data.supabase.SupabaseMemoryRepository
 import app.twoverse.core.data.supabase.SupabaseProfileRepository
 import app.twoverse.core.data.supabase.SupabasePushRepository
 import app.twoverse.core.data.supabase.SupabaseReunionRepository
+import app.twoverse.core.data.supabase.SupabaseShootingStarRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -92,7 +92,7 @@ internal interface DataModule {
 
     @Binds
     @Singleton
-    fun bindBirthdayRepository(impl: SupabaseBirthdayRepository): BirthdayRepository
+    fun bindShootingStarRepository(impl: SupabaseShootingStarRepository): ShootingStarRepository
 
     @Binds
     @Singleton
