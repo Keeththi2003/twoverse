@@ -6,6 +6,9 @@ import app.twoverse.core.model.MemorySender
 sealed interface VaultUiState {
     data object Loading : VaultUiState
 
+    /** Lock Ours is on and the user hasn't confirmed it's them yet (FR-VLT-5). */
+    data object Locked : VaultUiState
+
     data class Success(
         val filter: VaultFilter,
         /** All accessible memories, used for the count (FR-VLT-1). */

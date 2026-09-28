@@ -54,13 +54,14 @@ private val FabShadowOffset = 10.dp
 private const val FabShadowAlpha = 0.35f
 private val GridBottomPadding = FabSize + 40.dp
 
-/** Ours (FR-VLT-1 to FR-VLT-4, FR-VLT-9). */
+/** Ours (FR-VLT-1 to FR-VLT-5, FR-VLT-9). */
 @Composable
 fun VaultScreen(
     uiState: VaultUiState,
     onFilterSelected: (VaultFilter) -> Unit,
     onOpenMemory: (String) -> Unit,
     onAddMemory: () -> Unit,
+    onUnlock: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = TwoverseTheme.colors
@@ -71,6 +72,10 @@ fun VaultScreen(
             .background(colors.background)
             .safeDrawingPadding(),
     ) {
+        if (uiState is VaultUiState.Locked) {
+            OursLocked(onUnlock = onUnlock)
+            return@Box
+        }
         if (uiState !is VaultUiState.Success) return@Box
         Column(modifier = Modifier.padding(horizontal = spacing.screenHorizontal)) {
             VaultHeader(totalCount = uiState.totalCount)
@@ -243,6 +248,7 @@ private fun VaultScreenPreview() {
             onFilterSelected = {},
             onOpenMemory = {},
             onAddMemory = {},
+            onUnlock = {},
         )
     }
 }
@@ -256,6 +262,21 @@ private fun VaultScreenEmptyPreview() {
             onFilterSelected = {},
             onOpenMemory = {},
             onAddMemory = {},
+            onUnlock = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun VaultScreenLockedPreview() {
+    TwoverseTheme {
+        VaultScreen(
+            uiState = VaultUiState.Locked,
+            onFilterSelected = {},
+            onOpenMemory = {},
+            onAddMemory = {},
+            onUnlock = {},
         )
     }
 }
