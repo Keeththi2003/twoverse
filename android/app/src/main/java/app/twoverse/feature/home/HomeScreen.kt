@@ -49,6 +49,7 @@ import app.twoverse.core.designsystem.component.IconTile
 import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoversePrimaryButton
 import app.twoverse.core.designsystem.component.TwoverseStatusChip
+import app.twoverse.core.designsystem.component.TwoverseTextButton
 import app.twoverse.core.designsystem.text.labelRes
 import app.twoverse.core.designsystem.text.longText
 import app.twoverse.core.designsystem.text.messageRes
@@ -61,7 +62,7 @@ private val OursRowVerticalPadding = 16.dp
 private val FreshnessDotSize = 7.dp
 private val ChevronSize = 20.dp
 
-/** Our Universe (FR-LOC-8 to FR-LOC-11, FR-CNT-4). */
+/** Our Universe (FR-LOC-8 to FR-LOC-11, FR-CNT-4), with a way to send a Shooting Star (FR-STAR-1). */
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
@@ -69,6 +70,7 @@ fun HomeScreen(
     onOpenCountdown: () -> Unit,
     onOpenVault: () -> Unit,
     onSendMemory: () -> Unit,
+    onSendShootingStar: () -> Unit,
     onOpenLocationSetup: () -> Unit,
     miniNeedleRotation: () -> Float?,
     modifier: Modifier = Modifier,
@@ -127,6 +129,11 @@ fun HomeScreen(
                 text = stringResource(R.string.home_send_memory),
                 onClick = onSendMemory,
                 leadingIcon = R.drawable.ic_plus,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TwoverseTextButton(
+                text = stringResource(R.string.home_send_star),
+                onClick = onSendShootingStar,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -460,6 +467,7 @@ private fun HomeScreenPreview() {
             onOpenCountdown = {},
             onOpenVault = {},
             onSendMemory = {},
+            onSendShootingStar = {},
             onOpenLocationSetup = {},
             miniNeedleRotation = { 42f },
         )
@@ -485,6 +493,7 @@ private fun HomeScreenUnavailablePreview() {
             onOpenCountdown = {},
             onOpenVault = {},
             onSendMemory = {},
+            onSendShootingStar = {},
             onOpenLocationSetup = {},
             miniNeedleRotation = { 42f },
         )
