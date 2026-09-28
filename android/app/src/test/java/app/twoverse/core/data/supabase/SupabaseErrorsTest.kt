@@ -31,6 +31,16 @@ class SupabaseErrorsTest {
     }
 
     @Test
+    fun goneMemoriesAreUnavailable() {
+        assertEquals(DataError.MemoryUnavailable, SupabaseErrors.fromRpcErrorKey("memory_not_found"))
+    }
+
+    @Test
+    fun reconnectingTooLateIsReported() {
+        assertEquals(DataError.ReconnectUnavailable, SupabaseErrors.fromRpcErrorKey("no_ended_couple"))
+    }
+
+    @Test
     fun unknownCodesAreUnknown() {
         assertEquals(DataError.Unknown, SupabaseErrors.fromAuthErrorCode("something_new"))
         assertEquals(DataError.Unknown, SupabaseErrors.fromAuthErrorCode(null))
