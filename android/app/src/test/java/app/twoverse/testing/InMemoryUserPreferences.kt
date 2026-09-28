@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class InMemoryUserPreferences : UserPreferences {
     override val appearance = MutableStateFlow(AppearanceMode.System)
     override val distanceUnit = MutableStateFlow(DistanceUnit.Kilometres)
-    override val birthdayWelcomeSeen = MutableStateFlow(false)
     override val lockOurs = MutableStateFlow(true)
     override val batteryGuideShown = MutableStateFlow(false)
     override val notificationPermissionAsked = MutableStateFlow(false)
@@ -20,10 +19,6 @@ class InMemoryUserPreferences : UserPreferences {
 
     override suspend fun setDistanceUnit(unit: DistanceUnit) {
         distanceUnit.value = unit
-    }
-
-    override suspend fun setBirthdayWelcomeSeen() {
-        birthdayWelcomeSeen.value = true
     }
 
     override suspend fun setLockOurs(enabled: Boolean) {
