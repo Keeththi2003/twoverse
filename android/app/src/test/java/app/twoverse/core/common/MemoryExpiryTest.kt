@@ -1,5 +1,6 @@
 package app.twoverse.core.common
 
+import app.twoverse.core.model.MemoryExpiry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -40,5 +41,20 @@ class MemoryExpiryTest {
         assertEquals(ExpiryBadge.Days(2), badgeIn(Duration.ofDays(2)))
         assertEquals(ExpiryBadge.Days(7), badgeIn(Duration.ofDays(7).minusMinutes(1)))
         assertEquals(ExpiryBadge.Days(30), badgeIn(Duration.ofDays(30)))
+    }
+
+    @Test
+    fun expiryOptionsSetWhenTheMemoryDisappears() {
+        assertNull(MemoryExpiry.Never.expiresAt(now))
+        assertEquals(Instant.parse("2026-09-27T12:00:00Z"), MemoryExpiry.Hours24.expiresAt(now))
+        assertEquals(Instant.parse("2026-10-03T12:00:00Z"), MemoryExpiry.Days7.expiresAt(now))
+        assertEquals(Instant.parse("2026-10-26T12:00:00Z"), MemoryExpiry.Days30.expiresAt(now))
+    }
+
+    @Test
+    fun aMemoryExpiresExactlyAtItsExpiry() {
+        val expiresAt = MemoryExpiry.Hours24.expiresAt(now)
+        assertFalse(isExpired(expiresAt, now + Duration.ofHours(24).minusSeconds(1)))
+        assertTrue(isExpired(expiresAt, now + Duration.ofHours(24)))
     }
 }
