@@ -2,6 +2,7 @@ package app.twoverse.feature.location
 
 import app.twoverse.core.data.fake.FakeLocationPermissionChecker
 import app.twoverse.core.data.fake.FakeLocationRepository
+import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.LocationPermissionStatus
@@ -31,7 +32,7 @@ class LocationSetupViewModelTest {
     private val preferences = InMemoryUserPreferences()
     private val permissions = FakeLocationPermissionChecker(none)
     private val viewModel = LocationSetupViewModel(
-        DefaultSettingsRepository(locationRepository, preferences),
+        DefaultSettingsRepository(locationRepository, FakeProfileRepository(), preferences),
         preferences,
         permissions,
     )
@@ -115,7 +116,7 @@ class LocationSetupViewModelTest {
         assertTrue(preferences.batteryGuideShown.value)
         assertTrue(viewModel.uiState.value.isFinished)
 
-        val again = LocationSetupViewModel(DefaultSettingsRepository(locationRepository, preferences), preferences, permissions)
+        val again = LocationSetupViewModel(DefaultSettingsRepository(locationRepository, FakeProfileRepository(), preferences), preferences, permissions)
         again.onPermissionsChanged()
         runCurrent()
         assertTrue(again.uiState.value.isFinished)

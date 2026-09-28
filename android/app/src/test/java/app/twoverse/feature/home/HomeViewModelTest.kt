@@ -6,6 +6,7 @@ import app.twoverse.core.data.fake.FakeHeadingSource
 import app.twoverse.core.data.fake.FakeLocationPermissionChecker
 import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeMemoryRepository
+import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.fake.FakeReunionRepository
 import app.twoverse.core.data.sensors.CompassHeading
 import app.twoverse.core.data.settings.DefaultSettingsRepository
@@ -41,9 +42,9 @@ class HomeViewModelTest {
     private fun TestScope.state(): HomeUiState.Success {
         val viewModel = HomeViewModel(
             locationRepository = locationRepository,
-            settingsRepository = DefaultSettingsRepository(locationRepository, preferences),
+            settingsRepository = DefaultSettingsRepository(locationRepository, FakeProfileRepository(), preferences),
             reunionRepository = FakeReunionRepository(),
-            memoryRepository = FakeMemoryRepository(),
+            memoryRepository = FakeMemoryRepository(Clock.systemUTC()),
             permissions = permissions,
             preferences = preferences,
             compassHeading = CompassHeading(headingSource, Clock.systemUTC()),
