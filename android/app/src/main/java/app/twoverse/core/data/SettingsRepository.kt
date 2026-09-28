@@ -16,9 +16,12 @@ interface SettingsRepository {
     /** Saved on the server (FR-LOC-6). */
     suspend fun setLocationPrecision(precision: LocationPrecision): DataResult<Unit>
 
-    suspend fun setLockOurs(enabled: Boolean)
+    /** Saved on the server, with a copy on this device so Ours can lock offline (FR-VLT-5). */
+    suspend fun setLockOurs(enabled: Boolean): DataResult<Unit>
 
-    suspend fun setDistanceUnit(unit: DistanceUnit)
+    /** Saved on the profile and on this device (FR-SET-3). */
+    suspend fun setDistanceUnit(unit: DistanceUnit): DataResult<Unit>
 
-    suspend fun setAppearance(appearance: AppearanceMode)
+    /** Saved on the profile and on this device (FR-SET-3). */
+    suspend fun setAppearance(appearance: AppearanceMode): DataResult<Unit>
 }

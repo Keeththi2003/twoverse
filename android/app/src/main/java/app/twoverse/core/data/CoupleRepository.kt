@@ -3,6 +3,8 @@ package app.twoverse.core.data
 import app.twoverse.core.model.Couple
 import app.twoverse.core.model.CoupleCode
 import app.twoverse.core.model.DataResult
+import app.twoverse.core.model.EndedCouple
+import app.twoverse.core.model.ReconnectResult
 import kotlinx.coroutines.flow.Flow
 
 interface CoupleRepository {
@@ -17,4 +19,10 @@ interface CoupleRepository {
 
     /** Ends the couple (FR-PAIR-7, BR-9). */
     suspend fun disconnect(): DataResult<Unit>
+
+    /** The couple the user was disconnected from, while it can still be reconnected (SRS 12). */
+    val endedCouple: Flow<EndedCouple?>
+
+    /** Asks to reconnect, or confirms the partner's request; both must confirm (SRS 12). */
+    suspend fun reconnect(): DataResult<ReconnectResult>
 }
