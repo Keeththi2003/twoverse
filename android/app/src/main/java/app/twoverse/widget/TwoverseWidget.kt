@@ -10,9 +10,6 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import app.twoverse.MainActivity
 import app.twoverse.core.common.EXTRA_LAUNCH_SCREEN
-import app.twoverse.core.common.countdownUntil
-import app.twoverse.core.common.formatDistance
-import app.twoverse.core.common.partnerPosition
 import app.twoverse.core.common.ticks
 import app.twoverse.core.model.LaunchScreen
 import dagger.hilt.android.EntryPointAccessors
@@ -23,7 +20,7 @@ import kotlinx.coroutines.flow.combine
 class TwoverseWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val state = widgetState(EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java))
+        val state = stateFlow(EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java))
         val openHome = Intent(context, MainActivity::class.java)
             .putExtra(EXTRA_LAUNCH_SCREEN, LaunchScreen.Home.name)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -33,24 +30,14 @@ class TwoverseWidget : GlanceAppWidget() {
         }
     }
 
-    /** Updates while the widget session is active, as new location or countdown data arrives (FR-WGT-2). */
-    private fun widgetState(entryPoint: WidgetEntryPoint): Flow<WidgetState> {
-        val location = entryPoint.locationRepository()
+    /** Saved data only: no network, so it also works offline (FR-WGT-2, NFR-REL-1). */
+    private fun stateFlow(entryPoint: WidgetEntryPoint): Flow<WidgetState> {
+        val clock = entryPoint.clock()
         return combine(
-            location.myLocation,
-            location.partnerLocation,
-            entryPoint.settingsRepository().settings,
-            entryPoint.reunionRepository().reunion,
-            entryPoint.clock().ticks(RefreshMillis),
-        ) { mine, partner, settings, reunion, now ->
-            val position = partnerPosition(mine, partner, settings.shareLocation, now)
-            WidgetState(
-                distance = position.distanceKm?.let { formatDistance(it, settings.distanceUnit) },
-                distanceUnit = settings.distanceUnit,
-                freshness = position.freshness,
-                daysUntilReunion = reunion?.let { countdownUntil(it.meetAt, now).days },
-            )
-        }
+            entryPoint.offlineCache().snapshot,
+            entryPoint.userPreferences().distanceUnit,
+            clock.ticks(RefreshMillis),
+        ) { snapshot, unit, now -> widgetState(snapshot, unit, now) }
     }
 
     private companion object {
