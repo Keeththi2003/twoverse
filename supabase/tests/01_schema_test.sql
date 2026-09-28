@@ -3,7 +3,7 @@ select plan(19);
 
 -- Tables from SRS section 5
 select has_table('public', t, format('table %s exists', t))
-from unnest(array['profiles', 'couples', 'couple_codes', 'locations', 'reunions', 'memories', 'birthday_welcomes', 'device_tokens']) t;
+from unnest(array['profiles', 'couples', 'couple_codes', 'locations', 'reunions', 'memories', 'shooting_stars', 'device_tokens']) t;
 
 select is(
     (select count(*)::int from pg_class c join pg_namespace n on n.oid = c.relnamespace
