@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 2.0 |
+| Version | 2.1 |
 | Status | MVP scope agreed |
 | Platform | Android (min SDK 26), primary devices Samsung Galaxy |
 | Package | `app.twoverse` |
@@ -40,6 +40,7 @@ It is not a social network or a messaging app.
 | Memory | A photo with optional caption shared inside Ours |
 | Couple code | One-time code used to connect two accounts |
 | Wake-up ping | A silent push that asks the partner's phone for a fresh location |
+| Shooting Star | A surprise message one partner prepares for the other, shown once on a later app open |
 | Freshness | How recent the partner's last location update is |
 
 ### 1.4 References
@@ -209,14 +210,44 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | FR-WGT-4 | Tapping the widget opens Our Universe. | M |
 | FR-WGT-5 | Widget supports light and dark themes. | S |
 
-### 3.12 Birthday welcome (`FR-BDY`)
+### 3.12 Shooting Star — surprise messages (`FR-STAR`)
+
+A Shooting Star is a full-screen surprise one partner prepares for the other: a
+birthday wish, an anniversary note, a good-luck message or anything else. It
+replaces the single birthday welcome of version 2.0; existing birthday welcomes
+become Shooting Stars.
+
+**Composing ("Send a Shooting Star", from You & Her and from Our Universe)**
 
 | ID | Requirement | P |
 |---|---|---|
-| FR-BDY-1 | One partner can configure a birthday welcome (message and optional photo) for the other. | M |
-| FR-BDY-2 | The message is stored in the backend, not in app code. | M |
-| FR-BDY-3 | The recipient sees it once, on first open after pairing (or on the configured date), with "Enter Twoverse". | M |
-| FR-BDY-4 | The recipient can view it again from Settings. | C |
+| FR-STAR-1 | A paired user can send any number of Shooting Stars to their partner. Each is stored in the backend, not in app code. | M |
+| FR-STAR-2 | The sender picks one of three layouts, each shown as a small preview: **Photo and message** (photo card, eyebrow, title, message, signature), **Message only** (no photo; larger, vertically centred text with the star and planet decoration) and **Full photo** (the photo fills the screen, with an optional short title and message on top). | M |
+| FR-STAR-3 | Templates fill in the eyebrow and title, which stay editable: **Birthday** ("For you" / "Happy Birthday"), **Anniversary** ("For us" / "Happy Anniversary"), **Good luck** ("For you" / "Good luck"), **Thinking of you** ("Right now" / "Thinking of you") and **Blank** (clears both). Templates never change the message, signature or photo. | M |
+| FR-STAR-4 | The composer shows only the fields the layout uses. Photo and message: eyebrow, title, message, signature, photo. Message only: eyebrow, title, message, signature. Full photo: photo, photo fit, title, message. Fields a layout doesn't use are not saved. | M |
+| FR-STAR-5 | Every text field is optional. Limits: eyebrow 40, title 80, message 1,000 (multi-line), signature 50 characters. The signature starts as the sender's display name and can be edited or cleared. A star must show something: Full photo needs a photo; Message only needs a title or message; Photo and message needs a photo, title or message. | M |
+| FR-STAR-6 | The photo is picked with the Android photo picker, then resized (long edge ≤ 1,920 px) and compressed like memories (FR-MEM-2). Full photo offers **Fill screen** (cropped to fill) or **Fit whole image**. | M |
+| FR-STAR-7 | When to show: **the next time the partner opens Twoverse**, or a chosen **date and time** in the sender's time zone, which must be in the future. | M |
+| FR-STAR-8 | Before sending, a live full-screen preview shows the star exactly as the partner will see it, switchable between light and dark. | M |
+| FR-STAR-9 | The sender sees a list of their sent stars with their status (**Scheduled**, **Waiting** to be opened, **Seen**) and can edit or delete a star until the partner has seen it. | M |
+
+**Viewing**
+
+| ID | Requirement | P |
+|---|---|---|
+| FR-STAR-10 | Empty fields are hidden completely and the layout closes the gap. | M |
+| FR-STAR-11 | Long messages scroll; "Enter Twoverse" stays pinned at the bottom. On Full photo, the photo fills the screen edge to edge behind the system bars, "Enter Twoverse" sits on a gradient scrim so it is always readable, the text overlay appears only if a title or message is set, and the photo can be pinched to zoom. | M |
+| FR-STAR-12 | A star is shown once, on the first app open after it became visible (sent for the next open, or its time reached), and is then marked seen. Several waiting stars are shown one after another, oldest first. | M |
+| FR-STAR-13 | Received stars can be viewed again from a "Shooting Stars" list in You & Her. | S |
+| FR-STAR-14 | The composer, preview and viewer set `FLAG_SECURE`, like Ours (FR-VLT-6). | M |
+
+**Backend**
+
+| ID | Requirement | P |
+|---|---|---|
+| FR-STAR-15 | Only the couple can read a star. The recipient can read it only once it is visible, so a scheduled surprise stays hidden. Only the sender creates, edits or deletes it, and only while it is unseen. The recipient can only mark it seen. | M |
+| FR-STAR-16 | Photos are stored in the private memories bucket under `{couple_id}/stars/` and shown only through signed URLs (NFR-SEC-2). Replaced or deleted photos are removed. | M |
+| FR-STAR-17 | When a star becomes visible (sent for the next open, or its time reached), the partner receives a push: "Something special is waiting for you ✨", with no preview of the text or photo (FR-NOT-1). A scheduled job sends it for future times. At most one such push per recipient per minute. Rescheduling a star to a later time notifies again when it arrives. | M |
 
 ### 3.13 Settings — You & Her (`FR-SET`)
 
@@ -281,7 +312,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | Location | user_id (unique), lat, lng, accuracy_m, precision, sharing_enabled, updated_at |
 | Reunion | couple_id (unique), meet_at (UTC), place, note, updated_by, updated_at |
 | Memory | id, couple_id, sender_id, storage_path, caption, expires_at (nullable), allow_keep, viewed_at, created_at |
-| BirthdayWelcome | couple_id, for_user_id, message, photo_path, show_on, seen_at |
+| ShootingStar | id, couple_id, sender_id, recipient_id, layout (photo_message / message_only / full_photo), eyebrow, title, message, signature, photo_path, photo_fit (fill / fit), show_at (UTC, nullable = next open), seen_at, created_at |
 | DeviceToken | user_id, fcm_token, updated_at |
 
 ---
@@ -298,7 +329,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | BR-6 | Expired memories are inaccessible, even before their files are deleted. |
 | BR-7 | Deleted memories are removed for both partners. |
 | BR-8 | Old location data is never shown as live (see FR-LOC-10). |
-| BR-9 | Disconnecting ends location sharing immediately. Shared memories, reunion and birthday data are deleted for both after confirmation. |
+| BR-9 | Disconnecting ends location sharing immediately. Shared memories, reunion and Shooting Stars are deleted for both after confirmation. |
 | BR-10 | Couple codes expire after 24 hours and work only once. |
 
 ---
@@ -316,6 +347,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | No memories | "Nothing here yet. Send your first memory." |
 | No reunion date | "When will you see each other next?" |
 | Compass needs calibration | "Move your phone in a figure-8 to calibrate." |
+| Shooting Star unavailable (deleted, already seen, or not yet visible) | "This Shooting Star is no longer available." |
 
 ---
 
@@ -334,7 +366,9 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | Memory viewer | FR-VLT-8, FR-DEL |
 | New memory | FR-MEM |
 | You & Her (settings) | FR-SET |
-| Birthday welcome | FR-BDY |
+| Shooting Star (viewer) | FR-STAR-10 to FR-STAR-14 |
+| Send a Shooting Star (composer and preview) | FR-STAR-1 to FR-STAR-8, FR-STAR-14 |
+| Shooting Stars (sent and received list) | FR-STAR-9, FR-STAR-13 |
 | Widget | FR-WGT |
 
 ---
