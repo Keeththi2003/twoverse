@@ -69,7 +69,7 @@ object SampleData {
         hasTime = true,
         place = "Kandy",
         note = null,
-        updatedAt = now - Duration.ofDays(15),
+        dateSetAt = now - Duration.ofDays(15),
     )
 
     /** 17 memories, newest first: two unviewed, three with expiry badges (24h, 7d, 2d). */

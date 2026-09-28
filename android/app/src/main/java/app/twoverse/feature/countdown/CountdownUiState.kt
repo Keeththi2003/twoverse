@@ -6,24 +6,32 @@ import java.time.LocalTime
 
 data class CountdownUiState(
     val content: CountdownContent = CountdownContent.Loading,
-    val isDatePickerOpen: Boolean = false,
-    /** The user's local date; the picker only allows today or later. */
-    val today: LocalDate? = null,
 )
 
 sealed interface CountdownContent {
     data object Loading : CountdownContent
 
-    /** No date is set (FR-CNT-7), or the last reunion has arrived and passed (FR-CNT-5). */
-    data class NoDate(val afterReunion: Boolean) : CountdownContent
+    /** No date is set (FR-CNT-7). */
+    data object NoDate : CountdownContent
+
+    /** The reunion day is over: "When's the next time?" (FR-CNT-5). */
+    data object AfterReunion : CountdownContent
+
+    /** The countdown reached zero and it is the reunion day (FR-CNT-5). */
+    data class Celebrating(val plan: ReunionDetails) : CountdownContent
 
     data class Counting(
         val timeLeft: CountdownTime,
         /** Share of the wait already behind the couple, 0..1. */
         val progress: Float,
-        /** Reunion date and time in the user's local time zone (FR-CNT-6). */
-        val date: LocalDate,
-        val time: LocalTime?,
-        val place: String?,
+        val plan: ReunionDetails,
     ) : CountdownContent
 }
+
+/** The plan in the user's local time zone (FR-CNT-6). */
+data class ReunionDetails(
+    val date: LocalDate,
+    val time: LocalTime?,
+    val place: String?,
+    val note: String?,
+)

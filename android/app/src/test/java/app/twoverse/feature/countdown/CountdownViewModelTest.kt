@@ -2,7 +2,7 @@ package app.twoverse.feature.countdown
 
 import app.twoverse.core.common.CountdownTime
 import app.twoverse.core.data.fake.FakeReunionRepository
-import app.twoverse.core.model.Reunion
+import app.twoverse.core.model.ReunionPlan
 import app.twoverse.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -11,10 +11,10 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -29,7 +29,7 @@ class CountdownViewModelTest {
     private val colombo = ZoneId.of("Asia/Colombo")
 
     /** 01:35:50 local time in Colombo (UTC+5:30). */
-    private val start = Instant.parse("2026-09-25T20:05:50Z")
+    private var start = Instant.parse("2026-09-25T20:05:50Z")
 
     /** Saturday 10 October 2026, 10:00 in Colombo, stored as UTC. */
     private val meetAt = Instant.parse("2026-10-10T04:30:00Z")
@@ -49,83 +49,74 @@ class CountdownViewModelTest {
         return viewModel
     }
 
-    private suspend fun setReunion(meetAt: Instant, hasTime: Boolean = true) {
-        repository.setReunion(
-            Reunion(meetAt = meetAt, hasTime = hasTime, place = "Kandy", note = null, updatedAt = start),
-        )
+    private suspend fun plan(meetAt: Instant, hasTime: Boolean = true, note: String? = null) {
+        repository.saveReunion(ReunionPlan(meetAt = meetAt, hasTime = hasTime, place = "Kandy", note = note))
     }
 
-    private fun CountdownViewModel.counting() = uiState.value.content as CountdownContent.Counting
-
     @Test
-    fun showsTimeLeftAndLocalDateAndTime() = runTest(mainDispatcherRule.testDispatcher) {
-        setReunion(meetAt)
+    fun showsTimeLeftAndTheLocalPlan() = runTest(mainDispatcherRule.testDispatcher) {
+        plan(meetAt, note = "Bring the camera")
         val viewModel = createViewModel()
         runCurrent()
 
-        val content = viewModel.counting()
+        val content = viewModel.uiState.value.content as CountdownContent.Counting
         assertEquals(CountdownTime(days = 14, hours = 8, minutes = 24, seconds = 10), content.timeLeft)
-        assertEquals(LocalDate.of(2026, 10, 10), content.date)
-        assertEquals(LocalTime.of(10, 0), content.time)
-        assertEquals("Kandy", content.place)
+        assertEquals(ReunionDetails(LocalDate.of(2026, 10, 10), LocalTime.of(10, 0), "Kandy", "Bring the camera"), content.plan)
     }
 
     @Test
     fun secondsTickLive() = runTest(mainDispatcherRule.testDispatcher) {
-        setReunion(meetAt)
+        plan(meetAt)
         val viewModel = createViewModel()
         runCurrent()
 
         advanceTimeBy(3_000)
         runCurrent()
 
-        assertEquals(CountdownTime(days = 14, hours = 8, minutes = 24, seconds = 7), viewModel.counting().timeLeft)
+        val content = viewModel.uiState.value.content as CountdownContent.Counting
+        assertEquals(7, content.timeLeft.seconds)
     }
 
     @Test
     fun dateWithoutTimeHasNoTime() = runTest(mainDispatcherRule.testDispatcher) {
-        setReunion(meetAt, hasTime = false)
+        plan(meetAt, hasTime = false)
         val viewModel = createViewModel()
         runCurrent()
 
-        assertEquals(null, viewModel.counting().time)
+        assertEquals(null, (viewModel.uiState.value.content as CountdownContent.Counting).plan.time)
     }
 
     @Test
-    fun noReunionShowsEmptyState() = runTest(mainDispatcherRule.testDispatcher) {
+    fun noReunionShowsTheEmptyState() = runTest(mainDispatcherRule.testDispatcher) {
         repository.clearReunion()
         val viewModel = createViewModel()
         runCurrent()
 
-        assertEquals(CountdownContent.NoDate(afterReunion = false), viewModel.uiState.value.content)
+        assertEquals(CountdownContent.NoDate, viewModel.uiState.value.content)
     }
 
     @Test
-    fun reachedReunionAsksForTheNextOne() = runTest(mainDispatcherRule.testDispatcher) {
-        setReunion(start.minusSeconds(60))
+    fun reachingZeroCelebratesUntilTheEndOfTheDay() = runTest(mainDispatcherRule.testDispatcher) {
+        start = meetAt
+        plan(meetAt)
         val viewModel = createViewModel()
         runCurrent()
+        assertEquals(CountdownContent.Celebrating::class, viewModel.uiState.value.content::class)
 
-        assertEquals(CountdownContent.NoDate(afterReunion = true), viewModel.uiState.value.content)
+        advanceTimeBy(Duration.ofHours(14).toMillis())
+        runCurrent()
+        assertEquals(CountdownContent.AfterReunion, viewModel.uiState.value.content)
     }
 
     @Test
-    fun changingDateKeepsLocalTimeAndStoresUtc() = runTest(mainDispatcherRule.testDispatcher) {
-        setReunion(meetAt)
+    fun aPartnersChangeShowsUpLive() = runTest(mainDispatcherRule.testDispatcher) {
+        plan(meetAt)
         val viewModel = createViewModel()
         runCurrent()
 
-        viewModel.onChangeDate()
-        runCurrent()
-        assertTrue(viewModel.uiState.value.isDatePickerOpen)
-
-        viewModel.onDateSelected(LocalDate.of(2026, 10, 17))
+        plan(meetAt.plus(Duration.ofDays(7)))
         runCurrent()
 
-        val saved = repository.reunion.value
-        assertEquals(Instant.parse("2026-10-17T04:30:00Z"), saved?.meetAt)
-        assertEquals(LocalDate.of(2026, 10, 17).atTime(10, 0).atZone(colombo).toInstant(), saved?.meetAt)
-        assertEquals(false, viewModel.uiState.value.isDatePickerOpen)
-        assertEquals(LocalDate.of(2026, 10, 17), viewModel.counting().date)
+        assertEquals(LocalDate.of(2026, 10, 17), (viewModel.uiState.value.content as CountdownContent.Counting).plan.date)
     }
 }

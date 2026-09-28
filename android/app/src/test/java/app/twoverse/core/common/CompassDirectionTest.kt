@@ -17,6 +17,17 @@ class CompassDirectionTest {
     }
 
     @Test
+    fun sectorsChangeHalfwayBetweenPoints() {
+        assertEquals(CompassDirection.North, CompassDirection.fromBearing(22.49))
+        assertEquals(CompassDirection.NorthEast, CompassDirection.fromBearing(22.5))
+        assertEquals(CompassDirection.NorthEast, CompassDirection.fromBearing(67.49))
+        assertEquals(CompassDirection.East, CompassDirection.fromBearing(67.5))
+        assertEquals(CompassDirection.South, CompassDirection.fromBearing(180.0))
+        assertEquals(CompassDirection.NorthWest, CompassDirection.fromBearing(337.49))
+        assertEquals(CompassDirection.North, CompassDirection.fromBearing(337.5))
+    }
+
+    @Test
     fun negativeAndLargeBearingsAreNormalised() {
         assertEquals(CompassDirection.West, CompassDirection.fromBearing(-90.0))
         assertEquals(CompassDirection.NorthEast, CompassDirection.fromBearing(405.0))

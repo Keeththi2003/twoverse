@@ -41,6 +41,9 @@ data object LocationSetupRoute
 @Serializable
 data object CountdownRoute
 
+@Serializable
+data object EditReunionRoute
+
 /** [memoryId] is read by `MemoryViewModel` under the same name (`MemoryIdKey`). */
 @Serializable
 data class MemoryRoute(val memoryId: String)

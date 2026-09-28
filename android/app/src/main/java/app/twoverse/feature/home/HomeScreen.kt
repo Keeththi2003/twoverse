@@ -70,6 +70,7 @@ fun HomeScreen(
     onOpenVault: () -> Unit,
     onSendMemory: () -> Unit,
     onOpenLocationSetup: () -> Unit,
+    miniNeedleRotation: () -> Float?,
     modifier: Modifier = Modifier,
 ) {
     val spacing = TwoverseTheme.spacing
@@ -101,7 +102,7 @@ fun HomeScreen(
             ) {
                 YourStarTile(
                     direction = uiState.partnerDirection,
-                    bearingDegrees = uiState.bearingDegrees,
+                    needleRotation = miniNeedleRotation,
                     onClick = onOpenCompass,
                     modifier = Modifier
                         .weight(1f)
@@ -331,14 +332,14 @@ private fun UpdatedText(freshness: LocationFreshness, updatedAgo: ElapsedTime?, 
 @Composable
 private fun YourStarTile(
     direction: CompassDirection?,
-    bearingDegrees: Float?,
+    needleRotation: () -> Float?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = TwoverseTheme.colors
     HomeTile(onClick = onClick, modifier = modifier) {
         MiniCompass(
-            bearingDegrees = bearingDegrees,
+            needleRotation = needleRotation,
             modifier = Modifier.border(MiniCompassBorder, colors.outline, TwoverseTheme.shapes.circle),
         )
         Column {
@@ -460,6 +461,7 @@ private fun HomeScreenPreview() {
             onOpenVault = {},
             onSendMemory = {},
             onOpenLocationSetup = {},
+            miniNeedleRotation = { 42f },
         )
     }
 }
@@ -476,7 +478,6 @@ private fun HomeScreenUnavailablePreview() {
                 freshness = LocationFreshness.Unavailable,
                 partnerUpdatedAgo = null,
                 partnerDirection = null,
-                bearingDegrees = null,
                 daysUntilReunion = null,
                 newMemoryCount = 0,
             ),
@@ -485,6 +486,7 @@ private fun HomeScreenUnavailablePreview() {
             onOpenVault = {},
             onSendMemory = {},
             onOpenLocationSetup = {},
+            miniNeedleRotation = { 42f },
         )
     }
 }
@@ -500,7 +502,6 @@ private val PreviewHomeState = HomeUiState.Success(
     myCity = "Colombo",
     partnerCity = "Kandy",
     partnerDirection = CompassDirection.NorthEast,
-    bearingDegrees = 42f,
     daysUntilReunion = 12,
     memoryCount = 17,
     newMemoryCount = 2,

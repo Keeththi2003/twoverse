@@ -51,7 +51,11 @@ private val TipIconSize = 20.dp
 
 /** Your Star (FR-CMP-1 to FR-CMP-6). The needle follows `needleRotation` from the UiState. */
 @Composable
-fun CompassScreen(uiState: CompassUiState, modifier: Modifier = Modifier) {
+fun CompassScreen(
+    uiState: CompassUiState,
+    needleRotation: () -> Float?,
+    modifier: Modifier = Modifier,
+) {
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
     Box(
@@ -84,20 +88,30 @@ fun CompassScreen(uiState: CompassUiState, modifier: Modifier = Modifier) {
                 )
             }
             Spacer(modifier = Modifier.height(spacing.xl))
-            CompassDial(
-                needleRotation = uiState.needleRotation,
-                contentDescription = dialDescription(uiState.direction),
-                modifier = Modifier
-                    .widthIn(max = DialMaxSize)
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
-            )
+            if (uiState.hasCompassSensor) {
+                CompassDial(
+                    needleRotation = { if (uiState.showsNeedle) needleRotation() else null },
+                    contentDescription = dialDescription(uiState.direction),
+                    modifier = Modifier
+                        .widthIn(max = DialMaxSize)
+                        .fillMaxWidth()
+                        .aspectRatio(1f),
+                )
+            } else {
+                NoCompassDirection(direction = uiState.direction)
+            }
             Spacer(modifier = Modifier.height(spacing.lg))
             DistanceAndDirection(uiState = uiState)
             Spacer(modifier = Modifier.height(spacing.md))
             StatusChips(uiState = uiState)
             Spacer(modifier = Modifier.height(spacing.lg))
-            TipCard(textRes = if (uiState.isCalibrated) R.string.compass_tip else R.string.compass_calibrate_hint)
+            TipCard(
+                textRes = when {
+                    !uiState.hasCompassSensor -> R.string.compass_no_sensor
+                    uiState.isCalibrated -> R.string.compass_tip
+                    else -> R.string.compass_calibrate_hint
+                },
+            )
         }
     }
 }
@@ -157,13 +171,25 @@ private fun StatusChips(uiState: CompassUiState.Success) {
         if (uiState.isLastKnownDirection) {
             TwoverseStatusChip(text = stringResource(R.string.compass_last_known_direction))
         }
-        if (uiState.isCalibrated) {
+        if (uiState.hasCompassSensor && uiState.isCalibrated) {
             TwoverseStatusChip(text = stringResource(R.string.compass_calibrated), dotColor = colors.gold)
         }
         uiState.partnerUpdatedAgo?.let { updatedAgo ->
             TwoverseStatusChip(text = stringResource(R.string.compass_partner_location, updatedAgo.shortText()))
         }
     }
+}
+
+/** Without a compass sensor the direction is shown as text (FR-CMP-8). */
+@Composable
+private fun NoCompassDirection(direction: CompassDirection?) {
+    Text(
+        text = direction?.let { stringResource(it.labelRes()) } ?: stringResource(R.string.compass_dial_no_direction),
+        style = MaterialTheme.typography.displaySmall,
+        color = TwoverseTheme.colors.onSurface,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -198,7 +224,7 @@ private fun TipCard(textRes: Int) {
 @Composable
 private fun CompassScreenPreview() {
     TwoverseTheme {
-        CompassScreen(uiState = PreviewCompassState)
+        CompassScreen(uiState = PreviewCompassState, needleRotation = { 42f })
     }
 }
 
@@ -212,6 +238,18 @@ private fun CompassScreenOutdatedPreview() {
                 partnerUpdatedAgo = ElapsedTime.Hours(3),
                 isCalibrated = false,
             ),
+            needleRotation = { 42f },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun CompassScreenNoSensorPreview() {
+    TwoverseTheme {
+        CompassScreen(
+            uiState = PreviewCompassState.copy(hasCompassSensor = false, showsNeedle = false),
+            needleRotation = { null },
         )
     }
 }
@@ -225,11 +263,12 @@ private fun CompassScreenUnavailablePreview() {
                 distance = null,
                 direction = null,
                 bearingDegrees = null,
-                needleRotation = null,
+                showsNeedle = false,
                 freshness = LocationFreshness.Unavailable,
                 partnerUpdatedAgo = null,
                 unavailableReason = LocationUnavailableReason.PartnerUnavailable,
             ),
+            needleRotation = { null },
         )
     }
 }
@@ -239,7 +278,9 @@ private val PreviewCompassState = CompassUiState.Success(
     distanceUnit = DistanceUnit.Kilometres,
     direction = CompassDirection.NorthEast,
     bearingDegrees = 42,
-    needleRotation = 42f,
+    showsNeedle = true,
+    hasCompassSensor = true,
+    isPointingAtPartner = false,
     freshness = LocationFreshness.Live,
     partnerUpdatedAgo = ElapsedTime.Seconds(12),
     unavailableReason = null,

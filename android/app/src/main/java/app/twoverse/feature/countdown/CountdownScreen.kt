@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import app.twoverse.R
 import app.twoverse.core.common.CountdownTime
+import app.twoverse.core.designsystem.component.GoldStar
 import app.twoverse.core.designsystem.component.IconTile
 import app.twoverse.core.designsystem.component.TwoverseBackButton
 import app.twoverse.core.designsystem.component.TwoverseCard
@@ -51,15 +52,14 @@ private val PlanRowMinHeight = 58.dp
 private val PlanIconTileSize = 36.dp
 private val PlanIconSize = 18.dp
 private const val DatePattern = "EEEEdMMMM"
+private val CelebrationStarSize = 56.dp
 
 /** Until We Meet (FR-CNT-1 to FR-CNT-7). */
 @Composable
 fun CountdownScreen(
     uiState: CountdownUiState,
     onBack: () -> Unit,
-    onChangeDate: () -> Unit,
-    onDismissDatePicker: () -> Unit,
-    onDateSelected: (LocalDate) -> Unit,
+    onEditPlan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = TwoverseTheme.colors
@@ -96,23 +96,25 @@ fun CountdownScreen(
                 }
                 when (content) {
                     CountdownContent.Loading -> Unit
-                    is CountdownContent.NoDate -> NoDateMessage(afterReunion = content.afterReunion)
+                    CountdownContent.NoDate -> NoDateMessage(afterReunion = false)
+                    CountdownContent.AfterReunion -> NoDateMessage(afterReunion = true)
+                    is CountdownContent.Celebrating -> CelebrationContent(content.plan)
                     is CountdownContent.Counting -> CountingContent(content)
                 }
             }
             when (content) {
                 CountdownContent.Loading -> Unit
-                is CountdownContent.NoDate -> TwoversePrimaryButton(
+                CountdownContent.NoDate, CountdownContent.AfterReunion -> TwoversePrimaryButton(
                     text = stringResource(R.string.countdown_set_date),
-                    onClick = onChangeDate,
+                    onClick = onEditPlan,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = spacing.xl),
                 )
-                is CountdownContent.Counting -> Column(modifier = Modifier.padding(top = spacing.xl)) {
+                is CountdownContent.Counting, is CountdownContent.Celebrating -> Column(modifier = Modifier.padding(top = spacing.xl)) {
                     TwoverseSecondaryButton(
                         text = stringResource(R.string.countdown_change_date),
-                        onClick = onChangeDate,
+                        onClick = onEditPlan,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Text(
@@ -129,15 +131,6 @@ fun CountdownScreen(
         }
     }
 
-    val today = uiState.today
-    if (uiState.isDatePickerOpen && today != null) {
-        ReunionDatePicker(
-            initialDate = (content as? CountdownContent.Counting)?.date,
-            today = today,
-            onDismiss = onDismissDatePicker,
-            onDateSelected = onDateSelected,
-        )
-    }
 }
 
 @Composable
@@ -178,7 +171,36 @@ private fun CountingContent(content: CountdownContent.Counting) {
     }
     UnitTiles(timeLeft = content.timeLeft, modifier = Modifier.padding(top = spacing.lg))
     GettingCloserCard(progress = content.progress, modifier = Modifier.padding(top = spacing.smd))
-    PlanCard(content = content, modifier = Modifier.padding(top = spacing.smd))
+    PlanCard(plan = content.plan, modifier = Modifier.padding(top = spacing.smd))
+}
+
+/** The countdown reached zero on the reunion day (FR-CNT-5). */
+@Composable
+private fun CelebrationContent(plan: ReunionDetails) {
+    val colors = TwoverseTheme.colors
+    val spacing = TwoverseTheme.spacing
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = spacing.xl),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(spacing.md),
+    ) {
+        GoldStar(size = CelebrationStarSize)
+        Text(
+            text = stringResource(R.string.countdown_celebration_title),
+            style = MaterialTheme.typography.displaySmall,
+            color = colors.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(R.string.countdown_celebration_body),
+            style = MaterialTheme.typography.bodyLarge,
+            color = colors.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+    PlanCard(plan = plan, modifier = Modifier.padding(top = spacing.xl))
 }
 
 @Composable
@@ -239,17 +261,18 @@ private fun GettingCloserCard(progress: Float, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PlanCard(content: CountdownContent.Counting, modifier: Modifier = Modifier) {
+private fun PlanCard(plan: ReunionDetails, modifier: Modifier = Modifier) {
     val locale = LocalConfiguration.current.locales[0]
-    val dateText = remember(content.date, locale) { content.date.format(dateFormatter(locale)) }
-    val time = content.time
+    val dateText = remember(plan.date, locale) { plan.date.format(dateFormatter(locale)) }
+    val time = plan.time
     val rows = buildList {
         add(PlanRow(R.drawable.ic_calendar, R.string.countdown_date, dateText))
-        content.place?.let { add(PlanRow(R.drawable.ic_pin, R.string.countdown_place, it)) }
+        plan.place?.let { add(PlanRow(R.drawable.ic_pin, R.string.countdown_place, it)) }
         if (time != null) {
             val timeText = time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale))
             add(PlanRow(R.drawable.ic_clock, R.string.countdown_time, stringResource(R.string.countdown_time_around, timeText)))
         }
+        plan.note?.let { add(PlanRow(R.drawable.ic_heart, R.string.countdown_note, it)) }
     }
     TwoverseCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -305,15 +328,11 @@ private fun CountdownScreenPreview() {
                 content = CountdownContent.Counting(
                     timeLeft = CountdownTime(days = 12, hours = 8, minutes = 24, seconds = 10),
                     progress = 0.55f,
-                    date = LocalDate.of(2026, 10, 10),
-                    time = LocalTime.of(10, 0),
-                    place = "Kandy",
+                    plan = PreviewPlan,
                 ),
             ),
             onBack = {},
-            onChangeDate = {},
-            onDismissDatePicker = {},
-            onDateSelected = {},
+            onEditPlan = {},
         )
     }
 }
@@ -323,11 +342,28 @@ private fun CountdownScreenPreview() {
 private fun CountdownScreenNoDatePreview() {
     TwoverseTheme {
         CountdownScreen(
-            uiState = CountdownUiState(content = CountdownContent.NoDate(afterReunion = false)),
+            uiState = CountdownUiState(content = CountdownContent.NoDate),
             onBack = {},
-            onChangeDate = {},
-            onDismissDatePicker = {},
-            onDateSelected = {},
+            onEditPlan = {},
         )
     }
 }
+
+@PreviewLightDark
+@Composable
+private fun CountdownScreenCelebrationPreview() {
+    TwoverseTheme {
+        CountdownScreen(
+            uiState = CountdownUiState(content = CountdownContent.Celebrating(PreviewPlan)),
+            onBack = {},
+            onEditPlan = {},
+        )
+    }
+}
+
+private val PreviewPlan = ReunionDetails(
+    date = LocalDate.of(2026, 10, 10),
+    time = LocalTime.of(10, 0),
+    place = "Kandy",
+    note = "Bring the camera",
+)

@@ -36,6 +36,21 @@ class GeoMathTest {
     }
 
     @Test
+    fun bearingsToTheCardinalDirections() {
+        assertEquals(0.0, initialBearingDegrees(location(0.0, 0.0), location(1.0, 0.0)), 1e-6)
+        assertEquals(90.0, initialBearingDegrees(location(0.0, 0.0), location(0.0, 1.0)), 1e-6)
+        assertEquals(180.0, initialBearingDegrees(location(1.0, 0.0), location(0.0, 0.0)), 1e-6)
+    }
+
+    @Test
+    fun bearingIsInitialNotConstantOnLongRoutes() {
+        val london = location(51.5074, -0.1278)
+        val tokyo = location(35.6762, 139.6503)
+
+        assertEquals(31.9, initialBearingDegrees(london, tokyo), 0.5)
+    }
+
+    @Test
     fun bearingDueWestIs270Degrees() {
         assertEquals(270.0, initialBearingDegrees(location(0.0, 10.0), location(0.0, 9.0)), 1e-6)
     }

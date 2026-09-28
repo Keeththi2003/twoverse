@@ -9,16 +9,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun CountdownRoute(
     onBack: () -> Unit,
+    onEditPlan: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CountdownViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    CountdownScreen(
-        uiState = uiState,
-        onBack = onBack,
-        onChangeDate = viewModel::onChangeDate,
-        onDismissDatePicker = viewModel::onDismissDatePicker,
-        onDateSelected = viewModel::onDateSelected,
-        modifier = modifier,
-    )
+    CountdownScreen(uiState = uiState, onBack = onBack, onEditPlan = onEditPlan, modifier = modifier)
 }
