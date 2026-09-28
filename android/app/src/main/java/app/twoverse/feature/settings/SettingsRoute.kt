@@ -7,12 +7,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.twoverse.BuildConfig
 
 @Composable
 fun SettingsRoute(
     onSignedOut: () -> Unit,
     onDisconnected: () -> Unit,
+    onEditBirthdayMessage: () -> Unit,
     onShowBirthday: () -> Unit,
     onOpenLocationSetup: () -> Unit,
     modifier: Modifier = Modifier,
@@ -43,10 +43,10 @@ fun SettingsRoute(
             onLogOutConfirmed = viewModel::onLogOutConfirmed,
             onDisconnectConfirmed = viewModel::onDisconnectConfirmed,
             onDeleteAccountConfirmed = viewModel::onDeleteAccountConfirmed,
+            onEditBirthdayMessage = onEditBirthdayMessage,
             onShowBirthday = onShowBirthday,
             onOpenLocationSetup = onOpenLocationSetup,
         ),
-        showDebugOptions = BuildConfig.DEBUG,
         modifier = modifier,
     )
 }

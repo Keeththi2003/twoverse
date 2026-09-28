@@ -16,6 +16,9 @@ data class SettingsActions(
     val onLogOutConfirmed: () -> Unit = {},
     val onDisconnectConfirmed: () -> Unit = {},
     val onDeleteAccountConfirmed: () -> Unit = {},
+    /** Writes the birthday welcome for the partner (FR-BDY-1). */
+    val onEditBirthdayMessage: () -> Unit = {},
+    /** Shows the partner's birthday welcome again (FR-BDY-4). */
     val onShowBirthday: () -> Unit = {},
     /** Turning sharing on goes through the permission flow (FR-LOC-1). */
     val onOpenLocationSetup: () -> Unit = {},
