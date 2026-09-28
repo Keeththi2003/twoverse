@@ -36,6 +36,11 @@ class SupabaseErrorsTest {
     }
 
     @Test
+    fun goneShootingStarsAreUnavailable() {
+        assertEquals(DataError.StarUnavailable, SupabaseErrors.fromRpcErrorKey("star_not_found"))
+    }
+
+    @Test
     fun reconnectingTooLateIsReported() {
         assertEquals(DataError.ReconnectUnavailable, SupabaseErrors.fromRpcErrorKey("no_ended_couple"))
     }
