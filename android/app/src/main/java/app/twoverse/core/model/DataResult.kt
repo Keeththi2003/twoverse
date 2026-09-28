@@ -18,5 +18,11 @@ enum class DataError {
     InvalidCoupleCode,
     AlreadyPaired,
     NotPaired,
+
+    /** The memory expired, was deleted or hidden (BR-6). */
+    MemoryUnavailable,
+
+    /** The 7-day window to reconnect has passed (SRS 12). */
+    ReconnectUnavailable,
     Unknown,
 }
