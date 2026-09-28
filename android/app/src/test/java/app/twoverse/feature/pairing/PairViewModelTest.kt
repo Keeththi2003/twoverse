@@ -1,10 +1,14 @@
 package app.twoverse.feature.pairing
 
+import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeBirthdayRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakePushRepository
+import app.twoverse.core.model.AuthState
+import app.twoverse.core.model.BirthdayWelcome
 import app.twoverse.core.model.DataError
-import app.twoverse.testing.InMemoryUserPreferences
+import app.twoverse.core.model.EndedCouple
+import app.twoverse.core.model.ReconnectRequest
 import app.twoverse.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -19,6 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,11 +34,12 @@ class PairViewModelTest {
 
     private val coupleRepository = FakeCoupleRepository()
     private val pushRepository = FakePushRepository()
-    private val preferences = InMemoryUserPreferences()
+    private val authRepository = FakeAuthRepository()
+    private val birthdayRepository = FakeBirthdayRepository()
     private val clock = Clock.fixed(Instant.now(), ZoneOffset.UTC)
 
     private fun TestScope.createViewModel(): PairViewModel {
-        val viewModel = PairViewModel(coupleRepository, pushRepository, FakeBirthdayRepository(preferences), clock)
+        val viewModel = PairViewModel(coupleRepository, pushRepository, authRepository, birthdayRepository, clock)
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         runCurrent()
         return viewModel
@@ -75,6 +81,7 @@ class PairViewModelTest {
 
     @Test
     fun joiningAPartnersCodeConnects() = runTest(mainDispatcherRule.testDispatcher) {
+        birthdayRepository.setWelcome(welcome(seen = false))
         val viewModel = createViewModel()
 
         viewModel.onPartnerCodeChange("ab12-cd34!")
@@ -119,7 +126,7 @@ class PairViewModelTest {
 
     @Test
     fun seenBirthdayWelcomeIsNotShownAgain() = runTest(mainDispatcherRule.testDispatcher) {
-        preferences.setBirthdayWelcomeSeen()
+        birthdayRepository.setWelcome(welcome(seen = true))
         val viewModel = createViewModel()
 
         coupleRepository.simulatePartnerJoined()
@@ -127,4 +134,57 @@ class PairViewModelTest {
 
         assertFalse(viewModel.uiState.value.hasBirthdayWelcome)
     }
+
+    @Test
+    fun aDisconnectedCoupleCanBeReconnectedUntilItIsDeleted() = runTest(mainDispatcherRule.testDispatcher) {
+        coupleRepository.setEndedCouple(
+            EndedCouple(
+                id = "couple",
+                endedAt = Instant.parse("2026-09-27T09:00:00Z"),
+                deleteAfter = Instant.parse("2026-10-04T09:00:00Z"),
+                reconnectRequest = ReconnectRequest.ByPartner,
+            ),
+        )
+
+        val reconnect = createViewModel().uiState.value.reconnect
+
+        assertEquals(PairReconnect(deleteOn = LocalDate.of(2026, 10, 4), partnerAsked = true), reconnect)
+    }
+
+    @Test
+    fun withoutADisconnectedCoupleThereIsNothingToReconnect() = runTest(mainDispatcherRule.testDispatcher) {
+        assertNull(createViewModel().uiState.value.reconnect)
+    }
+
+    @Test
+    fun loggingOutAfterConfirmingRemovesThePushTokenFirst() = runTest(mainDispatcherRule.testDispatcher) {
+        authRepository.signInWithEmail("you@example.com", "secret1")
+        val viewModel = createViewModel()
+
+        viewModel.onLogOut()
+        runCurrent()
+        assertTrue(viewModel.uiState.value.isLogOutDialogOpen)
+        viewModel.onLogOutConfirmed()
+        runCurrent()
+
+        assertTrue(viewModel.uiState.value.isSignedOut)
+        assertEquals(listOf("unregister"), pushRepository.calls)
+        assertEquals(AuthState.SignedOut, authRepository.authState.value)
+    }
+
+    @Test
+    fun dismissingLogOutKeepsTheUserSignedIn() = runTest(mainDispatcherRule.testDispatcher) {
+        authRepository.signInWithEmail("you@example.com", "secret1")
+        val viewModel = createViewModel()
+
+        viewModel.onLogOut()
+        viewModel.onLogOutDismissed()
+        runCurrent()
+
+        assertFalse(viewModel.uiState.value.isLogOutDialogOpen)
+        assertFalse(viewModel.uiState.value.isSignedOut)
+    }
+
+    private fun welcome(seen: Boolean) =
+        BirthdayWelcome(message = "Happy birthday", fromName = "Her", photoUrl = null, showOn = null, seen = seen)
 }
