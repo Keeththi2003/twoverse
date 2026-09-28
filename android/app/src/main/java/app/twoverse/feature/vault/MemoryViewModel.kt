@@ -7,13 +7,20 @@ import app.twoverse.core.common.expiryBadge
 import app.twoverse.core.common.isExpired
 import app.twoverse.core.common.ticks
 import app.twoverse.core.data.MemoryRepository
+import app.twoverse.core.data.SettingsRepository
+import app.twoverse.core.data.local.OursLock
+import app.twoverse.core.model.DataResult
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
+import app.twoverse.core.model.canKeepForever
+import app.twoverse.core.model.isNew
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,18 +38,25 @@ internal const val MemoryIdKey = "memoryId"
 class MemoryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val memoryRepository: MemoryRepository,
+    settingsRepository: SettingsRepository,
+    private val oursLock: OursLock,
     private val clock: Clock,
 ) : ViewModel() {
 
     private val memoryId: String = checkNotNull(savedStateHandle[MemoryIdKey])
-    private val dialogState = MutableStateFlow(MemoryUiState())
+    private val interaction = MutableStateFlow(MemoryUiState())
+    private val memory = memoryRepository.memory(memoryId)
 
     val uiState: StateFlow<MemoryUiState> = combine(
-        dialogState,
-        memoryRepository.memory(memoryId),
+        interaction,
+        memory,
         clock.ticks(ExpiryRefreshMillis),
-    ) { state, memory, now ->
-        state.copy(content = if (state.isDeleted) MemoryContent.Loading else contentFor(memory, now))
+        oursLocked(settingsRepository, oursLock),
+    ) { state, memory, now, locked ->
+        state.copy(
+            content = if (state.isRemoved || locked) MemoryContent.Loading else contentFor(memory, now),
+            isLocked = locked,
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(StopTimeoutMillis),
@@ -50,26 +64,47 @@ class MemoryViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch { memoryRepository.markViewed(memoryId) }
+        viewModelScope.launch {
+            val opened = memory.filter { it != null }.first()
+            if (opened?.isNew == true) memoryRepository.markViewed(memoryId)
+        }
+    }
+
+    fun onUnlocked() {
+        oursLock.unlock()
     }
 
     fun onKeepForever() {
-        viewModelScope.launch { memoryRepository.keepForever(memoryId) }
+        interaction.update { it.copy(error = null) }
+        viewModelScope.launch { showFailure(memoryRepository.keepForever(memoryId)) }
     }
 
-    fun onDeleteRequested() {
-        dialogState.update { it.copy(isDeleteDialogOpen = true) }
+    fun onRemoveRequested() {
+        interaction.update { it.copy(isRemoveDialogOpen = true, error = null) }
     }
 
-    fun onDeleteDismissed() {
-        dialogState.update { it.copy(isDeleteDialogOpen = false) }
+    fun onRemoveDismissed() {
+        interaction.update { it.copy(isRemoveDialogOpen = false) }
     }
 
-    fun onDeleteConfirmed() {
+    /** The sender deletes for both; the recipient only hides it (SRS 12). */
+    fun onRemoveConfirmed() {
+        val removal = (uiState.value.content as? MemoryContent.Viewing)?.removal ?: return
+        interaction.update { it.copy(isRemoveDialogOpen = false) }
         viewModelScope.launch {
-            memoryRepository.delete(memoryId)
-            dialogState.update { it.copy(isDeleteDialogOpen = false, isDeleted = true) }
+            val result = when (removal) {
+                MemoryRemoval.Delete -> memoryRepository.delete(memoryId)
+                MemoryRemoval.Hide -> memoryRepository.hide(memoryId)
+            }
+            when (result) {
+                is DataResult.Success -> interaction.update { it.copy(isRemoved = true) }
+                is DataResult.Failure -> interaction.update { it.copy(error = result.error) }
+            }
         }
+    }
+
+    private fun showFailure(result: DataResult<Unit>) {
+        interaction.update { it.copy(error = (result as? DataResult.Failure)?.error) }
     }
 
     private fun contentFor(memory: Memory?, now: Instant): MemoryContent {
@@ -80,7 +115,8 @@ class MemoryViewModel @Inject constructor(
             caption = memory.caption,
             sentAt = memory.createdAt.atZone(clock.zone).toLocalDateTime(),
             expiryBadge = expiryBadge(memory.expiresAt, now),
-            canKeepForever = memory.sender == MemorySender.Partner && memory.allowKeep && memory.expiresAt != null,
+            canKeepForever = memory.canKeepForever,
+            removal = if (memory.sender == MemorySender.Me) MemoryRemoval.Delete else MemoryRemoval.Hide,
         )
     }
 

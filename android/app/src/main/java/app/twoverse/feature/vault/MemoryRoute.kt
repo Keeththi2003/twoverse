@@ -18,18 +18,23 @@ fun MemoryRoute(
     SecureWindowEffect()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentOnBack by rememberUpdatedState(onBack)
+    val unlock = rememberOursUnlocker(onUnlocked = viewModel::onUnlocked)
 
-    LaunchedEffect(uiState.isDeleted) {
-        if (uiState.isDeleted) currentOnBack()
+    LaunchedEffect(uiState.isRemoved) {
+        if (uiState.isRemoved) currentOnBack()
+    }
+    if (uiState.isLocked) {
+        LaunchedEffect(Unit) { unlock() }
     }
 
     MemoryScreen(
         uiState = uiState,
         onBack = onBack,
+        onUnlock = unlock,
         onKeepForever = viewModel::onKeepForever,
-        onDelete = viewModel::onDeleteRequested,
-        onDeleteConfirmed = viewModel::onDeleteConfirmed,
-        onDeleteDismissed = viewModel::onDeleteDismissed,
+        onRemove = viewModel::onRemoveRequested,
+        onRemoveConfirmed = viewModel::onRemoveConfirmed,
+        onRemoveDismissed = viewModel::onRemoveDismissed,
         modifier = modifier,
     )
 }
