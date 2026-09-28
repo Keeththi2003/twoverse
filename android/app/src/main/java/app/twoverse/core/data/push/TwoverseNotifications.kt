@@ -59,6 +59,7 @@ class TwoverseNotifications @Inject constructor(
         }
         val notification = NotificationCompat.Builder(context, channel.id)
             .setSmallIcon(R.drawable.ic_notification)
+            .setColor(ContextCompat.getColor(context, R.color.brand_primary))
             .setContentTitle(context.getString(titleRes))
             .setContentText(context.getString(bodyRes))
             .setAutoCancel(true)
