@@ -17,6 +17,8 @@ val localProperties = Properties().apply {
 
 fun localConfig(key: String): String = localProperties.getProperty(key, "").trim()
 
+val ReleaseSigningKeys = listOf("RELEASE_STORE_FILE", "RELEASE_STORE_PASSWORD", "RELEASE_KEY_ALIAS", "RELEASE_KEY_PASSWORD")
+
 android {
     namespace = "app.twoverse"
     compileSdk {
@@ -37,10 +39,27 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localConfig("GOOGLE_WEB_CLIENT_ID")}\"")
     }
 
+    signingConfigs {
+        // Release signing from local.properties (never committed). Without these keys the
+        // release APK is built unsigned.
+        if (ReleaseSigningKeys.all { localConfig(it).isNotEmpty() }) {
+            create("release") {
+                storeFile = file(localConfig("RELEASE_STORE_FILE"))
+                storePassword = localConfig("RELEASE_STORE_PASSWORD")
+                keyAlias = localConfig("RELEASE_KEY_ALIAS")
+                keyPassword = localConfig("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             optimization {
-                enable = false
+                enable = true
+                keepRules {
+                    files.add(file("proguard-rules.pro"))
+                }
             }
         }
     }
