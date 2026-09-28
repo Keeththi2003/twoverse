@@ -32,6 +32,7 @@ internal object SupabaseErrors {
         "already_paired" -> DataError.AlreadyPaired
         "not_paired" -> DataError.NotPaired
         "memory_not_found" -> DataError.MemoryUnavailable
+        "star_not_found" -> DataError.StarUnavailable
         "no_ended_couple" -> DataError.ReconnectUnavailable
         else -> DataError.Unknown
     }
