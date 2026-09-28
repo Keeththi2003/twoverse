@@ -117,22 +117,21 @@ fun SettingsScreen(
             )
         }
         if (uiState.isConnected) {
-            SectionHeader(R.string.settings_birthday)
+            SectionHeader(R.string.settings_stars)
             SettingsGroup {
                 SettingsValueRow(
-                    title = stringResource(R.string.settings_birthday_message),
-                    subtitle = stringResource(R.string.settings_birthday_message_subtitle),
+                    title = stringResource(R.string.settings_stars_send),
+                    subtitle = stringResource(R.string.settings_stars_send_subtitle),
                     value = "",
-                    onClick = actions.onEditBirthdayMessage,
+                    onClick = actions.onSendShootingStar,
                 )
-                if (uiState.hasBirthdayWelcome) {
-                    GroupDivider()
-                    SettingsValueRow(
-                        title = stringResource(R.string.settings_birthday_view),
-                        value = "",
-                        onClick = actions.onShowBirthday,
-                    )
-                }
+                GroupDivider()
+                SettingsValueRow(
+                    title = stringResource(R.string.settings_stars_list),
+                    subtitle = stringResource(R.string.settings_stars_list_subtitle),
+                    value = "",
+                    onClick = actions.onOpenShootingStars,
+                )
             }
         }
         SectionHeader(R.string.settings_preferences)
@@ -359,7 +358,6 @@ private fun SettingsScreenPreview() {
                 ),
                 isConnected = true,
                 connectedSince = LocalDate.of(2026, 2, 14),
-                hasBirthdayWelcome = true,
             ),
             actions = SettingsActions(),
         )
