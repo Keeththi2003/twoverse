@@ -12,6 +12,9 @@ enum class IncomingPush(val type: String, val opens: LaunchScreen?) {
     PartnerJoined("partner_joined", LaunchScreen.Home),
     ReunionDay("reunion_day", LaunchScreen.Countdown),
     NewMemory("new_memory", LaunchScreen.Vault),
+
+    /** A Shooting Star became visible; opening the app shows it (FR-STAR-17). */
+    ShootingStar("shooting_star", LaunchScreen.ShootingStar),
     ;
 
     companion object {
