@@ -1,5 +1,6 @@
 package app.twoverse.feature.pairing
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -43,6 +47,7 @@ import app.twoverse.core.designsystem.component.Planet
 import app.twoverse.core.designsystem.component.PlanetKind
 import app.twoverse.core.designsystem.component.TwoverseBackButton
 import app.twoverse.core.designsystem.component.TwoverseCard
+import app.twoverse.core.designsystem.component.TwoverseConfirmDialog
 import app.twoverse.core.designsystem.component.TwoverseOutlineButton
 import app.twoverse.core.designsystem.component.TwoversePrimaryButton
 import app.twoverse.core.designsystem.component.TwoverseSecondaryButton
@@ -51,6 +56,8 @@ import app.twoverse.core.designsystem.component.TwoverseTextField
 import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.DataError
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 private val ExpiryIconSize = 16.dp
 private val WaitingHerSize = 14.dp
@@ -58,19 +65,16 @@ private val WaitingYouSize = 11.dp
 private val WaitingLineWidth = 36.dp
 private val WaitingLineStroke = 2.dp
 private val WaitingDash = 4.dp
+private const val ReconnectDatePattern = "dMMMM"
 
-/** Connect your worlds (FR-PAIR-1 to FR-PAIR-5). */
+/** Connect your worlds (FR-PAIR-1 to FR-PAIR-5), reconnecting (SRS 12) and logging out. */
 @Composable
 fun PairScreen(
     uiState: PairUiState,
-    onBack: (() -> Unit)?,
-    onShareCode: (String) -> Unit,
-    onCopyCode: (String) -> Unit,
-    onRetryCode: () -> Unit,
-    onPartnerCodeChange: (String) -> Unit,
-    onConnect: () -> Unit,
+    actions: PairActions,
     modifier: Modifier = Modifier,
 ) {
+    val onBack = actions.onBack
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
 
@@ -106,12 +110,19 @@ fun PairScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.onSurfaceVariant,
                 )
+                uiState.reconnect?.let { reconnect ->
+                    ReconnectCard(
+                        reconnect = reconnect,
+                        onReconnect = actions.onReconnect,
+                        modifier = Modifier.padding(top = spacing.lg),
+                    )
+                }
                 Spacer(modifier = Modifier.height(spacing.xl))
                 CoupleCodeCard(
                     uiState = uiState,
-                    onShareCode = onShareCode,
-                    onCopyCode = onCopyCode,
-                    onRetryCode = onRetryCode,
+                    onShareCode = actions.onShareCode,
+                    onCopyCode = actions.onCopyCode,
+                    onRetryCode = actions.onRetryCode,
                 )
                 if (uiState.isWaitingForPartner) {
                     WaitingForPartner(modifier = Modifier.padding(top = spacing.lg))
@@ -119,7 +130,7 @@ fun PairScreen(
                 OrDivider(modifier = Modifier.padding(top = spacing.xl, bottom = spacing.lg))
                 TwoverseTextField(
                     value = uiState.partnerCode,
-                    onValueChange = onPartnerCodeChange,
+                    onValueChange = actions.onPartnerCodeChange,
                     label = stringResource(R.string.pair_partner_code_label),
                     placeholder = stringResource(R.string.pair_partner_code_placeholder),
                     textStyle = TwoverseTheme.textStyles.coupleCodeInput,
@@ -128,18 +139,80 @@ fun PairScreen(
                         autoCorrectEnabled = false,
                         imeAction = ImeAction.Done,
                     ),
-                    keyboardActions = KeyboardActions(onDone = { onConnect() }),
+                    keyboardActions = KeyboardActions(onDone = { actions.onConnect() }),
                     errorText = uiState.joinError?.let { stringResource(it.messageRes()) },
                 )
             }
-            TwoverseOutlineButton(
-                text = stringResource(R.string.pair_connect),
-                onClick = onConnect,
-                enabled = uiState.canConnect,
-                accentColor = colors.primary,
+            Column(modifier = Modifier.padding(top = spacing.xl)) {
+                TwoverseOutlineButton(
+                    text = stringResource(R.string.pair_connect),
+                    onClick = actions.onConnect,
+                    enabled = uiState.canConnect,
+                    accentColor = colors.primary,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                uiState.logOutError?.let {
+                    Text(
+                        text = stringResource(it.messageRes()),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = spacing.xs)
+                            .semantics { liveRegion = LiveRegionMode.Polite },
+                    )
+                }
+                TwoverseTextButton(
+                    text = stringResource(R.string.pair_log_out),
+                    onClick = actions.onLogOut,
+                    color = colors.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+    if (uiState.isLogOutDialogOpen) {
+        TwoverseConfirmDialog(
+            title = stringResource(R.string.pair_log_out_title),
+            message = stringResource(R.string.pair_log_out_message),
+            confirmLabel = stringResource(R.string.pair_log_out),
+            onConfirm = actions.onLogOutConfirmed,
+            onDismiss = actions.onLogOutDismissed,
+        )
+    }
+}
+
+/** Shown while a disconnected couple can still be restored (SRS 12). */
+@Composable
+private fun ReconnectCard(reconnect: PairReconnect, onReconnect: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = TwoverseTheme.colors
+    val locale = LocalConfiguration.current.locales[0]
+    val date = reconnect.deleteOn.format(
+        DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, ReconnectDatePattern), locale),
+    )
+    TwoverseCard(shape = TwoverseTheme.shapes.cardSmall, modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(TwoverseTheme.spacing.md)) {
+            Text(
+                text = stringResource(
+                    if (reconnect.partnerAsked) R.string.pair_reconnect_partner_asked else R.string.pair_reconnect_title,
+                ),
+                style = MaterialTheme.typography.titleMedium,
+                color = colors.onSurface,
+            )
+            Text(
+                text = stringResource(R.string.pair_reconnect_body, date),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.padding(top = TwoverseTheme.spacing.xxs),
+            )
+            TwoverseSecondaryButton(
+                text = stringResource(R.string.pair_reconnect_open),
+                onClick = onReconnect,
+                small = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = spacing.xl),
+                    .padding(top = TwoverseTheme.spacing.sm),
             )
         }
     }
@@ -266,12 +339,7 @@ private fun PairScreenPreview() {
     TwoverseTheme {
         PairScreen(
             uiState = PairUiState(coupleCode = "AB72-KP91", codeExpiresInHours = 24),
-            onBack = {},
-            onShareCode = {},
-            onCopyCode = {},
-            onRetryCode = {},
-            onPartnerCodeChange = {},
-            onConnect = {},
+            actions = PairActions(onBack = {}),
         )
     }
 }
@@ -287,12 +355,22 @@ private fun PairScreenInvalidCodePreview() {
                 partnerCode = "ZZ00-0000",
                 joinError = DataError.InvalidCoupleCode,
             ),
-            onBack = null,
-            onShareCode = {},
-            onCopyCode = {},
-            onRetryCode = {},
-            onPartnerCodeChange = {},
-            onConnect = {},
+            actions = PairActions(),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun PairScreenReconnectPreview() {
+    TwoverseTheme {
+        PairScreen(
+            uiState = PairUiState(
+                coupleCode = "AB72-KP91",
+                codeExpiresInHours = 24,
+                reconnect = PairReconnect(deleteOn = LocalDate.of(2026, 10, 4), partnerAsked = true),
+            ),
+            actions = PairActions(),
         )
     }
 }

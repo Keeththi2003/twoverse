@@ -3,12 +3,15 @@ package app.twoverse.feature.pairing
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.common.ticks
+import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.PushRepository
 import app.twoverse.core.model.CoupleCode
 import app.twoverse.core.model.DataResult
 import app.twoverse.core.model.PartnerPush
+import app.twoverse.core.model.ReconnectRequest
+import app.twoverse.core.model.isDue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,26 +29,33 @@ import javax.inject.Inject
 class PairViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
     private val pushRepository: PushRepository,
+    private val authRepository: AuthRepository,
     birthdayRepository: BirthdayRepository,
-    clock: Clock,
+    private val clock: Clock,
 ) : ViewModel() {
 
     private val coupleCode = MutableStateFlow<CoupleCode?>(null)
     private val form = MutableStateFlow(PairUiState())
 
     val uiState: StateFlow<PairUiState> = combine(
-        form,
-        coupleCode,
+        combine(form, coupleCode, ::Pair),
         coupleRepository.couple,
+        coupleRepository.endedCouple,
         birthdayRepository.welcome,
         clock.ticks(ExpiryRefreshMillis),
-    ) { form, code, couple, welcome, now ->
+    ) { (form, code), couple, ended, welcome, now ->
         form.copy(
             coupleCode = code?.code,
             codeExpiresInHours = code?.let { hoursUntil(it.expiresAt, now) } ?: 0,
             isWaitingForPartner = couple == null,
             isConnected = couple != null,
-            hasBirthdayWelcome = welcome != null && !welcome.seen,
+            hasBirthdayWelcome = welcome?.isDue(now.atZone(clock.zone).toLocalDate()) == true,
+            reconnect = ended?.takeIf { couple == null }?.let {
+                PairReconnect(
+                    deleteOn = it.deleteAfter.atZone(clock.zone).toLocalDate(),
+                    partnerAsked = it.reconnectRequest == ReconnectRequest.ByPartner,
+                )
+            },
         )
     }.stateIn(
         scope = viewModelScope,
@@ -84,6 +94,26 @@ class PairViewModel @Inject constructor(
             if (result is DataResult.Success) pushRepository.sendToPartner(PartnerPush.PartnerJoined)
             form.update {
                 it.copy(isConnecting = false, joinError = (result as? DataResult.Failure)?.error)
+            }
+        }
+    }
+
+    fun onLogOut() {
+        form.update { it.copy(isLogOutDialogOpen = true, logOutError = null) }
+    }
+
+    fun onLogOutDismissed() {
+        form.update { it.copy(isLogOutDialogOpen = false) }
+    }
+
+    /** Removes this device's push token first, while still signed in, so pushes stop here. */
+    fun onLogOutConfirmed() {
+        form.update { it.copy(isLogOutDialogOpen = false) }
+        viewModelScope.launch {
+            pushRepository.unregisterThisDevice()
+            when (val result = authRepository.signOut()) {
+                is DataResult.Success -> form.update { it.copy(isSignedOut = true) }
+                is DataResult.Failure -> form.update { it.copy(logOutError = result.error) }
             }
         }
     }
