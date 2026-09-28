@@ -23,7 +23,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.Twoverse"
+            android:theme="@style/Theme.Twoverse.Starting"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,6 +42,13 @@
                     android:scheme="app.twoverse" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/brand_primary" />
 
         <service
             android:name=".core.data.push.TwoverseMessagingService"
