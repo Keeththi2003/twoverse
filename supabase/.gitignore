@@ -6,3 +6,7 @@
 .env.keys
 .env.local
 .env.*.local
+
+# Local Edge Function secrets (never committed)
+.env
+functions/.env
