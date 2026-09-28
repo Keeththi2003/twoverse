@@ -3,7 +3,6 @@ package app.twoverse.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.AuthRepository
-import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.SettingsRepository
@@ -29,7 +28,6 @@ class SettingsViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
     private val authRepository: AuthRepository,
     private val pushRepository: PushRepository,
-    birthdayRepository: BirthdayRepository,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -39,13 +37,11 @@ class SettingsViewModel @Inject constructor(
         interaction,
         settingsRepository.settings,
         coupleRepository.couple,
-        birthdayRepository.welcome,
-    ) { state, settings, couple, welcome ->
+    ) { state, settings, couple ->
         state.copy(
             settings = settings,
             isConnected = couple?.status == CoupleStatus.Active,
             connectedSince = couple?.connectedAt?.atZone(clock.zone)?.toLocalDate(),
-            hasBirthdayWelcome = welcome != null,
         )
     }.stateIn(
         scope = viewModelScope,
