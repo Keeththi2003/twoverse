@@ -1,8 +1,7 @@
 package app.twoverse.widget
 
-import app.twoverse.core.data.LocationRepository
-import app.twoverse.core.data.ReunionRepository
-import app.twoverse.core.data.SettingsRepository
+import app.twoverse.core.data.local.OfflineCache
+import app.twoverse.core.data.local.UserPreferences
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -12,8 +11,7 @@ import java.time.Clock
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface WidgetEntryPoint {
-    fun locationRepository(): LocationRepository
-    fun settingsRepository(): SettingsRepository
-    fun reunionRepository(): ReunionRepository
+    fun offlineCache(): OfflineCache
+    fun userPreferences(): UserPreferences
     fun clock(): Clock
 }
