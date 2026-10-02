@@ -34,7 +34,7 @@ class OfflineSnapshotTest {
 
     private val full = OfflineSnapshot(
         ownerId = "me",
-        couple = Couple("couple", UserProfile("her", "Her"), CoupleStatus.Active, connectedAt = now),
+        couple = Couple("couple", UserProfile("her", "Her", timeZone = "Europe/London"), CoupleStatus.Active, connectedAt = now),
         sharing = LocationSharing(enabled = true, precision = LocationPrecision.Precise),
         myLocation = location("me"),
         partnerLocation = location("her"),
@@ -51,6 +51,7 @@ class OfflineSnapshotTest {
                 viewedAt = null,
             ),
         ),
+        hasWaitingStar = true,
     )
 
     @Test
