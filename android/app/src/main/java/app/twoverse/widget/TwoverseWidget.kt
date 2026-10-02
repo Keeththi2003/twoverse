@@ -32,6 +32,7 @@ class TwoverseWidget : GlanceAppWidget() {
             openCountdown = open(context, LaunchScreen.Countdown),
             openVault = open(context, LaunchScreen.Vault),
             openShootingStar = open(context, LaunchScreen.ShootingStar),
+            openOrbit = open(context, LaunchScreen.Orbit),
         )
         provideContent {
             val current by state.collectAsState(initial = null)

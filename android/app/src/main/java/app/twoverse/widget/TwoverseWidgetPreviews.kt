@@ -8,8 +8,8 @@ import androidx.glance.preview.Preview
 import app.twoverse.core.common.ElapsedTime
 import app.twoverse.core.common.LocationFreshness
 
-// Glance previews for every size and state (FR-WGT-1, FR-WGT-6), light and dark. Sizes are
-// typical 2×2, 4×2, 4×3 and 4×4 cells.
+// Glance previews for every size and state (FR-WGT-1, FR-WGT-6, FR-WGT-8), light and dark. Sizes
+// are typical 2×2, 4×2, 4×3 and 4×4 cells.
 
 private val Unavailable = SampleWidgetState.copy(
     location = WidgetLocation.Unavailable,
@@ -86,6 +86,20 @@ private fun SmallNoReunionDarkPreview() {
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 150, heightDp = 150)
 @Composable
+private fun SmallNoTogetherSinceLightPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 150, 150, dark = false)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 150, heightDp = 150)
+@Composable
+private fun SmallNoTogetherSinceDarkPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 150, 150, dark = true)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 150, heightDp = 150)
+@Composable
 private fun SmallSharingOffLightPreview() {
     WidgetPreview(Unavailable.copy(location = WidgetLocation.SharingOff), 150, 150, dark = false)
 }
@@ -115,14 +129,14 @@ private fun SmallDistanceUnavailableDarkPreview() {
 @Preview(widthDp = 150, heightDp = 150)
 @Composable
 private fun SmallNotPairedLightPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 150, 150, dark = false)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 150, 150, dark = false)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 150, heightDp = 150)
 @Composable
 private fun SmallNotPairedDarkPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 150, 150, dark = true)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 150, 150, dark = true)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
@@ -184,6 +198,20 @@ private fun MediumNoReunionDarkPreview() {
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 280, heightDp = 140)
 @Composable
+private fun MediumNoTogetherSinceLightPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 280, 140, dark = false)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 280, heightDp = 140)
+@Composable
+private fun MediumNoTogetherSinceDarkPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 280, 140, dark = true)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 280, heightDp = 140)
+@Composable
 private fun MediumSharingOffLightPreview() {
     WidgetPreview(Unavailable.copy(location = WidgetLocation.SharingOff), 280, 140, dark = false)
 }
@@ -213,14 +241,14 @@ private fun MediumDistanceUnavailableDarkPreview() {
 @Preview(widthDp = 280, heightDp = 140)
 @Composable
 private fun MediumNotPairedLightPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 280, 140, dark = false)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 280, 140, dark = false)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 280, heightDp = 140)
 @Composable
 private fun MediumNotPairedDarkPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 280, 140, dark = true)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 280, 140, dark = true)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
@@ -282,6 +310,20 @@ private fun LargeNoReunionDarkPreview() {
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 280, heightDp = 210)
 @Composable
+private fun LargeNoTogetherSinceLightPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 280, 210, dark = false)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 280, heightDp = 210)
+@Composable
+private fun LargeNoTogetherSinceDarkPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 280, 210, dark = true)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 280, heightDp = 210)
+@Composable
 private fun LargeSharingOffLightPreview() {
     WidgetPreview(Unavailable.copy(location = WidgetLocation.SharingOff), 280, 210, dark = false)
 }
@@ -311,14 +353,14 @@ private fun LargeDistanceUnavailableDarkPreview() {
 @Preview(widthDp = 280, heightDp = 210)
 @Composable
 private fun LargeNotPairedLightPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 280, 210, dark = false)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 280, 210, dark = false)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 280, heightDp = 210)
 @Composable
 private fun LargeNotPairedDarkPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 280, 210, dark = true)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 280, 210, dark = true)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
@@ -380,6 +422,20 @@ private fun TallNoReunionDarkPreview() {
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 280, heightDp = 300)
 @Composable
+private fun TallNoTogetherSinceLightPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 280, 300, dark = false)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 280, heightDp = 300)
+@Composable
+private fun TallNoTogetherSinceDarkPreview() {
+    WidgetPreview(SampleWidgetState.copy(orbit = null), 280, 300, dark = true)
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 280, heightDp = 300)
+@Composable
 private fun TallSharingOffLightPreview() {
     WidgetPreview(Unavailable.copy(location = WidgetLocation.SharingOff), 280, 300, dark = false)
 }
@@ -409,12 +465,12 @@ private fun TallDistanceUnavailableDarkPreview() {
 @Preview(widthDp = 280, heightDp = 300)
 @Composable
 private fun TallNotPairedLightPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 280, 300, dark = false)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 280, 300, dark = false)
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 280, heightDp = 300)
 @Composable
 private fun TallNotPairedDarkPreview() {
-    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0), 280, 300, dark = true)
+    WidgetPreview(Unavailable.copy(location = WidgetLocation.NotPaired, reunion = null, newMemoryCount = 0, orbit = null), 280, 300, dark = true)
 }
