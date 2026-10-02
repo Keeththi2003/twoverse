@@ -57,6 +57,7 @@
     <string name="error_rate_limited">Too many attempts. Wait a moment and try again.</string>
     <string name="error_unknown">Something went wrong. Try again.</string>
     <string name="error_reconnect_unavailable">The time to reconnect has passed.</string>
+    <string name="error_date_in_future">Choose a date that isn\'t in the future.</string>
     <string name="error_star_unavailable">This Shooting Star is no longer available.</string>
 
     <string name="pair_title">Connect your worlds</string>
@@ -462,4 +463,150 @@
     <string name="common_retry">Try again</string>
     <string name="common_cancel">Cancel</string>
 
+
+    <!-- Our Orbit (FR-ORB) -->
+    <string name="orbit_title">Our Orbit</string>
+    <string name="orbit_since">In orbit since %1$s</string>
+    <plurals name="orbit_total_days">
+        <item quantity="one">%d day together</item>
+        <item quantity="other">%d days together</item>
+    </plurals>
+    <string name="orbit_change_date">Change date</string>
+    <string name="orbit_not_set_title">When did your story begin?</string>
+    <string name="orbit_not_set_body">Add the day it all started, and Twoverse counts your days, anniversaries and milestones.</string>
+    <string name="orbit_set_date">Add your date</string>
+    <plurals name="orbit_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+    <plurals name="orbit_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="orbit_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="orbit_first_day">Your first day</string>
+    <string name="orbit_list_separator">", "</string>
+    <string name="orbit_celebrate_anniversary_title">Happy anniversary ✨</string>
+    <plurals name="orbit_celebrate_anniversary_body">
+        <item quantity="one">%d year in orbit</item>
+        <item quantity="other">%d years in orbit</item>
+    </plurals>
+    <string name="orbit_celebrate_milestone_title">Day %1$d ✨</string>
+    <plurals name="orbit_celebrate_milestone_body">
+        <item quantity="one">Today marks %d day of your story.</item>
+        <item quantity="other">Today marks %d days of your story.</item>
+    </plurals>
+    <string name="orbit_next_anniversary">Next anniversary</string>
+    <string name="orbit_anniversary_caption">%1$s · %2$s</string>
+    <string name="orbit_next_milestone">Next milestone</string>
+    <plurals name="orbit_days_count">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="orbit_in_days">
+        <item quantity="one">in %d day</item>
+        <item quantity="other">in %d days</item>
+    </plurals>
+    <plurals name="orbit_days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    <string name="orbit_today">Today</string>
+    <string name="orbit_tomorrow">Tomorrow</string>
+    <plurals name="orbit_times_met_label">
+        <item quantity="one">time met</item>
+        <item quantity="other">times met</item>
+    </plurals>
+    <plurals name="orbit_days_in_person_label">
+        <item quantity="one">day together in person</item>
+        <item quantity="other">days together in person</item>
+    </plurals>
+    <string name="orbit_last_met_label">Last met</string>
+    <string name="orbit_last_met_never">Not yet</string>
+    <string name="orbit_meetups">Meetups</string>
+    <string name="orbit_add_meetup">Add a meetup</string>
+    <string name="orbit_meetups_empty">No meetups yet. Add the times you\'ve met.</string>
+    <string name="orbit_meetup_range">%1$s – %2$s</string>
+    <string name="orbit_detail_separator">" · "</string>
+    <string name="orbit_meetup_delete_description">Delete the meetup on %1$s</string>
+    <string name="orbit_meetup_delete_title">Delete this meetup?</string>
+    <string name="orbit_meetup_delete_message">It\'s removed for both of you.</string>
+    <string name="orbit_meetup_delete">Delete</string>
+    <string name="orbit_story_title">When did your story begin?</string>
+    <string name="orbit_story_body">The day it all started for you two, not the day you paired in Twoverse. You can change it any time in You &amp; Her.</string>
+    <string name="orbit_story_date_label">Together since</string>
+    <string name="orbit_story_choose_date">Choose the date</string>
+    <string name="orbit_story_save">Save</string>
+    <string name="orbit_story_skip">Not now</string>
+    <string name="orbit_meetup_add_title">Add a meetup</string>
+    <string name="orbit_meetup_edit_title">Edit meetup</string>
+    <string name="orbit_meetup_date">Date</string>
+    <string name="orbit_meetup_first_day">First day</string>
+    <string name="orbit_meetup_last_day">Last day</string>
+    <string name="orbit_meetup_choose_date">Choose a date</string>
+    <string name="orbit_meetup_several_days">Lasted several days</string>
+    <string name="orbit_meetup_place">Place (optional)</string>
+    <string name="orbit_meetup_place_placeholder">Kandy</string>
+    <string name="orbit_meetup_note">Note (optional)</string>
+    <string name="orbit_meetup_note_placeholder">What made it special…</string>
+    <string name="orbit_meetup_note_count">%1$d/%2$d</string>
+    <string name="orbit_meetup_save">Save</string>
+    <string name="orbit_meetup_problem_start_missing">Choose the date you met.</string>
+    <string name="orbit_meetup_problem_end_before_start">The last day can\'t be before the first.</string>
+    <plurals name="home_together_days">
+        <item quantity="one">Together %d day</item>
+        <item quantity="other">Together %d days</item>
+    </plurals>
+    <string name="home_together_prompt">Add the day your story began</string>
+    <string name="home_met_none">No meetups yet</string>
+    <plurals name="home_met_times">
+        <item quantity="one">Met %d time</item>
+        <item quantity="other">Met %d times</item>
+    </plurals>
+    <string name="home_meetup_question">Did you meet on %1$s?</string>
+    <string name="home_meetup_question_body">Add it to your meetups in Our Orbit.</string>
+    <string name="home_meetup_question_yes">Yes, add it</string>
+    <string name="home_meetup_question_no">No</string>
+    <string name="settings_orbit">Our Orbit</string>
+    <string name="settings_together_since">Together since</string>
+    <string name="settings_together_since_not_set">Not set</string>
+    <string name="notification_channel_orbit">Our Orbit</string>
+    <string name="notification_channel_orbit_description">Your anniversary and milestone days</string>
+    <string name="notification_anniversary_title">Happy anniversary ✨</string>
+    <plurals name="notification_anniversary_body">
+        <item quantity="one">%d year in orbit</item>
+        <item quantity="other">%d years in orbit</item>
+    </plurals>
+    <string name="notification_anniversary_body_generic">Another year in orbit together</string>
+    <plurals name="notification_milestone_title">
+        <item quantity="one">%d day in orbit ✨</item>
+        <item quantity="other">%d days in orbit ✨</item>
+    </plurals>
+    <string name="notification_milestone_title_generic">A milestone in orbit ✨</string>
+    <string name="notification_milestone_body">Today is a milestone in your story.</string>
+    <plurals name="widget_days_together">
+        <item quantity="one">%d day together</item>
+        <item quantity="other">%d days together</item>
+    </plurals>
+    <plurals name="widget_days_together_label">
+        <item quantity="one">day together</item>
+        <item quantity="other">days together</item>
+    </plurals>
+    <string name="widget_years_short">%1$dy</string>
+    <string name="widget_months_short">%1$dm</string>
+    <string name="widget_days_short">%1$dd</string>
+    <string name="widget_first_day">Your first day</string>
+    <string name="widget_together_for">%1$s together</string>
+    <plurals name="widget_met_times">
+        <item quantity="one">Met %d time</item>
+        <item quantity="other">Met %d times</item>
+    </plurals>
+    <plurals name="widget_anniversary_in">
+        <item quantity="one">Anniversary in %d day</item>
+        <item quantity="other">Anniversary in %d days</item>
+    </plurals>
+    <string name="widget_anniversary_today">Happy anniversary ✨</string>
 </resources>
