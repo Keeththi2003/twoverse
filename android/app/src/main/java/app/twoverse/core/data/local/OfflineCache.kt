@@ -2,6 +2,7 @@ package app.twoverse.core.data.local
 
 import app.twoverse.core.model.Couple
 import app.twoverse.core.model.LocationSharing
+import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.Reunion
 import app.twoverse.core.model.UserLocation
@@ -25,6 +26,8 @@ data class OfflineSnapshot(
     val memories: List<Memory>? = null,
     /** A Shooting Star from the partner is visible and not opened yet (only the fact, never its content). */
     val hasWaitingStar: Boolean? = null,
+    /** The couple's meetups, newest first (FR-ORB-3). */
+    val meetups: List<Meetup>? = null,
 )
 
 interface OfflineCache {
