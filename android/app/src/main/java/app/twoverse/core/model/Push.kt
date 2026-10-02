@@ -4,4 +4,4 @@ package app.twoverse.core.model
 enum class PartnerPush { WakeUp, PartnerJoined, NewMemory }
 
 /** Screens a notification or widget can open. */
-enum class LaunchScreen { Home, Countdown, Vault }
+enum class LaunchScreen { Home, Countdown, Vault, ShootingStar }

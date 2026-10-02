@@ -15,8 +15,8 @@ data class PairUiState(
     val joinError: DataError? = null,
     /** Paired, either by joining a code or by the partner joining this user's code (FR-PAIR-6). */
     val isConnected: Boolean = false,
-    /** After connecting, whether a birthday welcome is due (FR-BDY-3). */
-    val hasBirthdayWelcome: Boolean = false,
+    /** After connecting, whether a Shooting Star is waiting to be shown (FR-STAR-12). */
+    val hasWaitingStar: Boolean = false,
     /** A disconnected couple that can still be restored (SRS 12); null otherwise. */
     val reconnect: PairReconnect? = null,
     val isLogOutDialogOpen: Boolean = false,

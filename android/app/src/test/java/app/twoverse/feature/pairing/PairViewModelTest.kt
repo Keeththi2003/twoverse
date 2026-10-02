@@ -1,15 +1,15 @@
 package app.twoverse.feature.pairing
 
 import app.twoverse.core.data.fake.FakeAuthRepository
-import app.twoverse.core.data.fake.FakeBirthdayRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakePushRepository
+import app.twoverse.core.data.fake.FakeShootingStarRepository
 import app.twoverse.core.model.AuthState
-import app.twoverse.core.model.BirthdayWelcome
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.EndedCouple
 import app.twoverse.core.model.ReconnectRequest
 import app.twoverse.testing.MainDispatcherRule
+import app.twoverse.testing.testStar
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -35,11 +35,11 @@ class PairViewModelTest {
     private val coupleRepository = FakeCoupleRepository()
     private val pushRepository = FakePushRepository()
     private val authRepository = FakeAuthRepository()
-    private val birthdayRepository = FakeBirthdayRepository()
+    private val starRepository = FakeShootingStarRepository()
     private val clock = Clock.fixed(Instant.now(), ZoneOffset.UTC)
 
     private fun TestScope.createViewModel(): PairViewModel {
-        val viewModel = PairViewModel(coupleRepository, pushRepository, authRepository, birthdayRepository, clock)
+        val viewModel = PairViewModel(coupleRepository, pushRepository, authRepository, starRepository, clock)
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         runCurrent()
         return viewModel
@@ -81,7 +81,7 @@ class PairViewModelTest {
 
     @Test
     fun joiningAPartnersCodeConnects() = runTest(mainDispatcherRule.testDispatcher) {
-        birthdayRepository.setWelcome(welcome(seen = false))
+        starRepository.setReceived(listOf(testStar()))
         val viewModel = createViewModel()
 
         viewModel.onPartnerCodeChange("ab12-cd34!")
@@ -90,7 +90,7 @@ class PairViewModelTest {
 
         assertEquals("AB12-CD34", viewModel.uiState.value.partnerCode)
         assertTrue(viewModel.uiState.value.isConnected)
-        assertTrue(viewModel.uiState.value.hasBirthdayWelcome)
+        assertTrue(viewModel.uiState.value.hasWaitingStar)
         assertEquals(listOf("send:PartnerJoined"), pushRepository.calls)
     }
 
@@ -125,14 +125,14 @@ class PairViewModelTest {
     }
 
     @Test
-    fun seenBirthdayWelcomeIsNotShownAgain() = runTest(mainDispatcherRule.testDispatcher) {
-        birthdayRepository.setWelcome(welcome(seen = true))
+    fun seenShootingStarsAreNotShownAgain() = runTest(mainDispatcherRule.testDispatcher) {
+        starRepository.setReceived(listOf(testStar(seenAt = clock.instant())))
         val viewModel = createViewModel()
 
         coupleRepository.simulatePartnerJoined()
         runCurrent()
 
-        assertFalse(viewModel.uiState.value.hasBirthdayWelcome)
+        assertFalse(viewModel.uiState.value.hasWaitingStar)
     }
 
     @Test
@@ -184,7 +184,4 @@ class PairViewModelTest {
         assertFalse(viewModel.uiState.value.isLogOutDialogOpen)
         assertFalse(viewModel.uiState.value.isSignedOut)
     }
-
-    private fun welcome(seen: Boolean) =
-        BirthdayWelcome(message = "Happy birthday", fromName = "Her", photoUrl = null, showOn = null, seen = seen)
 }

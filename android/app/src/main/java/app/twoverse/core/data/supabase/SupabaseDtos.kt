@@ -9,6 +9,10 @@ import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.ProfileSettings
 import app.twoverse.core.model.Reunion
+import app.twoverse.core.model.ShootingStar
+import app.twoverse.core.model.StarContent
+import app.twoverse.core.model.StarLayout
+import app.twoverse.core.model.StarPhotoFit
 import app.twoverse.core.model.UserLocation
 import app.twoverse.core.model.UserProfile
 import kotlinx.serialization.SerialName
@@ -139,15 +143,46 @@ internal data class MemoryDto(
 }
 
 @Serializable
-internal data class BirthdayWelcomeDto(
-    @SerialName("couple_id") val coupleId: String,
-    @SerialName("for_user_id") val forUserId: String,
-    @SerialName("created_by") val createdBy: String,
-    val message: String,
+internal data class ShootingStarDto(
+    val id: String,
+    val layout: String,
+    val eyebrow: String? = null,
+    val title: String? = null,
+    val message: String? = null,
+    val signature: String? = null,
     @SerialName("photo_path") val photoPath: String? = null,
-    @SerialName("show_on") val showOn: String? = null,
+    @SerialName("photo_fit") val photoFit: String,
+    @SerialName("show_at") val showAt: String? = null,
     @SerialName("seen_at") val seenAt: String? = null,
-)
+    @SerialName("created_at") val createdAt: String,
+) {
+    fun toModel(photoUrl: String? = null) = ShootingStar(
+        id = id,
+        content = StarContent(
+            layout = StarLayout.entries.firstOrNull { it.toColumn() == layout } ?: StarLayout.PhotoMessage,
+            eyebrow = eyebrow,
+            title = title,
+            message = message,
+            signature = signature,
+            photoFit = StarPhotoFit.entries.firstOrNull { it.toColumn() == photoFit } ?: StarPhotoFit.Fill,
+        ),
+        hasPhoto = photoPath != null,
+        photoUrl = photoUrl,
+        showAt = showAt?.let(::parseTimestamp),
+        seenAt = seenAt?.let(::parseTimestamp),
+        createdAt = parseTimestamp(createdAt),
+    )
+}
+
+/** The shooting_stars.layout values: 'photo_message', 'message_only', 'full_photo'. */
+internal fun StarLayout.toColumn(): String = when (this) {
+    StarLayout.PhotoMessage -> "photo_message"
+    StarLayout.MessageOnly -> "message_only"
+    StarLayout.FullPhoto -> "full_photo"
+}
+
+/** The shooting_stars.photo_fit values: 'fill', 'fit'. */
+internal fun StarPhotoFit.toColumn(): String = name.lowercase(Locale.ROOT)
 
 internal const val PrecisionApproximate = "approximate"
 internal const val PrecisionPrecise = "precise"

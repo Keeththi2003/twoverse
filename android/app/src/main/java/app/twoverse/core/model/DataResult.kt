@@ -22,6 +22,9 @@ enum class DataError {
     /** The memory expired, was deleted or hidden (BR-6). */
     MemoryUnavailable,
 
+    /** The Shooting Star was deleted, already seen, or isn't visible yet (FR-STAR-15). */
+    StarUnavailable,
+
     /** The 7-day window to reconnect has passed (SRS 12). */
     ReconnectUnavailable,
     Unknown,

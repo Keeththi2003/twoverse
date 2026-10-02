@@ -117,13 +117,30 @@ class SupabaseLocationRepository @Inject constructor(
         val sharing = currentOwnRow()?.row?.toSharing() ?: return DataResult.Success(Unit)
         if (!sharing.enabled) return DataResult.Success(Unit)
         val rounded = position.forPrecision(sharing.precision)
-        return write(
+        return update(
             buildJsonObject {
                 put("lat", rounded.latitude)
                 put("lng", rounded.longitude)
                 put("accuracy_m", rounded.accuracyMeters)
             },
         )
+    }
+
+    /**
+     * Changes the existing row. Positions must not be upserted: the insert half runs the row
+     * triggers on a default row (sharing off), which clears the coordinates before the update.
+     */
+    private suspend fun update(columns: JsonObject): DataResult<Unit> {
+        val userId = awaitUserId() ?: return DataResult.Failure(DataError.Unknown)
+        return supabaseCall {
+            val row = supabase.from(Table)
+                .update(columns) {
+                    filter { eq("user_id", userId) }
+                    select()
+                }
+                .decodeSingle<LocationDto>()
+            ownRow.value = OwnRow(userId, row)
+        }
     }
 
     /** Upserts the user's single row (FR-LOC-7) with only the given columns changed. */
