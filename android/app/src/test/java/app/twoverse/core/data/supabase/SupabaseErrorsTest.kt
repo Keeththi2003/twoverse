@@ -41,6 +41,11 @@ class SupabaseErrorsTest {
     }
 
     @Test
+    fun aFutureStoryDateIsReported() {
+        assertEquals(DataError.DateInFuture, SupabaseErrors.fromRpcErrorKey("date_in_future"))
+    }
+
+    @Test
     fun reconnectingTooLateIsReported() {
         assertEquals(DataError.ReconnectUnavailable, SupabaseErrors.fromRpcErrorKey("no_ended_couple"))
     }

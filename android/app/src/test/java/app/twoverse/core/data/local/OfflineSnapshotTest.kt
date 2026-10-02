@@ -5,6 +5,7 @@ import app.twoverse.core.model.Couple
 import app.twoverse.core.model.CoupleStatus
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.LocationSharing
+import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.Reunion
@@ -17,6 +18,7 @@ import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.time.Instant
+import java.time.LocalDate
 
 class OfflineSnapshotTest {
 
@@ -34,7 +36,13 @@ class OfflineSnapshotTest {
 
     private val full = OfflineSnapshot(
         ownerId = "me",
-        couple = Couple("couple", UserProfile("her", "Her", timeZone = "Europe/London"), CoupleStatus.Active, connectedAt = now),
+        couple = Couple(
+            "couple",
+            UserProfile("her", "Her", timeZone = "Europe/London"),
+            CoupleStatus.Active,
+            connectedAt = now,
+            togetherSince = LocalDate.of(2024, 2, 29),
+        ),
         sharing = LocationSharing(enabled = true, precision = LocationPrecision.Precise),
         myLocation = location("me"),
         partnerLocation = location("her"),
@@ -52,6 +60,10 @@ class OfflineSnapshotTest {
             ),
         ),
         hasWaitingStar = true,
+        meetups = listOf(
+            Meetup("meetup", LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 14), "Kandy", "Long weekend", fromReunionAt = now),
+            Meetup("single", LocalDate.of(2026, 9, 20), null, null, null),
+        ),
     )
 
     @Test
