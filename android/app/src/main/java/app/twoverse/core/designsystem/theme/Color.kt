@@ -25,9 +25,15 @@ data class TwoverseColors(
     val error: Color,
     val starSoft: Color,
     val vaultTileTints: List<Color>,
+    /** Darkens a photo behind text and buttons so they stay readable (Full photo Shooting Star). */
+    val photoScrim: Color,
+    /** Text on [photoScrim]. */
+    val onPhotoScrim: Color,
 )
 
 private val Plum = Color(0xFF2B1633)
+private val PhotoScrim = Color(0xD9120E24)
+private val OnPhotoScrim = Color(0xFFF6ECF1)
 
 val CardShadowColor = Plum.copy(alpha = 0.07f)
 
@@ -54,6 +60,8 @@ val LightTwoverseColors = TwoverseColors(
         Color(0xFFFBEFD9),
         Color(0xFFFFFFFF),
     ),
+    photoScrim = PhotoScrim,
+    onPhotoScrim = OnPhotoScrim,
 )
 
 val DarkTwoverseColors = TwoverseColors(
@@ -79,6 +87,8 @@ val DarkTwoverseColors = TwoverseColors(
         Color(0xFF33263A),
         Color(0xFF1C1733),
     ),
+    photoScrim = PhotoScrim,
+    onPhotoScrim = OnPhotoScrim,
 )
 
 internal fun TwoverseColors.toColorScheme(): ColorScheme {

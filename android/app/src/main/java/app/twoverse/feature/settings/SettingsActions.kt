@@ -16,10 +16,10 @@ data class SettingsActions(
     val onLogOutConfirmed: () -> Unit = {},
     val onDisconnectConfirmed: () -> Unit = {},
     val onDeleteAccountConfirmed: () -> Unit = {},
-    /** Writes the birthday welcome for the partner (FR-BDY-1). */
-    val onEditBirthdayMessage: () -> Unit = {},
-    /** Shows the partner's birthday welcome again (FR-BDY-4). */
-    val onShowBirthday: () -> Unit = {},
+    /** Writes a Shooting Star for the partner (FR-STAR-1). */
+    val onSendShootingStar: () -> Unit = {},
+    /** Sent and received Shooting Stars (FR-STAR-9, FR-STAR-13). */
+    val onOpenShootingStars: () -> Unit = {},
     /** Turning sharing on goes through the permission flow (FR-LOC-1). */
     val onOpenLocationSetup: () -> Unit = {},
 )

@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.twoverse.core.common.EXTRA_LAUNCH_SCREEN
@@ -30,6 +31,7 @@ class MainActivity : FragmentActivity() {
     lateinit var authDeepLinkHandler: AuthDeepLinkHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         handleAuthDeepLink(intent)

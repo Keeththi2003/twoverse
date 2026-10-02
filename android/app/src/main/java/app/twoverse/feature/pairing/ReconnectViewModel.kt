@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 /**
  * Reconnecting after a disconnect (SRS 12): the first partner asks, the other confirms, and the
- * server restores the couple with its memories, reunion and birthday message.
+ * server restores the couple with its memories, reunion and Shooting Stars.
  */
 @HiltViewModel
 class ReconnectViewModel @Inject constructor(

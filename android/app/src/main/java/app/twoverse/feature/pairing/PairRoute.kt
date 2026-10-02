@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PairRoute(
     onBack: (() -> Unit)?,
-    onConnected: (showBirthday: Boolean) -> Unit,
+    onConnected: (showShootingStar: Boolean) -> Unit,
     onReconnect: () -> Unit,
     onSignedOut: () -> Unit,
     modifier: Modifier = Modifier,
@@ -37,7 +37,7 @@ fun PairRoute(
     val shareMessage = uiState.coupleCode?.let { stringResource(R.string.pair_share_message, it) }
 
     LaunchedEffect(uiState.isConnected) {
-        if (uiState.isConnected) currentOnConnected(uiState.hasBirthdayWelcome)
+        if (uiState.isConnected) currentOnConnected(uiState.hasWaitingStar)
     }
     LaunchedEffect(uiState.isSignedOut) {
         if (uiState.isSignedOut) currentOnSignedOut()

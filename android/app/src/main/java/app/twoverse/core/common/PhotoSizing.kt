@@ -6,6 +6,9 @@ import kotlin.math.roundToInt
 /** Memory photos are sent with their long edge at most this many pixels (FR-MEM-2). */
 const val MemoryPhotoLongEdge = 1080
 
+/** Shooting Star photos can fill the screen, so they keep more detail (FR-STAR-6). */
+const val StarPhotoLongEdge = 1920
+
 data class PixelSize(val width: Int, val height: Int)
 
 /**

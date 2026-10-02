@@ -10,8 +10,6 @@ data class SettingsUiState(
     val isConnected: Boolean = false,
     /** When the couple connected, in the user's local time zone (FR-SET-1). */
     val connectedSince: LocalDate? = null,
-    /** The partner wrote a birthday welcome for this user, so it can be viewed again (FR-BDY-4). */
-    val hasBirthdayWelcome: Boolean = false,
     val openDialog: SettingsDialog? = null,
     /** Log out, disconnect or account deletion failed on the server. */
     val error: DataError? = null,

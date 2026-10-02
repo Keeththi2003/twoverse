@@ -2,11 +2,11 @@ package app.twoverse.feature.splash
 
 import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.fake.FakeAuthRepository
-import app.twoverse.core.data.fake.FakeBirthdayRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
+import app.twoverse.core.data.fake.FakeShootingStarRepository
 import app.twoverse.core.model.AuthState
-import app.twoverse.core.model.BirthdayWelcome
 import app.twoverse.testing.MainDispatcherRule
+import app.twoverse.testing.testStar
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -20,7 +20,6 @@ import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,13 +30,10 @@ class SplashViewModelTest {
 
     private val authRepository = FakeAuthRepository()
     private val coupleRepository = FakeCoupleRepository()
-    private val birthdayRepository = FakeBirthdayRepository()
+    private val starRepository = FakeShootingStarRepository()
     private val clock = Clock.fixed(Instant.parse("2026-09-28T09:00:00Z"), ZoneId.of("Asia/Colombo"))
 
-    private fun createViewModel() = SplashViewModel(authRepository, coupleRepository, birthdayRepository, clock)
-
-    private fun welcome(showOn: LocalDate? = null, seen: Boolean = false) =
-        BirthdayWelcome(message = "Happy birthday", fromName = "Her", photoUrl = null, showOn = showOn, seen = seen)
+    private fun createViewModel() = SplashViewModel(authRepository, coupleRepository, starRepository, clock)
 
     private fun TestScope.collectState(viewModel: SplashViewModel) {
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
@@ -59,7 +55,7 @@ class SplashViewModelTest {
         val restoring = object : AuthRepository by authRepository {
             override val authState = MutableStateFlow<AuthState>(AuthState.Loading)
         }
-        val viewModel = SplashViewModel(restoring, coupleRepository, birthdayRepository, clock)
+        val viewModel = SplashViewModel(restoring, coupleRepository, starRepository, clock)
         collectState(viewModel)
         advanceTimeBy(SplashViewModel.MinimumDisplayMillis * 5)
         runCurrent()
@@ -87,23 +83,22 @@ class SplashViewModelTest {
     }
 
     @Test
-    fun pairedUserWithUnseenBirthdayWelcomeGoesToBirthday() = runTest(mainDispatcherRule.testDispatcher) {
+    fun pairedUserWithAWaitingShootingStarSeesItFirst() = runTest(mainDispatcherRule.testDispatcher) {
         authRepository.signInWithGoogle("token", "nonce")
         coupleRepository.join("AB72-KP91")
-        birthdayRepository.setWelcome(welcome())
+        starRepository.setReceived(listOf(testStar()))
         val viewModel = createViewModel()
         collectState(viewModel)
         advanceUntilIdle()
 
-        assertEquals(SplashUiState.Ready(SplashDestination.Birthday), viewModel.uiState.value)
+        assertEquals(SplashUiState.Ready(SplashDestination.ShootingStar), viewModel.uiState.value)
     }
 
     @Test
-    fun pairedUserWithSeenBirthdayWelcomeGoesToHome() = runTest(mainDispatcherRule.testDispatcher) {
+    fun seenShootingStarsAreNotShownAgain() = runTest(mainDispatcherRule.testDispatcher) {
         authRepository.signInWithGoogle("token", "nonce")
         coupleRepository.join("AB72-KP91")
-        birthdayRepository.setWelcome(welcome())
-        birthdayRepository.markSeen()
+        starRepository.setReceived(listOf(testStar(seenAt = Instant.parse("2026-09-27T09:00:00Z"))))
         val viewModel = createViewModel()
         collectState(viewModel)
         advanceUntilIdle()
@@ -112,10 +107,10 @@ class SplashViewModelTest {
     }
 
     @Test
-    fun birthdayWelcomeForALaterDateWaitsForThatDay() = runTest(mainDispatcherRule.testDispatcher) {
+    fun aScheduledShootingStarWaitsForItsTime() = runTest(mainDispatcherRule.testDispatcher) {
         authRepository.signInWithGoogle("token", "nonce")
         coupleRepository.join("AB72-KP91")
-        birthdayRepository.setWelcome(welcome(showOn = LocalDate.of(2026, 9, 29)))
+        starRepository.setReceived(listOf(testStar(showAt = clock.instant().plusSeconds(60))))
         val viewModel = createViewModel()
         collectState(viewModel)
         advanceUntilIdle()
@@ -124,14 +119,14 @@ class SplashViewModelTest {
     }
 
     @Test
-    fun birthdayWelcomeShowsOnItsDay() = runTest(mainDispatcherRule.testDispatcher) {
+    fun aShootingStarShowsOnceItsTimeHasCome() = runTest(mainDispatcherRule.testDispatcher) {
         authRepository.signInWithGoogle("token", "nonce")
         coupleRepository.join("AB72-KP91")
-        birthdayRepository.setWelcome(welcome(showOn = LocalDate.of(2026, 9, 28)))
+        starRepository.setReceived(listOf(testStar(showAt = clock.instant())))
         val viewModel = createViewModel()
         collectState(viewModel)
         advanceUntilIdle()
 
-        assertEquals(SplashUiState.Ready(SplashDestination.Birthday), viewModel.uiState.value)
+        assertEquals(SplashUiState.Ready(SplashDestination.ShootingStar), viewModel.uiState.value)
     }
 }

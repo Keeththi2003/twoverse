@@ -3,10 +3,10 @@ package app.twoverse.feature.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.AuthRepository
-import app.twoverse.core.data.BirthdayRepository
 import app.twoverse.core.data.CoupleRepository
+import app.twoverse.core.data.ShootingStarRepository
 import app.twoverse.core.model.AuthState
-import app.twoverse.core.model.isDue
+import app.twoverse.core.model.waitingToBeShown
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import java.time.Clock
-import java.time.LocalDate
 import javax.inject.Inject
 
 /** Chooses the first screen from the saved session and couple status (FR-ONB-3). */
@@ -27,7 +26,7 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     authRepository: AuthRepository,
     private val coupleRepository: CoupleRepository,
-    private val birthdayRepository: BirthdayRepository,
+    private val starRepository: ShootingStarRepository,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -51,8 +50,8 @@ class SplashViewModel @Inject constructor(
 
     private suspend fun signedInDestination(): SplashDestination {
         if (coupleRepository.couple.first() == null) return SplashDestination.Pair
-        val welcome = birthdayRepository.welcome.first()
-        return if (welcome?.isDue(LocalDate.now(clock)) == true) SplashDestination.Birthday else SplashDestination.Home
+        val waiting = starRepository.received.first().waitingToBeShown(clock.instant())
+        return if (waiting.isNotEmpty()) SplashDestination.ShootingStar else SplashDestination.Home
     }
 
     companion object {

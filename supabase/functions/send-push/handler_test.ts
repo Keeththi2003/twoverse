@@ -48,6 +48,7 @@ Deno.test("user pushes need a bearer token", async () => {
 Deno.test("users cannot send server-only or unknown types", async () => {
   const { deps, prepared } = fakeDeps();
   assertEquals((await handle(post({ type: "reunion_day" }, signedIn), deps)).status, 400);
+  assertEquals((await handle(post({ type: "shooting_star" }, signedIn), deps)).status, 400);
   assertEquals((await handle(post({ type: "anything" }, signedIn), deps)).status, 400);
   assertEquals(prepared.length, 0);
 });
@@ -74,6 +75,13 @@ Deno.test("server pushes need the internal secret", async () => {
   assertEquals((await handle(post(body, { "x-internal-secret": "wrong" }), deps)).status, 401);
   assertEquals((await handle(post(body, { "x-internal-secret": "internal-secret" }), deps)).status, 200);
   assertEquals(sent.map((m) => m.token), ["target-token"]);
+});
+
+Deno.test("a shooting star push is a server push that carries only its type", async () => {
+  const { deps, sent } = fakeDeps();
+  const response = await handle(post({ type: "shooting_star", user_ids: [USER_A] }, { "x-internal-secret": "internal-secret" }), deps);
+  assertEquals(response.status, 200);
+  assertEquals(sent[0].data, { type: "shooting_star" });
 });
 
 Deno.test("server pushes are refused when no internal secret is configured", async () => {

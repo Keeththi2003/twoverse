@@ -1,12 +1,12 @@
 /** Push types and the FCM messages built for them (FR-NOT, FR-LOC-5). */
 
-export type PushType = "wake_up" | "partner_joined" | "new_memory" | "reunion_day";
+export type PushType = "wake_up" | "partner_joined" | "new_memory" | "reunion_day" | "shooting_star";
 
 /** Types a signed-in user may send to their partner; the database applies the rules. */
 export const USER_PUSH_TYPES: ReadonlySet<string> = new Set(["wake_up", "partner_joined", "new_memory"]);
 
-/** Types only the server sends (pg_cron with the internal secret). */
-export const SERVER_PUSH_TYPES: ReadonlySet<string> = new Set(["reunion_day"]);
+/** Types only the server sends (pg_cron and database triggers, with the internal secret). */
+export const SERVER_PUSH_TYPES: ReadonlySet<string> = new Set(["reunion_day", "shooting_star"]);
 
 export interface FcmMessage {
   token: string;

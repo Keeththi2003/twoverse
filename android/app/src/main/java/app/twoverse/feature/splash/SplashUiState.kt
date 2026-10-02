@@ -7,4 +7,4 @@ sealed interface SplashUiState {
 }
 
 /** Where the app goes after the splash (FR-ONB-3). */
-enum class SplashDestination { Welcome, Pair, Birthday, Home }
+enum class SplashDestination { Welcome, Pair, ShootingStar, Home }
