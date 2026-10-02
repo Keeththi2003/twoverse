@@ -84,6 +84,25 @@ Deno.test("a shooting star push is a server push that carries only its type", as
   assertEquals(sent[0].data, { type: "shooting_star" });
 });
 
+Deno.test("anniversary and milestone pushes carry only their type and number", async () => {
+  const { deps, sent } = fakeDeps();
+  const secret = { "x-internal-secret": "internal-secret" };
+  assertEquals((await handle(post({ type: "anniversary", count: 2, user_ids: [USER_A], note: "x" }, secret), deps)).status, 200);
+  assertEquals(sent[0].data, { type: "anniversary", count: "2" });
+  assertEquals((await handle(post({ type: "orbit_milestone", count: 1000, user_ids: [USER_A] }, secret), deps)).status, 200);
+  assertEquals(sent[1].data, { type: "orbit_milestone", count: "1000" });
+});
+
+Deno.test("anniversary and milestone pushes need a sensible number and are server-only", async () => {
+  const { deps, sent } = fakeDeps();
+  const secret = { "x-internal-secret": "internal-secret" };
+  for (const count of [undefined, 0, -1, 1.5, "2", 1_000_000]) {
+    assertEquals((await handle(post({ type: "anniversary", count, user_ids: [USER_A] }, secret), deps)).status, 400, String(count));
+  }
+  assertEquals((await handle(post({ type: "orbit_milestone", count: 100 }, signedIn), deps)).status, 400);
+  assertEquals(sent.length, 0);
+});
+
 Deno.test("server pushes are refused when no internal secret is configured", async () => {
   const { deps } = fakeDeps({ internalSecret: undefined });
   const response = await handle(post({ type: "reunion_day", user_ids: [USER_A] }, { "x-internal-secret": "" }), deps);
