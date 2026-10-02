@@ -6,6 +6,7 @@ import app.twoverse.core.data.fake.FakeHeadingSource
 import app.twoverse.core.data.fake.FakeLocationPermissionChecker
 import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeMemoryRepository
+import app.twoverse.core.data.fake.FakeOrbitRepository
 import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.fake.FakeReunionRepository
 import app.twoverse.core.data.sensors.CompassHeading
@@ -13,6 +14,8 @@ import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.HeadingReading
 import app.twoverse.core.model.LocationPermissionStatus
+import app.twoverse.core.model.Meetup
+import app.twoverse.core.model.ReunionPlan
 import app.twoverse.testing.InMemoryUserPreferences
 import app.twoverse.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,11 +24,14 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -38,17 +44,22 @@ class HomeViewModelTest {
     private val preferences = InMemoryUserPreferences()
     private val permissions = FakeLocationPermissionChecker()
     private val headingSource = FakeHeadingSource()
+    private val reunionRepository = FakeReunionRepository()
+    private val orbitRepository = FakeOrbitRepository()
+    private var clock: Clock = Clock.fixed(Instant.now(), ZoneOffset.UTC)
+    private lateinit var viewModel: HomeViewModel
 
     private fun TestScope.state(): HomeUiState.Success {
-        val viewModel = HomeViewModel(
+        viewModel = HomeViewModel(
             locationRepository = locationRepository,
             settingsRepository = DefaultSettingsRepository(locationRepository, FakeProfileRepository(), preferences),
-            reunionRepository = FakeReunionRepository(),
+            reunionRepository = reunionRepository,
             memoryRepository = FakeMemoryRepository(Clock.systemUTC()),
+            orbitRepository = orbitRepository,
             permissions = permissions,
             preferences = preferences,
             compassHeading = CompassHeading(headingSource, Clock.systemUTC()),
-            clock = Clock.fixed(Instant.now(), ZoneOffset.UTC),
+            clock = clock,
         )
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.miniNeedleRotation.collect { miniNeedle = it } }
@@ -110,5 +121,74 @@ class HomeViewModelTest {
         permissions.current = LocationPermissionStatus(foreground = false, background = false)
 
         assertEquals(SharingStatus.PermissionNeeded, state().sharingStatus)
+    }
+
+    // Our Orbit (FR-ORB-2, FR-ORB-9, FR-ORB-10)
+
+    private val meetupDay = Instant.parse("2026-10-10T08:00:00Z")
+
+    private suspend fun passedReunion() {
+        clock = Clock.fixed(Instant.parse("2026-10-12T10:00:00Z"), ZoneOffset.UTC)
+        reunionRepository.saveReunion(ReunionPlan(meetAt = meetupDay, hasTime = true, place = "Kandy", note = null))
+    }
+
+    @Test
+    fun withoutTogetherSinceHomeOffersToSetIt() = runTest(mainDispatcherRule.testDispatcher) {
+        val state = state()
+
+        assertTrue(state.askTogetherSince)
+        assertNull(state.orbit)
+    }
+
+    @Test
+    fun showsDaysTogetherAndTimesMet() = runTest(mainDispatcherRule.testDispatcher) {
+        clock = Clock.fixed(Instant.parse("2026-10-12T10:00:00Z"), ZoneOffset.UTC)
+        orbitRepository.setTogetherSince(LocalDate.of(2026, 10, 1))
+        orbitRepository.setMeetups(
+            listOf(
+                Meetup("a", LocalDate.of(2026, 10, 3), null, null, null),
+                Meetup("b", LocalDate.of(2026, 10, 7), null, null, null),
+            ),
+        )
+
+        val state = state()
+
+        assertFalse(state.askTogetherSince)
+        assertEquals(HomeOrbit(totalDays = 12, timesMet = 2), state.orbit)
+    }
+
+    @Test
+    fun aPassedReunionAsksWhetherYouMet() = runTest(mainDispatcherRule.testDispatcher) {
+        passedReunion()
+
+        assertEquals(LocalDate.of(2026, 10, 10), state().meetupQuestion)
+    }
+
+    @Test
+    fun anUpcomingReunionAsksNothing() = runTest(mainDispatcherRule.testDispatcher) {
+        clock = Clock.fixed(Instant.parse("2026-10-09T10:00:00Z"), ZoneOffset.UTC)
+        reunionRepository.saveReunion(ReunionPlan(meetAt = meetupDay, hasTime = true, place = null, note = null))
+
+        assertNull(state().meetupQuestion)
+    }
+
+    @Test
+    fun aReunionRecordedAsAMeetupIsNotAskedAgain() = runTest(mainDispatcherRule.testDispatcher) {
+        passedReunion()
+        orbitRepository.setMeetups(listOf(Meetup("m", LocalDate.of(2026, 10, 10), null, "Kandy", null, fromReunionAt = meetupDay)))
+
+        assertNull(state().meetupQuestion)
+    }
+
+    @Test
+    fun answeringNoDismissesTheQuestionOnThisDevice() = runTest(mainDispatcherRule.testDispatcher) {
+        passedReunion()
+        state()
+
+        viewModel.onMeetupQuestionDismissed()
+        runCurrent()
+
+        assertEquals(meetupDay, preferences.dismissedMeetupQuestion.value)
+        assertNull((viewModel.uiState.value as HomeUiState.Success).meetupQuestion)
     }
 }
