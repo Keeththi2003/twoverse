@@ -50,6 +50,7 @@ class PairViewModel @Inject constructor(
             isWaitingForPartner = couple == null,
             isConnected = couple != null,
             hasWaitingStar = stars.waitingToBeShown(now).isNotEmpty(),
+            askTogetherSince = couple != null && couple.togetherSince == null,
             reconnect = ended?.takeIf { couple == null }?.let {
                 PairReconnect(
                     deleteOn = it.deleteAfter.atZone(clock.zone).toLocalDate(),

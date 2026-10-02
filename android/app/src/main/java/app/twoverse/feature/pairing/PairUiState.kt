@@ -17,6 +17,8 @@ data class PairUiState(
     val isConnected: Boolean = false,
     /** After connecting, whether a Shooting Star is waiting to be shown (FR-STAR-12). */
     val hasWaitingStar: Boolean = false,
+    /** After connecting, ask "When did your story begin?" unless the partner already set it (FR-ORB-2). */
+    val askTogetherSince: Boolean = false,
     /** A disconnected couple that can still be restored (SRS 12); null otherwise. */
     val reconnect: PairReconnect? = null,
     val isLogOutDialogOpen: Boolean = false,
