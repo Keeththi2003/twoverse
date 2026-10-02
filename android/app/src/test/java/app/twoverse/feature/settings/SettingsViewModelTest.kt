@@ -5,6 +5,7 @@ import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.fake.FakePushRepository
+import app.twoverse.core.data.sample.SampleData
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.AuthState
@@ -114,6 +115,17 @@ class SettingsViewModelTest {
 
         assertEquals(DistanceUnit.Kilometres, preferences.distanceUnit.value)
         assertEquals(DataError.Network, viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun showsWhenTheStoryBegan() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+        assertNull(viewModel.uiState.value.togetherSince)
+
+        coupleRepository.setCouple(SampleData.couple.copy(togetherSince = LocalDate.of(2024, 2, 14)))
+        runCurrent()
+
+        assertEquals(LocalDate.of(2024, 2, 14), viewModel.uiState.value.togetherSince)
     }
 
     @Test
