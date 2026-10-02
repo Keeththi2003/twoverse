@@ -10,6 +10,7 @@ import app.twoverse.core.model.DistanceUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,6 +38,14 @@ class DataStoreUserPreferences @Inject constructor(
     override val notificationPermissionAsked: Flow<Boolean> = dataStore.data
         .map { prefs -> prefs[NotificationPermissionAskedKey] ?: false }
         .distinctUntilChanged()
+
+    override val dismissedMeetupQuestion: Flow<Instant?> = dataStore.data
+        .map { prefs -> prefs[DismissedMeetupQuestionKey]?.let(Instant::parse) }
+        .distinctUntilChanged()
+
+    override suspend fun setDismissedMeetupQuestion(reunionAt: Instant) {
+        dataStore.edit { it[DismissedMeetupQuestionKey] = reunionAt.toString() }
+    }
 
     override suspend fun setAppearance(appearance: AppearanceMode) {
         dataStore.edit { it[AppearanceKey] = appearance.name }
@@ -68,5 +77,6 @@ class DataStoreUserPreferences @Inject constructor(
         val LockOursKey = booleanPreferencesKey("lock_ours")
         val BatteryGuideShownKey = booleanPreferencesKey("battery_guide_shown")
         val NotificationPermissionAskedKey = booleanPreferencesKey("notification_permission_asked")
+        val DismissedMeetupQuestionKey = stringPreferencesKey("dismissed_meetup_question")
     }
 }

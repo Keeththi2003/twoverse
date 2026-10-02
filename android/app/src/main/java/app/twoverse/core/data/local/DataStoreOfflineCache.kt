@@ -10,6 +10,7 @@ import app.twoverse.core.model.Couple
 import app.twoverse.core.model.CoupleStatus
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.LocationSharing
+import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.Reunion
@@ -26,6 +27,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -91,6 +93,7 @@ internal data class CachedSnapshot(
     val reunion: CachedReunion? = null,
     val memories: List<CachedMemory>? = null,
     val hasWaitingStar: Boolean? = null,
+    val meetups: List<CachedMeetup>? = null,
 ) {
     fun toModel() = OfflineSnapshot(
         ownerId = ownerId,
@@ -101,13 +104,21 @@ internal data class CachedSnapshot(
         reunion = reunion?.toModel(),
         memories = memories?.map { it.toModel() },
         hasWaitingStar = hasWaitingStar,
+        meetups = meetups?.map { it.toModel() },
     )
 }
 
 internal fun OfflineSnapshot.toCached() = CachedSnapshot(
     ownerId = ownerId,
     couple = couple?.let {
-        CachedCouple(it.id, it.partner.id, it.partner.displayName, it.connectedAt?.toString(), it.partner.timeZone)
+        CachedCouple(
+            id = it.id,
+            partnerId = it.partner.id,
+            partnerName = it.partner.displayName,
+            connectedAt = it.connectedAt?.toString(),
+            partnerTimeZone = it.partner.timeZone,
+            togetherSince = it.togetherSince?.toString(),
+        )
     },
     sharing = sharing?.let { CachedSharing(it.enabled, it.precision.name) },
     myLocation = myLocation?.toCached(),
@@ -127,6 +138,9 @@ internal fun OfflineSnapshot.toCached() = CachedSnapshot(
         )
     },
     hasWaitingStar = hasWaitingStar,
+    meetups = meetups?.map {
+        CachedMeetup(it.id, it.startDate.toString(), it.endDate?.toString(), it.place, it.note, it.fromReunionAt?.toString())
+    },
 )
 
 @Serializable
@@ -136,12 +150,14 @@ internal data class CachedCouple(
     val partnerName: String,
     val connectedAt: String? = null,
     val partnerTimeZone: String? = null,
+    val togetherSince: String? = null,
 ) {
     fun toModel() = Couple(
         id = id,
         partner = UserProfile(id = partnerId, displayName = partnerName, timeZone = partnerTimeZone),
         status = CoupleStatus.Active,
         connectedAt = connectedAt?.let(Instant::parse),
+        togetherSince = togetherSince?.let(LocalDate::parse),
     )
 }
 
@@ -214,3 +230,22 @@ internal data class CachedMemory(
 
 private fun String.toPrecision(): LocationPrecision =
     LocationPrecision.entries.firstOrNull { it.name == this } ?: LocationPrecision.Approximate
+
+@Serializable
+internal data class CachedMeetup(
+    val id: String,
+    val startDate: String,
+    val endDate: String? = null,
+    val place: String? = null,
+    val note: String? = null,
+    val fromReunionAt: String? = null,
+) {
+    fun toModel() = Meetup(
+        id = id,
+        startDate = LocalDate.parse(startDate),
+        endDate = endDate?.let(LocalDate::parse),
+        place = place,
+        note = note,
+        fromReunionAt = fromReunionAt?.let(Instant::parse),
+    )
+}
