@@ -3,4 +3,10 @@
     <color name="window_background">#FFF6ECF1</color>
     <!-- Brand primary (LightTwoverseColors.primary); tints notification icons. -->
     <color name="brand_primary">#FFC4466A</color>
+    <!-- Widget colours for XML drawables and layouts, mirroring the Color.kt tokens (light). -->
+    <color name="widget_arc">#FFD7A9BF</color>
+    <color name="widget_card">#FFFFFFFF</color>
+    <color name="widget_text">#FF2B1633</color>
+    <color name="widget_text_muted">#FF6B5572</color>
+    <color name="widget_gold">#FFE8B04A</color>
 </resources>
