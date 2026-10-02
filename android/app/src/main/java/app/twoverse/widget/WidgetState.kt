@@ -2,20 +2,24 @@ package app.twoverse.widget
 
 import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.ElapsedTime
+import app.twoverse.core.common.Anniversary
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.common.LocationUnavailableReason
 import app.twoverse.core.common.ReunionPhase
 import app.twoverse.core.common.countdownProgress
 import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
+import app.twoverse.core.common.nextAnniversary
 import app.twoverse.core.common.partnerPosition
 import app.twoverse.core.common.reunionPhase
+import app.twoverse.core.common.togetherDuration
 import app.twoverse.core.data.local.OfflineSnapshot
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.isNew
 import java.time.DateTimeException
 import java.time.Instant
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import java.util.Locale
 
@@ -53,6 +57,8 @@ data class WidgetState(
     val hasWaitingStar: Boolean,
     /** No connection: the widget says it shows saved data. */
     val isOffline: Boolean,
+    /** How long they've been together; null when "together since" isn't set, so that part is left out (FR-WGT-8). */
+    val orbit: WidgetOrbit? = null,
 ) {
     val isPaired: Boolean get() = location != WidgetLocation.NotPaired
 }
@@ -65,6 +71,18 @@ data class WidgetReunion(
     /** How much of the wait has passed since the date was set, 0..1 ("getting closer"). */
     val progress: Float,
 )
+
+data class WidgetOrbit(
+    /** The day number; the start date is day 1 (FR-ORB). */
+    val totalDays: Long,
+    val period: Period,
+    val timesMet: Int,
+    /** The next anniversary, only when it is within [AnniversarySoonDays]. */
+    val anniversary: Anniversary?,
+)
+
+/** The large widget mentions the next anniversary from this many days before it. */
+internal const val AnniversarySoonDays = 30L
 
 /**
  * The widget reads only the data saved on the device, so it works without a connection.
@@ -116,6 +134,17 @@ internal fun widgetState(
         newMemoryCount = couple?.let { snapshot.memories?.count { it.isNew } } ?: 0,
         hasWaitingStar = couple != null && snapshot.hasWaitingStar == true,
         isOffline = !isOnline,
+        orbit = couple?.togetherSince?.let { since ->
+            val today = now.atZone(zone).toLocalDate()
+            togetherDuration(since, today)?.let { duration ->
+                WidgetOrbit(
+                    totalDays = duration.totalDays,
+                    period = duration.period,
+                    timesMet = snapshot.meetups?.size ?: 0,
+                    anniversary = nextAnniversary(since, today).takeIf { it.daysUntil <= AnniversarySoonDays },
+                )
+            }
+        },
     )
 }
 

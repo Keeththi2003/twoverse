@@ -19,12 +19,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * Redraws the widget whenever what it shows changes: location, sharing, reunion, new memories,
- * a waiting Shooting Star or connectivity (FR-WGT-2). Between changes the system refreshes it
+ * a waiting Shooting Star, Our Orbit or connectivity (FR-WGT-2, FR-WGT-8). Between changes the system refreshes it
  * every 30 minutes so freshness keeps ageing. Also publishes the generated picker preview.
  */
 @Singleton
@@ -50,6 +51,8 @@ class WidgetUpdater @Inject constructor(
                     reunionSetAt = snapshot?.reunion?.dateSetAt,
                     newMemories = snapshot?.memories?.count { it.isNew } ?: 0,
                     hasWaitingStar = snapshot?.hasWaitingStar == true,
+                    togetherSince = snapshot?.couple?.togetherSince,
+                    timesMet = snapshot?.meetups?.size ?: 0,
                     unit = unit,
                     online = online,
                 )
@@ -77,6 +80,8 @@ class WidgetUpdater @Inject constructor(
         val reunionSetAt: Instant?,
         val newMemories: Int,
         val hasWaitingStar: Boolean,
+        val togetherSince: LocalDate?,
+        val timesMet: Int,
         val unit: DistanceUnit,
         val online: Boolean,
     )
