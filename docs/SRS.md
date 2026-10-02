@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 2.2 |
+| Version | 2.3 |
 | Status | MVP scope agreed |
 | Platform | Android (min SDK 26), primary devices Samsung Galaxy |
 | Package | `app.twoverse` |
@@ -41,6 +41,9 @@ It is not a social network or a messaging app.
 | Couple code | One-time code used to connect two accounts |
 | Wake-up ping | A silent push that asks the partner's phone for a fresh location |
 | Shooting Star | A surprise message one partner prepares for the other, shown once on a later app open |
+| Together since | The date the relationship began. Not the date the couple paired in Twoverse |
+| Meetup | A time the couple met in person: a start date, an optional end date, place and note |
+| Our Orbit | The screen showing how long the couple has been together and their meetup history |
 | Freshness | How recent the partner's last location update is |
 
 ### 1.4 References
@@ -199,6 +202,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | FR-NOT-3 | Notify one day before a temporary memory expires. | C |
 | FR-NOT-4 | Notify on the reunion day. | S |
 | FR-NOT-5 | The wake-up ping is a silent data message with no visible notification. | M |
+| FR-NOT-6 | Notify both partners on their anniversary ("Happy anniversary ✨ 2 years in orbit") and on day milestones (FR-ORB-6), at 08:00 in each partner's time zone. At most one such notification per person per day; the anniversary wins when both fall on the same day. Only the type and the number are sent. | S |
 
 ### 3.11 Home-screen widget (`FR-WGT`)
 
@@ -211,6 +215,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | FR-WGT-5 | Widget supports light and dark themes, using the app's colour tokens, and on Android 12+ the system widget corner radius. | S |
 | FR-WGT-6 | Not paired, location sharing off, distance unavailable, no reunion date and offline each have a designed state (planets faded with a short explanation); old data is never shown as live (BR-8). | M |
 | FR-WGT-7 | The widget picker shows a preview with sample data and the description "See how far apart you are and when you'll meet." | S |
+| FR-WGT-8 | When "together since" is set, the widget adds it: **small** "845 days together" under the distance (or in its place when the distance is unavailable); **medium** "16 days until we meet · 845 days together"; **large** an Our Orbit row with the together duration (2y 3m 5d), times met, and the next anniversary when it is within 30 days, which opens Our Orbit. When it isn't set, this part is left out with no empty space and no prompt. | S |
 
 ### 3.12 Shooting Star — surprise messages (`FR-STAR`)
 
@@ -251,7 +256,28 @@ become Shooting Stars.
 | FR-STAR-16 | Photos are stored in the private memories bucket under `{couple_id}/stars/` and shown only through signed URLs (NFR-SEC-2). Replaced or deleted photos are removed. | M |
 | FR-STAR-17 | When a star becomes visible (sent for the next open, or its time reached), the partner receives a push: "Something special is waiting for you ✨", with no preview of the text or photo (FR-NOT-1). A scheduled job sends it for future times. At most one such push per recipient per minute. Rescheduling a star to a later time notifies again when it arrives. | M |
 
-### 3.13 Settings — You & Her (`FR-SET`)
+### 3.13 Our Orbit — relationship and meetups (`FR-ORB`)
+
+Day counts use the couple's local date. The start date is day 1: on the day the
+relationship began the couple has been together 1 day, and "day 100" is 99 days
+after it.
+
+| ID | Requirement | P |
+|---|---|---|
+| FR-ORB-1 | Either partner can set or change "together since", the date the relationship began. It can't be in the future, is never derived from the pairing date, and the backend records who changed it and when. | M |
+| FR-ORB-2 | After pairing (unless the partner already set it), and from You & Her, the app asks "When did your story begin?" with a date picker. Asking after pairing can be skipped; Our Universe then shows a gentle prompt to set it later. | M |
+| FR-ORB-3 | Either partner can add, edit and delete meetups: start date (today or earlier), optional end date (on or after the start, for visits lasting several days), optional place (up to 100 characters) and note (up to 300 characters). | M |
+| FR-ORB-4 | Our Orbit, opened from a card on Our Universe, shows: "In orbit since 14 February 2024", the duration in years, months and days ("2 years, 3 months, 5 days") and the total days, with the planets-and-orbit visual. | M |
+| FR-ORB-5 | Our Orbit shows the next anniversary with a countdown. An anniversary on 29 February falls on 28 February in years without one. | M |
+| FR-ORB-6 | Milestones are days 100, 365, 500 and 1000, then every 1000 days, plus every yearly anniversary. Our Orbit shows the next one ("1000 days in 23 days"). | M |
+| FR-ORB-7 | Meetup statistics: times met (number of meetups); days together in person (the days covered by meetups so far, counting both the start and end day, with overlapping meetups counted once); and days since you last met ("12 days ago"). | M |
+| FR-ORB-8 | A meetup timeline, newest first, with add, edit and delete. | M |
+| FR-ORB-9 | Our Universe shows a card: "Together 845 days" and "Met 7 times". | M |
+| FR-ORB-10 | When a reunion from Until We Meet has passed and isn't recorded as a meetup yet, Our Universe asks once on this device: "Did you meet on 10 October?". Yes opens a new meetup prefilled with the date and place, with an editable end date; No dismisses the question. A reunion is recorded as a meetup at most once per couple. | S |
+| FR-ORB-11 | On an anniversary or milestone day, Our Orbit shows a small celebration. | C |
+| FR-ORB-12 | Only the couple can read or change their "together since" date and meetups (NFR-SEC-1); meetups update live for both partners. | M |
+
+### 3.14 Settings — You & Her (`FR-SET`)
 
 | ID | Requirement | P |
 |---|---|---|
@@ -261,6 +287,7 @@ become Shooting Stars.
 | FR-SET-4 | Log out. | M |
 | FR-SET-5 | Disconnect from partner (FR-PAIR-7). | M |
 | FR-SET-6 | Request account deletion, which removes the user's account and data. | M |
+| FR-SET-7 | Show and change "together since" (FR-ORB-2). | M |
 
 ---
 
@@ -309,12 +336,13 @@ become Shooting Stars.
 | Entity | Key fields |
 |---|---|
 | Profile | id, display_name, distance_unit, appearance, created_at |
-| Couple | id, user_a, user_b, status (pending / active / ended), connected_at |
+| Couple | id, user_a, user_b, status (pending / active / ended), connected_at, together_since (date, nullable), together_since_set_by, together_since_set_at |
 | CoupleCode | code, couple_id, created_by, expires_at, used_at |
 | Location | user_id (unique), lat, lng, accuracy_m, precision, sharing_enabled, updated_at |
 | Reunion | couple_id (unique), meet_at (UTC), place, note, updated_by, updated_at |
 | Memory | id, couple_id, sender_id, storage_path, caption, expires_at (nullable), allow_keep, viewed_at, created_at |
 | ShootingStar | id, couple_id, sender_id, recipient_id, layout (photo_message / message_only / full_photo), eyebrow, title, message, signature, photo_path, photo_fit (fill / fit), show_at (UTC, nullable = next open), seen_at, created_at |
+| Meetup | id, couple_id, start_date, end_date (nullable, ≥ start_date), place, note (≤ 300), created_by, from_reunion_at (the reunion it records, nullable, once per couple), created_at |
 | DeviceToken | user_id, fcm_token, updated_at |
 
 ---
@@ -331,7 +359,7 @@ become Shooting Stars.
 | BR-6 | Expired memories are inaccessible, even before their files are deleted. |
 | BR-7 | Deleted memories are removed for both partners. |
 | BR-8 | Old location data is never shown as live (see FR-LOC-10). |
-| BR-9 | Disconnecting ends location sharing immediately. Shared memories, reunion and Shooting Stars are deleted for both after confirmation. |
+| BR-9 | Disconnecting ends location sharing immediately. Shared memories, reunion, Shooting Stars, meetups and the "together since" date are deleted for both after confirmation. |
 | BR-10 | Couple codes expire after 24 hours and work only once. |
 
 ---
@@ -350,6 +378,9 @@ become Shooting Stars.
 | No reunion date | "When will you see each other next?" |
 | Compass needs calibration | "Move your phone in a figure-8 to calibrate." |
 | Shooting Star unavailable (deleted, already seen, or not yet visible) | "This Shooting Star is no longer available." |
+| "Together since" not set | "When did your story begin?" |
+| No meetups | "No meetups yet. Add the times you've met." |
+| Date in the future | "Choose a date that isn't in the future." |
 
 ---
 
@@ -361,7 +392,7 @@ become Shooting Stars.
 | Welcome | FR-ONB-2 |
 | Sign in | FR-AUTH |
 | Connect your worlds | FR-PAIR |
-| Our Universe (home) | FR-LOC, FR-CNT-4, FR-VLT (entry) |
+| Our Universe (home) | FR-LOC, FR-CNT-4, FR-VLT (entry), FR-ORB-2, FR-ORB-9, FR-ORB-10 |
 | Your Star | FR-CMP |
 | Until We Meet | FR-CNT |
 | Ours | FR-VLT |
@@ -371,6 +402,9 @@ become Shooting Stars.
 | Shooting Star (viewer) | FR-STAR-10 to FR-STAR-14 |
 | Send a Shooting Star (composer and preview) | FR-STAR-1 to FR-STAR-8, FR-STAR-14 |
 | Shooting Stars (sent and received list) | FR-STAR-9, FR-STAR-13 |
+| Our Orbit | FR-ORB-4 to FR-ORB-8, FR-ORB-11 |
+| When did your story begin? | FR-ORB-1, FR-ORB-2 |
+| Add / edit meetup | FR-ORB-3, FR-ORB-10 |
 | Widget | FR-WGT |
 
 ---
