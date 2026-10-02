@@ -7,16 +7,21 @@ import app.twoverse.core.common.DayPeriod
 import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
 import app.twoverse.core.common.initialBearingDegrees
+import app.twoverse.core.common.ReunionPhase
 import app.twoverse.core.common.partnerPosition
+import app.twoverse.core.common.reunionPhase
+import app.twoverse.core.common.togetherDuration
 import app.twoverse.core.common.ticks
 import app.twoverse.core.data.LocationPermissionChecker
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
+import app.twoverse.core.data.OrbitRepository
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.data.local.UserPreferences
 import app.twoverse.core.data.sensors.CompassHeading
 import app.twoverse.core.model.HeadingSample
+import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.Reunion
@@ -26,20 +31,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     settingsRepository: SettingsRepository,
-    reunionRepository: ReunionRepository,
+    private val reunionRepository: ReunionRepository,
     memoryRepository: MemoryRepository,
+    orbitRepository: OrbitRepository,
     private val permissions: LocationPermissionChecker,
     private val preferences: UserPreferences,
     compassHeading: CompassHeading,
@@ -79,14 +87,20 @@ class HomeViewModel @Inject constructor(
         locationRepository.partnerLocation,
     ) { mine, partner -> mine to partner }
 
+    private val orbit = combine(
+        orbitRepository.togetherSince,
+        orbitRepository.meetups,
+        preferences.dismissedMeetupQuestion,
+    ) { since, meetups, dismissed -> OrbitInputs(since, meetups, dismissed) }
+
     val uiState: StateFlow<HomeUiState> = combine(
         locations,
         settingsRepository.settings,
         reunionRepository.reunion,
         memoryRepository.memories,
-        clock.ticks(),
-    ) { (mine, partner), settings, reunion, memories, now ->
-        buildState(mine, partner, settings, reunion, memories, now)
+        combine(clock.ticks(), orbit, ::Pair),
+    ) { (mine, partner), settings, reunion, memories, (now, orbit) ->
+        buildState(mine, partner, settings, reunion, memories, now).withOrbit(orbit, reunion, now)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(StopTimeoutMillis),
@@ -122,6 +136,30 @@ class HomeViewModel @Inject constructor(
             newMemoryCount = memories.count { it.sender == MemorySender.Partner && it.viewedAt == null },
         )
     }
+
+    /** No: this device won't ask about this reunion again (FR-ORB-10). Yes opens the meetup editor. */
+    fun onMeetupQuestionDismissed() {
+        viewModelScope.launch {
+            reunionRepository.reunion.first()?.let { preferences.setDismissedMeetupQuestion(it.meetAt) }
+        }
+    }
+
+    private fun HomeUiState.Success.withOrbit(orbit: OrbitInputs, reunion: Reunion?, now: Instant): HomeUiState.Success {
+        val today = now.atZone(clock.zone).toLocalDate()
+        val duration = orbit.since?.let { togetherDuration(it, today) }
+        val question = reunion?.takeIf { passed ->
+            reunionPhase(passed.meetAt, now, clock.zone) == ReunionPhase.Past &&
+                orbit.meetups.none { it.fromReunionAt == passed.meetAt } &&
+                orbit.dismissed != passed.meetAt
+        }
+        return copy(
+            orbit = duration?.let { HomeOrbit(totalDays = it.totalDays, timesMet = orbit.meetups.size) },
+            askTogetherSince = orbit.since == null,
+            meetupQuestion = question?.meetAt?.atZone(clock.zone)?.toLocalDate(),
+        )
+    }
+
+    private data class OrbitInputs(val since: LocalDate?, val meetups: List<Meetup>, val dismissed: Instant?)
 
     private companion object {
         const val StopTimeoutMillis = 5_000L
