@@ -3,6 +3,7 @@ package app.twoverse.core.data.supabase
 import app.twoverse.core.common.StarPhotoLongEdge
 import app.twoverse.core.data.CoupleRepository
 import app.twoverse.core.data.ShootingStarRepository
+import app.twoverse.core.data.local.OfflineCache
 import app.twoverse.core.data.memory.MemoryPhotoCompressor
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.DataResult
@@ -10,6 +11,7 @@ import app.twoverse.core.model.ShootingStar
 import app.twoverse.core.model.ShootingStarDraft
 import app.twoverse.core.model.StarField
 import app.twoverse.core.model.StarPhotoChange
+import app.twoverse.core.model.waitingToBeShown
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -31,6 +33,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,6 +50,8 @@ class SupabaseShootingStarRepository @Inject constructor(
     private val supabase: SupabaseClient,
     private val coupleRepository: CoupleRepository,
     private val compressor: MemoryPhotoCompressor,
+    private val offlineCache: OfflineCache,
+    private val clock: Clock,
 ) : ShootingStarRepository {
 
     /** Re-reads after this user marks a star seen. */
@@ -165,7 +170,10 @@ class SupabaseShootingStarRepository @Inject constructor(
         }
     }
 
-    /** RLS returns only the stars that are visible to this user already. */
+    /**
+     * RLS returns only the stars that are visible to this user already. Whether one is waiting is
+     * saved for the widget (FR-WGT-1); a failed load keeps what was saved.
+     */
     private suspend fun fetchReceived(): List<ShootingStar> {
         val userId = currentUserId() ?: return emptyList()
         val result = supabaseCall {
@@ -177,7 +185,10 @@ class SupabaseShootingStarRepository @Inject constructor(
                 .decodeList<ShootingStarDto>()
                 .map { it.toModel() }
         }
-        return (result as? DataResult.Success)?.value.orEmpty()
+        val stars = (result as? DataResult.Success)?.value ?: return emptyList()
+        val waiting = stars.waitingToBeShown(clock.instant()).isNotEmpty()
+        offlineCache.update(userId) { it.copy(hasWaitingStar = waiting) }
+        return stars
     }
 
     private suspend fun fetchRow(id: String): ShootingStarDto? =
