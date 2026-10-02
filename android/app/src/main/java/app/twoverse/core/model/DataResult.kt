@@ -25,6 +25,9 @@ enum class DataError {
     /** The Shooting Star was deleted, already seen, or isn't visible yet (FR-STAR-15). */
     StarUnavailable,
 
+    /** The chosen date is after today (FR-ORB-1). */
+    DateInFuture,
+
     /** The 7-day window to reconnect has passed (SRS 12). */
     ReconnectUnavailable,
     Unknown,

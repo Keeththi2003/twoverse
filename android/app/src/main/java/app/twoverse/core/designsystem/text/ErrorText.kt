@@ -13,6 +13,7 @@ fun DataError.messageRes(): Int = when (this) {
     DataError.NotPaired -> R.string.error_not_paired
     DataError.MemoryUnavailable -> R.string.memory_expired
     DataError.StarUnavailable -> R.string.error_star_unavailable
+    DataError.DateInFuture -> R.string.error_date_in_future
     DataError.ReconnectUnavailable -> R.string.error_reconnect_unavailable
     DataError.InvalidCredentials -> R.string.error_invalid_credentials
     DataError.EmailNotConfirmed -> R.string.error_email_not_confirmed
