@@ -38,7 +38,7 @@ class TwoverseMessagingService : FirebaseMessagingService() {
                 runBlocking { markStarWaiting() }
                 notifications.show(push)
             }
-            else -> notifications.show(push)
+            else -> notifications.show(push, count = message.data["count"]?.toIntOrNull()?.takeIf { it > 0 })
         }
     }
 

@@ -32,6 +32,7 @@ class TwoverseNotifications @Inject constructor(
         Reunion("reunion", R.string.notification_channel_reunion, R.string.notification_channel_reunion_description, NotificationManager.IMPORTANCE_HIGH),
         Memories("memories", R.string.notification_channel_memories, R.string.notification_channel_memories_description, NotificationManager.IMPORTANCE_HIGH),
         Stars("shooting_stars", R.string.notification_channel_stars, R.string.notification_channel_stars_description, NotificationManager.IMPORTANCE_HIGH),
+        Orbit("orbit", R.string.notification_channel_orbit, R.string.notification_channel_orbit_description, NotificationManager.IMPORTANCE_DEFAULT),
     }
 
     fun createChannels() {
@@ -45,14 +46,29 @@ class TwoverseNotifications @Inject constructor(
         }
     }
 
-    /** Shows the notification for a visible push; its text never includes content from the push (FR-NOT-1). */
-    fun show(push: IncomingPush) {
-        val (channel, titleRes, bodyRes) = when (push) {
+    /**
+     * Shows the notification for a visible push; its text never includes content from the push
+     * (FR-NOT-1). Anniversary and milestone pushes carry only their number ([count], FR-NOT-6).
+     */
+    fun show(push: IncomingPush, count: Int? = null) {
+        val (channel, title, body) = when (push) {
             IncomingPush.WakeUp -> return
-            IncomingPush.PartnerJoined -> Triple(Channel.Partner, R.string.notification_partner_joined_title, R.string.notification_partner_joined_body)
-            IncomingPush.ReunionDay -> Triple(Channel.Reunion, R.string.notification_reunion_day_title, R.string.notification_reunion_day_body)
-            IncomingPush.NewMemory -> Triple(Channel.Memories, R.string.notification_new_memory_title, R.string.notification_new_memory_body)
-            IncomingPush.ShootingStar -> Triple(Channel.Stars, R.string.notification_star_title, R.string.notification_star_body)
+            IncomingPush.PartnerJoined -> texts(Channel.Partner, R.string.notification_partner_joined_title, R.string.notification_partner_joined_body)
+            IncomingPush.ReunionDay -> texts(Channel.Reunion, R.string.notification_reunion_day_title, R.string.notification_reunion_day_body)
+            IncomingPush.NewMemory -> texts(Channel.Memories, R.string.notification_new_memory_title, R.string.notification_new_memory_body)
+            IncomingPush.ShootingStar -> texts(Channel.Stars, R.string.notification_star_title, R.string.notification_star_body)
+            IncomingPush.Anniversary -> Triple(
+                Channel.Orbit,
+                context.getString(R.string.notification_anniversary_title),
+                count?.let { context.resources.getQuantityString(R.plurals.notification_anniversary_body, it, it) }
+                    ?: context.getString(R.string.notification_anniversary_body_generic),
+            )
+            IncomingPush.OrbitMilestone -> Triple(
+                Channel.Orbit,
+                count?.let { context.resources.getQuantityString(R.plurals.notification_milestone_title, it, it) }
+                    ?: context.getString(R.string.notification_milestone_title_generic),
+                context.getString(R.string.notification_milestone_body),
+            )
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
@@ -62,13 +78,16 @@ class TwoverseNotifications @Inject constructor(
         val notification = NotificationCompat.Builder(context, channel.id)
             .setSmallIcon(R.drawable.ic_notification)
             .setColor(ContextCompat.getColor(context, R.color.brand_primary))
-            .setContentTitle(context.getString(titleRes))
-            .setContentText(context.getString(bodyRes))
+            .setContentTitle(title)
+            .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(openIntent(push))
             .build()
         NotificationManagerCompat.from(context).notify(push.ordinal, notification)
     }
+
+    private fun texts(channel: Channel, @StringRes titleRes: Int, @StringRes bodyRes: Int) =
+        Triple(channel, context.getString(titleRes), context.getString(bodyRes))
 
     /** Opens the app on the screen that fits the notification. */
     private fun openIntent(push: IncomingPush): PendingIntent? {
