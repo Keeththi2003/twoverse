@@ -1,4 +1,12 @@
-import { buildMessage, type FcmMessage, type PushType, SERVER_PUSH_TYPES, USER_PUSH_TYPES } from "./message.ts";
+import {
+  buildMessage,
+  COUNTED_PUSH_TYPES,
+  type FcmMessage,
+  MAX_PUSH_COUNT,
+  type PushType,
+  SERVER_PUSH_TYPES,
+  USER_PUSH_TYPES,
+} from "./message.ts";
 
 export type SendResult = "ok" | "invalid_token" | "failed";
 
@@ -28,7 +36,7 @@ const ERROR_STATUS: Record<string, number> = {
 export async function handle(req: Request, deps: PushDeps): Promise<Response> {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
-  let body: { type?: unknown; user_ids?: unknown };
+  let body: { type?: unknown; user_ids?: unknown; count?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -38,6 +46,7 @@ export async function handle(req: Request, deps: PushDeps): Promise<Response> {
 
   const internalHeader = req.headers.get("x-internal-secret");
   let tokens: string[];
+  let count: number | undefined;
   if (internalHeader !== null) {
     if (!deps.internalSecret || !constantTimeEquals(internalHeader, deps.internalSecret)) {
       return json({ error: "unauthorized" }, 401);
@@ -45,6 +54,13 @@ export async function handle(req: Request, deps: PushDeps): Promise<Response> {
     const userIds = body.user_ids;
     if (!SERVER_PUSH_TYPES.has(type) || !Array.isArray(userIds) || !userIds.every((id) => typeof id === "string" && UUID.test(id))) {
       return json({ error: "invalid_request" }, 400);
+    }
+    if (COUNTED_PUSH_TYPES.has(type)) {
+      const value = body.count;
+      if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > MAX_PUSH_COUNT) {
+        return json({ error: "invalid_request" }, 400);
+      }
+      count = value;
     }
     tokens = await deps.pushTargets(userIds as string[]);
   } else {
@@ -60,7 +76,7 @@ export async function handle(req: Request, deps: PushDeps): Promise<Response> {
 
   if (deps.send === null) return json({ error: "push_not_configured" }, 503);
 
-  const results = await Promise.all(tokens.map((token) => deps.send!(buildMessage(type as PushType, token))));
+  const results = await Promise.all(tokens.map((token) => deps.send!(buildMessage(type as PushType, token, count))));
   const invalid = tokens.filter((_, i) => results[i] === "invalid_token");
   if (invalid.length > 0) await deps.removeTokens(invalid);
   return json({ sent: results.filter((r) => r === "ok").length }, 200);
