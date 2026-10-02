@@ -15,6 +15,7 @@ fun SettingsRoute(
     onSendShootingStar: () -> Unit,
     onOpenShootingStars: () -> Unit,
     onOpenLocationSetup: () -> Unit,
+    onSetTogetherSince: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -46,6 +47,7 @@ fun SettingsRoute(
             onSendShootingStar = onSendShootingStar,
             onOpenShootingStars = onOpenShootingStars,
             onOpenLocationSetup = onOpenLocationSetup,
+            onSetTogetherSince = onSetTogetherSince,
         ),
         modifier = modifier,
     )

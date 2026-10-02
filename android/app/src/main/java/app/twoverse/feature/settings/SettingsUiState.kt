@@ -10,6 +10,8 @@ data class SettingsUiState(
     val isConnected: Boolean = false,
     /** When the couple connected, in the user's local time zone (FR-SET-1). */
     val connectedSince: LocalDate? = null,
+    /** When the relationship began (FR-SET-7); null until set. */
+    val togetherSince: LocalDate? = null,
     val openDialog: SettingsDialog? = null,
     /** Log out, disconnect or account deletion failed on the server. */
     val error: DataError? = null,

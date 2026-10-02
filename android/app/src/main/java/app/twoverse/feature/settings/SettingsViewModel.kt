@@ -42,6 +42,7 @@ class SettingsViewModel @Inject constructor(
             settings = settings,
             isConnected = couple?.status == CoupleStatus.Active,
             connectedSince = couple?.connectedAt?.atZone(clock.zone)?.toLocalDate(),
+            togetherSince = couple?.togetherSince,
         )
     }.stateIn(
         scope = viewModelScope,
