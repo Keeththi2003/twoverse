@@ -26,8 +26,9 @@ import java.util.Locale
 internal data class ProfileDto(
     val id: String,
     @SerialName("display_name") val displayName: String,
+    @SerialName("time_zone") val timeZone: String? = null,
 ) {
-    fun toModel() = UserProfile(id = id, displayName = displayName)
+    fun toModel() = UserProfile(id = id, displayName = displayName, timeZone = timeZone)
 }
 
 @Serializable
