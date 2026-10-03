@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 2.1 |
+| Version | 2.2 |
 | Status | MVP scope agreed |
 | Platform | Android (min SDK 26), primary devices Samsung Galaxy |
 | Package | `app.twoverse` |
@@ -204,11 +204,13 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 
 | ID | Requirement | P |
 |---|---|---|
-| FR-WGT-1 | Widget shows distance, freshness and days until the next reunion. | M |
-| FR-WGT-2 | Widget updates when new location or countdown data arrives, within Android widget limits. | M |
-| FR-WGT-3 | Widget never shows photos or captions. | M |
-| FR-WGT-4 | Tapping the widget opens Our Universe. | M |
-| FR-WGT-5 | Widget supports light and dark themes. | S |
+| FR-WGT-1 | Widget shows distance, freshness and days until the next reunion. It adapts to its size: **small (2×2)** planets with the dashed arc, distance and freshness; **medium (4×2)** distance, "apart" and freshness beside the planets, with the days until the reunion below; **large (4×3 and bigger)** the orbit with the distance inside it, the partner's direction, both local times when the couple is in different time zones, a reunion card with the date and a "getting closer" progress line, and as space allows a line for new memories or a waiting Shooting Star. No size leaves large empty areas. | M |
+| FR-WGT-2 | Widget updates when location, reunion, memory, Shooting Star or connectivity data arrives, within Android widget limits. | M |
+| FR-WGT-3 | Widget never shows photos or captions; memories and Shooting Stars appear only as text ("2 new memories", "✨ Something is waiting for you"). | M |
+| FR-WGT-4 | Tapping the distance or planets opens Our Universe, the reunion opens Until We Meet, and the memories line opens Ours. | M |
+| FR-WGT-5 | Widget supports light and dark themes, using the app's colour tokens, and on Android 12+ the system widget corner radius. | S |
+| FR-WGT-6 | Not paired, location sharing off, distance unavailable, no reunion date and offline each have a designed state (planets faded with a short explanation); old data is never shown as live (BR-8). | M |
+| FR-WGT-7 | The widget picker shows a preview with sample data and the description "See how far apart you are and when you'll meet." | S |
 
 ### 3.12 Shooting Star — surprise messages (`FR-STAR`)
 

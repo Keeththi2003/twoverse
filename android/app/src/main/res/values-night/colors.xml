@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="window_background">#FF120E24</color>
+    <!-- Widget colours, mirroring the Color.kt tokens (dark). -->
+    <color name="widget_arc">#80E8E2F7</color>
+    <color name="widget_card">#FF1C1733</color>
+    <color name="widget_text">#FFF6ECF1</color>
+    <color name="widget_text_muted">#FFB8AECF</color>
+    <color name="widget_gold">#FFF2C46D</color>
 </resources>

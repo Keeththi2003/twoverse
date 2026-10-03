@@ -2,6 +2,7 @@ package app.twoverse.widget
 
 import app.twoverse.core.data.local.OfflineCache
 import app.twoverse.core.data.local.UserPreferences
+import app.twoverse.core.data.network.NetworkMonitor
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -13,5 +14,6 @@ import java.time.Clock
 interface WidgetEntryPoint {
     fun offlineCache(): OfflineCache
     fun userPreferences(): UserPreferences
+    fun networkMonitor(): NetworkMonitor
     fun clock(): Clock
 }

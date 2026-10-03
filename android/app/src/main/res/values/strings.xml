@@ -427,14 +427,33 @@
     <string name="offline_banner">You\'re offline. Showing the latest saved information.</string>
 
     <string name="widget_name">Twoverse</string>
-    <string name="widget_description">Distance, freshness and days until you meet</string>
+    <string name="widget_description">See how far apart you are and when you\'ll meet.</string>
     <string name="widget_distance_label">Distance between you</string>
-    <string name="widget_distance">%1$s %2$s</string>
+    <string name="widget_orbit_description">Your planet and hers, joined by your star</string>
+    <string name="widget_updated">Updated %1$s</string>
+    <string name="widget_last_seen">Last seen %1$s</string>
+    <string name="widget_offline">Offline · saved data</string>
+    <string name="widget_offline_short">Offline</string>
+    <string name="widget_not_paired">Connect with her in Twoverse</string>
+    <string name="widget_sharing_off">Location sharing is off</string>
     <plurals name="widget_days_until">
         <item quantity="one">%d day until we meet</item>
         <item quantity="other">%d days until we meet</item>
     </plurals>
+    <plurals name="widget_days_label">
+        <item quantity="one">day until we meet</item>
+        <item quantity="other">days until we meet</item>
+    </plurals>
+    <string name="widget_reunion_today">Today\'s the day</string>
     <string name="widget_no_date">No reunion date yet</string>
+    <string name="widget_set_date">Tap to choose one</string>
+    <plurals name="widget_new_memories">
+        <item quantity="one">%d new memory</item>
+        <item quantity="other">%d new memories</item>
+    </plurals>
+    <string name="widget_star_waiting">✨ Something is waiting for you</string>
+    <string name="widget_preview_distance" translatable="false">94.6</string>
+    <string name="widget_preview_days">16 days until we meet</string>
 
     <string name="common_back">Back</string>
     <string name="common_close">Close</string>

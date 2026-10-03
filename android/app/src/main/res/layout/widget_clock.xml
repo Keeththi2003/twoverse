@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A live clock for the large widget; the widget sets its time zone, so it never shows a stale time. -->
+<TextClock xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_clock"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:fontFamily="sans-serif-medium"
+    android:maxLines="1"
+    android:textColor="@color/widget_text"
+    android:textSize="12sp" />

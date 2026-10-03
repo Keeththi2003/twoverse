@@ -90,6 +90,7 @@ internal data class CachedSnapshot(
     val partnerLocation: CachedLocation? = null,
     val reunion: CachedReunion? = null,
     val memories: List<CachedMemory>? = null,
+    val hasWaitingStar: Boolean? = null,
 ) {
     fun toModel() = OfflineSnapshot(
         ownerId = ownerId,
@@ -99,12 +100,15 @@ internal data class CachedSnapshot(
         partnerLocation = partnerLocation?.toModel(),
         reunion = reunion?.toModel(),
         memories = memories?.map { it.toModel() },
+        hasWaitingStar = hasWaitingStar,
     )
 }
 
 internal fun OfflineSnapshot.toCached() = CachedSnapshot(
     ownerId = ownerId,
-    couple = couple?.let { CachedCouple(it.id, it.partner.id, it.partner.displayName, it.connectedAt?.toString()) },
+    couple = couple?.let {
+        CachedCouple(it.id, it.partner.id, it.partner.displayName, it.connectedAt?.toString(), it.partner.timeZone)
+    },
     sharing = sharing?.let { CachedSharing(it.enabled, it.precision.name) },
     myLocation = myLocation?.toCached(),
     partnerLocation = partnerLocation?.toCached(),
@@ -122,6 +126,7 @@ internal fun OfflineSnapshot.toCached() = CachedSnapshot(
             viewedAt = it.viewedAt?.toString(),
         )
     },
+    hasWaitingStar = hasWaitingStar,
 )
 
 @Serializable
@@ -130,10 +135,11 @@ internal data class CachedCouple(
     val partnerId: String,
     val partnerName: String,
     val connectedAt: String? = null,
+    val partnerTimeZone: String? = null,
 ) {
     fun toModel() = Couple(
         id = id,
-        partner = UserProfile(id = partnerId, displayName = partnerName),
+        partner = UserProfile(id = partnerId, displayName = partnerName, timeZone = partnerTimeZone),
         status = CoupleStatus.Active,
         connectedAt = connectedAt?.let(Instant::parse),
     )

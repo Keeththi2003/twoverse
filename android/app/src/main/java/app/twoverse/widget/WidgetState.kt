@@ -1,22 +1,69 @@
 package app.twoverse.widget
 
+import app.twoverse.core.common.CompassDirection
+import app.twoverse.core.common.ElapsedTime
 import app.twoverse.core.common.LocationFreshness
+import app.twoverse.core.common.LocationUnavailableReason
+import app.twoverse.core.common.ReunionPhase
+import app.twoverse.core.common.countdownProgress
 import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
 import app.twoverse.core.common.partnerPosition
+import app.twoverse.core.common.reunionPhase
 import app.twoverse.core.data.local.OfflineSnapshot
 import app.twoverse.core.model.DistanceUnit
+import app.twoverse.core.model.isNew
+import java.time.DateTimeException
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Locale
+
+/** Why the widget can or can't show the distance (FR-WGT-6). */
+enum class WidgetLocation {
+    /** Signed out or not connected to a partner yet. */
+    NotPaired,
+
+    /** This user's own location sharing is off. */
+    SharingOff,
+
+    /** One of the two locations isn't known. */
+    Unavailable,
+
+    Available,
+}
 
 /** What the widget shows (FR-WGT-1). Never photos or captions (FR-WGT-3). */
 data class WidgetState(
-    /** Formatted distance number, or null when unavailable. */
+    val location: WidgetLocation,
+    /** Formatted distance number, or null unless [location] is available. */
     val distance: String?,
     val distanceUnit: DistanceUnit,
     val freshness: LocationFreshness,
-    /** Whole days until the reunion, or null when no date is set. */
-    val daysUntilReunion: Long?,
+    /** How long ago her position was recorded, for "Updated 5 min ago" and "Last seen …". */
+    val updatedAgo: ElapsedTime?,
+    /** Her direction from this user. */
+    val direction: CompassDirection?,
+    /** Her time zone, only when it differs from this phone's right now. */
+    val partnerTimeZone: ZoneId?,
+    /** The upcoming reunion, or null when no date is set or it has passed. */
+    val reunion: WidgetReunion?,
+    val newMemoryCount: Int,
+    /** A Shooting Star is waiting to be opened (only the fact, never its content). */
+    val hasWaitingStar: Boolean,
+    /** No connection: the widget says it shows saved data. */
+    val isOffline: Boolean,
+) {
+    val isPaired: Boolean get() = location != WidgetLocation.NotPaired
+}
+
+data class WidgetReunion(
+    val daysUntil: Long,
+    /** The reunion day in this user's time zone. */
+    val date: LocalDate,
+    val isToday: Boolean,
+    /** How much of the wait has passed since the date was set, 0..1 ("getting closer"). */
+    val progress: Float,
 )
 
 /**
@@ -27,20 +74,57 @@ data class WidgetState(
 internal fun widgetState(
     snapshot: OfflineSnapshot?,
     distanceUnit: DistanceUnit,
+    isOnline: Boolean,
     now: Instant,
+    zone: ZoneId,
     locale: Locale = Locale.getDefault(),
 ): WidgetState {
-    val paired = snapshot?.couple != null
+    val couple = snapshot?.couple
     val position = partnerPosition(
         myLocation = snapshot?.myLocation,
-        partnerLocation = snapshot?.partnerLocation?.takeIf { paired },
+        partnerLocation = snapshot?.partnerLocation?.takeIf { couple != null },
         sharingEnabled = snapshot?.sharing?.enabled == true,
         now = now,
     )
+    val location = when {
+        couple == null -> WidgetLocation.NotPaired
+        position.unavailableReason == LocationUnavailableReason.SharingOff -> WidgetLocation.SharingOff
+        position.distanceKm == null -> WidgetLocation.Unavailable
+        else -> WidgetLocation.Available
+    }
+    val available = location == WidgetLocation.Available
     return WidgetState(
-        distance = position.distanceKm?.let { formatDistance(it, distanceUnit, locale) },
+        location = location,
+        distance = position.distanceKm?.takeIf { available }?.let { formatDistance(it, distanceUnit, locale) },
         distanceUnit = distanceUnit,
-        freshness = position.freshness,
-        daysUntilReunion = snapshot?.reunion?.takeIf { paired }?.let { countdownUntil(it.meetAt, now).days },
+        freshness = if (available) position.freshness else LocationFreshness.Unavailable,
+        updatedAgo = position.updatedAgo?.takeIf { available },
+        direction = position.bearingDegrees?.takeIf { available }?.let(CompassDirection::fromBearing),
+        partnerTimeZone = couple?.partner?.timeZone?.let { differentZone(it, zone, now) },
+        reunion = couple?.let { snapshot.reunion }?.let { reunion ->
+            when (reunionPhase(reunion.meetAt, now, zone)) {
+                ReunionPhase.Past -> null
+                ReunionPhase.Today -> WidgetReunion(0, reunion.meetAt.atZone(zone).toLocalDate(), isToday = true, progress = 1f)
+                ReunionPhase.Upcoming -> WidgetReunion(
+                    daysUntil = countdownUntil(reunion.meetAt, now).days,
+                    date = reunion.meetAt.atZone(zone).toLocalDate(),
+                    isToday = false,
+                    progress = countdownProgress(reunion.dateSetAt, reunion.meetAt, now),
+                )
+            }
+        },
+        newMemoryCount = couple?.let { snapshot.memories?.count { it.isNew } } ?: 0,
+        hasWaitingStar = couple != null && snapshot.hasWaitingStar == true,
+        isOffline = !isOnline,
     )
+}
+
+/** Her zone when its clock differs from this phone's at [now]; null when the same or not a real zone. */
+private fun differentZone(id: String, mine: ZoneId, now: Instant): ZoneId? {
+    val hers = try {
+        ZoneId.of(id)
+    } catch (e: DateTimeException) {
+        return null
+    }
+    return hers.takeIf { it.rules.getOffset(now) != mine.rules.getOffset(now) }
 }

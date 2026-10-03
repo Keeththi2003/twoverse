@@ -23,6 +23,8 @@ data class OfflineSnapshot(
     val reunion: Reunion? = null,
     /** Memory details without photos; photos live in the memory photo cache. */
     val memories: List<Memory>? = null,
+    /** A Shooting Star from the partner is visible and not opened yet (only the fact, never its content). */
+    val hasWaitingStar: Boolean? = null,
 )
 
 interface OfflineCache {
