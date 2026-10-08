@@ -37,6 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerString
+import app.twoverse.core.designsystem.text.partnerNameStart
+import app.twoverse.core.designsystem.text.partnerName
+import app.twoverse.core.designsystem.text.PronounStrings
 import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.common.ExpiryBadge
@@ -65,6 +69,9 @@ private val SenderPlanetSize = 36.dp
 private val DetailsHorizontalPadding = 8.dp
 private val NoteIconSize = 14.dp
 private const val DatePattern = "dMMMy"
+
+/** "Ammu sent it, so she still has it." (SRS 12: the sender controls the memory.) */
+private val HideMessage = PronounStrings(R.string.memory_hide_message_she, R.string.memory_hide_message_he, R.string.memory_hide_message_they)
 
 /** Memory viewer (FR-VLT-8, FR-DEL-2, FR-DEL-3; the recipient hides instead of deleting, SRS 12). */
 @Composable
@@ -122,9 +129,11 @@ fun MemoryScreen(
             title = stringResource(
                 if (removal == MemoryRemoval.Delete) R.string.memory_delete_title else R.string.memory_hide_title,
             ),
-            message = stringResource(
-                if (removal == MemoryRemoval.Delete) R.string.memory_delete_message else R.string.memory_hide_message,
-            ),
+            message = if (removal == MemoryRemoval.Delete) {
+                stringResource(R.string.memory_delete_message)
+            } else {
+                partnerString(HideMessage, partnerNameStart())
+            },
             confirmLabel = stringResource(removal.labelRes()),
             onConfirm = onRemoveConfirmed,
             onDismiss = onRemoveDismissed,
@@ -157,9 +166,11 @@ private fun MemoryPhoto(content: MemoryContent.Viewing, onBack: () -> Unit, onRe
         if (content.imageUrl != null) {
             AsyncImage(
                 model = content.imageUrl,
-                contentDescription = stringResource(
-                    if (content.sender == MemorySender.Me) R.string.memory_photo_from_you else R.string.memory_photo_from_her,
-                ),
+                contentDescription = if (content.sender == MemorySender.Me) {
+                    stringResource(R.string.memory_photo_from_you)
+                } else {
+                    stringResource(R.string.memory_photo_from_partner, partnerName())
+                },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
@@ -256,9 +267,11 @@ private fun MemoryDetails(
             )
             Column {
                 Text(
-                    text = stringResource(
-                        if (content.sender == MemorySender.Me) R.string.memory_from_you else R.string.memory_from_her,
-                    ),
+                    text = if (content.sender == MemorySender.Me) {
+                        stringResource(R.string.memory_from_you)
+                    } else {
+                        stringResource(R.string.memory_from_partner, partnerName())
+                    },
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                     color = colors.onSurface,
                 )
