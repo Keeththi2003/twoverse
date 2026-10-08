@@ -9,4 +9,15 @@
     <color name="widget_text">#FF2B1633</color>
     <color name="widget_text_muted">#FF6B5572</color>
     <color name="widget_gold">#FFE8B04A</color>
+    <!-- Fixed widget colours for a forced Light or Dark appearance; never overridden for night (FR-WGT-5). -->
+    <color name="widget_background_light">#FFF6ECF1</color>
+    <color name="widget_arc_light">#FFD7A9BF</color>
+    <color name="widget_card_light">#FFFFFFFF</color>
+    <color name="widget_text_muted_light">#FF6B5572</color>
+    <color name="widget_gold_light">#FFE8B04A</color>
+    <color name="widget_background_dark">#FF120E24</color>
+    <color name="widget_arc_dark">#80E8E2F7</color>
+    <color name="widget_card_dark">#FF1C1733</color>
+    <color name="widget_text_muted_dark">#FFB8AECF</color>
+    <color name="widget_gold_dark">#FFF2C46D</color>
 </resources>
