@@ -4,6 +4,7 @@
     <string name="nav_universe">Universe</string>
     <string name="nav_your_star">Your Star</string>
     <string name="nav_ours">Ours</string>
+    <string name="nav_our_orbit">Our Orbit</string>
     <string name="nav_you_and_her">You &amp; Her</string>
 
     <string name="splash_tagline">A private universe for two.</string>
@@ -112,7 +113,11 @@
     <string name="home_updated_ago">Updated %1$s ago</string>
     <string name="home_last_seen">Last seen %1$s ago</string>
     <string name="home_star_direction">She\'s %1$s</string>
-    <string name="home_direction_unavailable">Direction unavailable</string>
+    <string name="home_direction_last_known">Last known: %1$s</string>
+    <string name="home_direction_degrees">%1$d°</string>
+    <string name="home_distance_open_star">Open Your Star</string>
+    <string name="home_together_label">Together</string>
+    <string name="home_together_set_date">Set your date</string>
     <plurals name="home_countdown_days">
         <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>
@@ -556,12 +561,6 @@
     <string name="orbit_meetup_save">Save</string>
     <string name="orbit_meetup_problem_start_missing">Choose the date you met.</string>
     <string name="orbit_meetup_problem_end_before_start">The last day can\'t be before the first.</string>
-    <plurals name="home_together_days">
-        <item quantity="one">Together %d day</item>
-        <item quantity="other">Together %d days</item>
-    </plurals>
-    <string name="home_together_prompt">Add the day your story began</string>
-    <string name="home_met_none">No meetups yet</string>
     <plurals name="home_met_times">
         <item quantity="one">Met %d time</item>
         <item quantity="other">Met %d times</item>
