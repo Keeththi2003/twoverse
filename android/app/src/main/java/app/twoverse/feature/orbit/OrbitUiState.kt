@@ -2,6 +2,7 @@ package app.twoverse.feature.orbit
 
 import app.twoverse.core.common.Anniversary
 import app.twoverse.core.common.MeetupStats
+import app.twoverse.core.common.Milestone
 import app.twoverse.core.common.TogetherDuration
 import app.twoverse.core.common.UpcomingMilestone
 import app.twoverse.core.model.DataError
@@ -24,7 +25,20 @@ data class OrbitUiState(
     val meetups: List<Meetup> = emptyList(),
     val pendingDeleteId: String? = null,
     val error: DataError? = null,
-)
+) {
+    /** Today's day number and the next day milestone, e.g. day 475 of 500; null without a date. */
+    val milestoneProgress: MilestoneProgress?
+        get() {
+            val milestone = (nextDayMilestone?.milestone as? Milestone.Days)?.day ?: return null
+            val day = duration?.totalDays ?: return null
+            return MilestoneProgress(day = day, milestone = milestone)
+        }
+}
+
+data class MilestoneProgress(val day: Long, val milestone: Long) {
+    /** 0..1 for the progress bar. */
+    val fraction: Float get() = (day.toFloat() / milestone).coerceIn(0f, 1f)
+}
 
 /** A small celebration on the day itself (FR-ORB-11). */
 sealed interface Celebration {
