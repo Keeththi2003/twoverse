@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -73,6 +75,7 @@ private val PlanetsWidth = 66.dp
 private val ActionRowMinHeight = 54.dp
 private val SectionHeaderInset = 4.dp
 private val CreditLineGap = 6.dp
+private val CreditHeartSize = 12.dp
 private const val DatePattern = "dMMMy"
 
 private val StarsSendSubtitle = PronounStrings(
@@ -241,25 +244,25 @@ private fun AboutSection(versionName: String, versionCode: Int) {
     ) {
         Text(
             text = stringResource(R.string.settings_credit, stringResource(R.string.developer_name)),
-            style = TwoverseTheme.textStyles.credit,
+            style = MaterialTheme.typography.bodyMedium,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
         )
-        val heartDescription = stringResource(R.string.settings_credit_heart_description)
-        Row(horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.xxs)) {
+        // An icon, not the "♥" character: Samsung draws that as a red emoji, ignoring the theme colour.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.xxs),
+        ) {
             Text(
                 text = stringResource(R.string.settings_credit_tagline),
                 style = MaterialTheme.typography.labelSmall,
                 color = colors.onSurfaceVariant,
-                modifier = Modifier.alignByBaseline(),
             )
-            Text(
-                text = stringResource(R.string.settings_credit_heart),
-                style = MaterialTheme.typography.labelSmall,
-                color = colors.primary,
-                modifier = Modifier
-                    .alignByBaseline()
-                    .semantics { contentDescription = heartDescription },
+            Icon(
+                painter = painterResource(R.drawable.ic_heart_filled),
+                contentDescription = stringResource(R.string.settings_credit_heart_description),
+                tint = colors.primary,
+                modifier = Modifier.size(CreditHeartSize),
             )
         }
     }
