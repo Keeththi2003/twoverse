@@ -379,7 +379,7 @@ after it.
 | Compass needs calibration | "Move your phone in a figure-8 to calibrate." |
 | Shooting Star unavailable (deleted, already seen, or not yet visible) | "This Shooting Star is no longer available." |
 | "Together since" not set | "When did your story begin?" |
-| No meetups | "No meetups yet. Add the times you've met." |
+| No meetups | "Every meeting brings your planets together" with "Add your first meetup" |
 | Date in the future | "Choose a date that isn't in the future." |
 
 ---
