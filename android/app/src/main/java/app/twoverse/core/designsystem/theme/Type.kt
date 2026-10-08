@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -34,6 +35,19 @@ private fun fraunces(opticalSize: Float) = FontFamily(
             ),
         )
     },
+)
+
+/** Fraunces Italic, from its own file, with the optical-size axis matched like [fraunces]. */
+private fun frauncesItalic(opticalSize: Float) = FontFamily(
+    Font(
+        resId = R.font.fraunces_italic,
+        weight = FontWeight(500),
+        style = FontStyle.Italic,
+        variationSettings = FontVariation.Settings(
+            FontVariation.weight(500),
+            FontVariation.Setting("opsz", opticalSize),
+        ),
+    ),
 )
 
 private fun serif(size: TextUnit, weight: Int, lineHeight: Float, letterSpacing: TextUnit) = TextStyle(
@@ -96,4 +110,12 @@ data class TwoverseTextStyles(
     val starTitleLarge: TextStyle = serif(52.sp, 600, lineHeight = 1.1f, letterSpacing = (-0.5).sp),
     /** Message of a Message only Shooting Star. */
     val starMessageLarge: TextStyle = serif(24.sp, 500, lineHeight = 1.45f, letterSpacing = 0.sp),
+    /** The italic credit line in Settings › About ("A little universe by Keeththi"). */
+    val credit: TextStyle = TextStyle(
+        fontFamily = frauncesItalic(17f),
+        fontWeight = FontWeight(500),
+        fontStyle = FontStyle.Italic,
+        fontSize = 17.sp,
+        lineHeight = 1.35.em,
+    ),
 )
