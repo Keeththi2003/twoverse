@@ -28,6 +28,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import app.twoverse.core.common.defaultShortName
 import app.twoverse.core.common.formatDate
 import app.twoverse.core.common.toPartnerName
+import app.twoverse.BuildConfig
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.Planet
 import app.twoverse.core.designsystem.component.PlanetKind
@@ -45,6 +48,7 @@ import app.twoverse.core.designsystem.component.SettingsSwitchRow
 import app.twoverse.core.designsystem.component.SettingsValueRow
 import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoverseConfirmDialog
+import app.twoverse.core.designsystem.component.TwoversePreviewBackground
 import app.twoverse.core.designsystem.component.TwoverseTextFieldDialog
 import app.twoverse.core.designsystem.text.PronounStrings
 import app.twoverse.core.designsystem.text.labelRes
@@ -82,6 +86,8 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     actions: SettingsActions,
     modifier: Modifier = Modifier,
+    versionName: String = BuildConfig.VERSION_NAME,
+    versionCode: Int = BuildConfig.VERSION_CODE,
 ) {
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
@@ -198,6 +204,7 @@ fun SettingsScreen(
                     .semantics { liveRegion = LiveRegionMode.Polite },
             )
         }
+        AboutSection(versionName = versionName, versionCode = versionCode)
     }
     if (settings != null) {
         SettingsDialogs(
@@ -206,6 +213,42 @@ fun SettingsScreen(
             nicknameDraft = uiState.nicknameDraft,
             hasNickname = uiState.partner?.nickname != null,
             actions = actions,
+        )
+    }
+}
+
+/** The app version and a short credit, at the end of the screen. */
+@Composable
+private fun AboutSection(versionName: String, versionCode: Int) {
+    val colors = TwoverseTheme.colors
+    val versionDescription = stringResource(R.string.settings_version_description, versionName)
+    SectionHeader(R.string.settings_about)
+    SettingsGroup {
+        Column(modifier = Modifier.clearAndSetSemantics { contentDescription = versionDescription }) {
+            DetailRow(
+                label = stringResource(R.string.settings_version),
+                value = stringResource(R.string.settings_version_value, versionName, versionCode),
+            )
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = TwoverseTheme.spacing.lg),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.xxs),
+    ) {
+        Text(
+            text = stringResource(R.string.settings_credit, stringResource(R.string.developer_name)),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(R.string.settings_credit_tagline),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -489,6 +532,8 @@ private fun SettingsPreview(partner: UserProfile?) {
                 partner = partner,
             ),
             actions = SettingsActions(),
+            versionName = "1.0.0",
+            versionCode = 1,
         )
     }
 }
@@ -552,6 +597,16 @@ private fun SettingsNicknameDialogPreview() {
                 nicknameDraft = "Chellam",
             ),
             actions = SettingsActions(),
+            versionName = "1.0.0",
+            versionCode = 1,
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun AboutSectionPreview() {
+    TwoversePreviewBackground {
+        Column { AboutSection(versionName = "1.0.0", versionCode = 1) }
     }
 }
