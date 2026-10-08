@@ -36,6 +36,7 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import app.twoverse.R
 import app.twoverse.core.common.LocationFreshness
+import app.twoverse.core.common.PartnerName
 import java.time.ZoneId
 
 /** Glance picks the largest of these that fits the widget (FR-WGT-1). */
@@ -103,6 +104,7 @@ private fun ColumnScope.SmallLayout(state: WidgetState) {
     Orbit(
         drawable = R.drawable.widget_orbit_small,
         faded = state.location != WidgetLocation.Available,
+        partner = state.partner,
         modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
     )
     Spacer(modifier = GlanceModifier.height(Gap))
@@ -138,6 +140,7 @@ private fun ColumnScope.MediumLayout(state: WidgetState, actions: WidgetActions)
         Orbit(
             drawable = R.drawable.widget_orbit_medium,
             faded = state.location != WidgetLocation.Available,
+            partner = state.partner,
             modifier = GlanceModifier.size(MediumOrbitWidth, MediumOrbitHeight),
         )
     }
@@ -167,6 +170,7 @@ private fun ColumnScope.LargeLayout(state: WidgetState, isTall: Boolean, actions
         Orbit(
             drawable = R.drawable.widget_orbit_large,
             faded = state.location != WidgetLocation.Available,
+            partner = state.partner,
             modifier = GlanceModifier.fillMaxSize(),
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -188,10 +192,11 @@ private fun ColumnScope.LargeLayout(state: WidgetState, isTall: Boolean, actions
 }
 
 @Composable
-private fun Orbit(@DrawableRes drawable: Int, faded: Boolean, modifier: GlanceModifier) {
+private fun Orbit(@DrawableRes drawable: Int, faded: Boolean, modifier: GlanceModifier, partner: PartnerName? = null) {
+    val context = LocalContext.current
     Image(
         provider = ImageProvider(drawable),
-        contentDescription = LocalContext.current.getString(R.string.widget_orbit_description),
+        contentDescription = context.getString(R.string.widget_orbit_description, context.partnerLabel(partner)),
         alpha = if (faded) FadedAlpha else 1f,
         modifier = modifier,
         contentScale = ContentScale.Fit,
@@ -379,18 +384,18 @@ private fun InfoRow(state: WidgetState) {
             maxLines = 1,
             modifier = GlanceModifier.defaultWeight(),
         )
-        if (herZone != null) LocalTimes(herZone)
+        if (herZone != null) LocalTimes(herZone, state.partner)
     }
 }
 
 /** Live clocks (TextClock), so the times stay right between widget updates. */
 @Composable
-private fun LocalTimes(herZone: ZoneId) {
+private fun LocalTimes(herZone: ZoneId, partner: PartnerName?) {
     val context = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = context.getString(R.string.home_you) + " ", style = WidgetText.muted(WidgetText.Small))
         AndroidRemoteViews(RemoteViews(context.packageName, R.layout.widget_clock))
-        Text(text = Separator + context.getString(R.string.home_her) + " ", style = WidgetText.muted(WidgetText.Small))
+        Text(text = Separator + context.partnerLabelStart(partner) + " ", style = WidgetText.muted(WidgetText.Small), maxLines = 1)
         AndroidRemoteViews(
             RemoteViews(context.packageName, R.layout.widget_clock).apply {
                 setString(R.id.widget_clock, "setTimeZone", herZone.id)
