@@ -267,12 +267,12 @@ after it.
 | FR-ORB-1 | Either partner can set or change "together since", the date the relationship began. It can't be in the future, is never derived from the pairing date, and the backend records who changed it and when. | M |
 | FR-ORB-2 | After pairing (unless the partner already set it), and from You & Her, the app asks "When did your story begin?" with a date picker. Asking after pairing can be skipped; Our Universe then shows a gentle prompt to set it later. | M |
 | FR-ORB-3 | Either partner can add, edit and delete meetups: start date (today or earlier), optional end date (on or after the start, for visits lasting several days), optional place (up to 100 characters) and note (up to 300 characters). | M |
-| FR-ORB-4 | Our Orbit, opened from a card on Our Universe, shows: "In orbit since 14 February 2024", the duration in years, months and days ("2 years, 3 months, 5 days") and the total days, with the planets-and-orbit visual. | M |
+| FR-ORB-4 | Our Orbit, a bottom-bar tab also opened from the Together tile on Our Universe, shows: "In orbit since 14 February 2024", the duration in years, months and days ("2 years, 3 months, 5 days") and the total days, with the planets-and-orbit visual. | M |
 | FR-ORB-5 | Our Orbit shows the next anniversary with a countdown. An anniversary on 29 February falls on 28 February in years without one. | M |
 | FR-ORB-6 | Milestones are days 100, 365, 500 and 1000, then every 1000 days, plus every yearly anniversary. Our Orbit shows the next one ("1000 days in 23 days"). | M |
 | FR-ORB-7 | Meetup statistics: times met (number of meetups); days together in person (the days covered by meetups so far, counting both the start and end day, with overlapping meetups counted once); and days since you last met ("12 days ago"). | M |
 | FR-ORB-8 | A meetup timeline, newest first, with add, edit and delete. | M |
-| FR-ORB-9 | Our Universe shows a card: "Together 845 days" and "Met 7 times". | M |
+| FR-ORB-9 | Our Universe shows a Together tile beside Until we meet: "475 days", "Together" and "Met 7 times"; before the date is set it shows "Set your date". | M |
 | FR-ORB-10 | When a reunion from Until We Meet has passed and isn't recorded as a meetup yet, Our Universe asks once on this device: "Did you meet on 10 October?". Yes opens a new meetup prefilled with the date and place, with an editable end date; No dismisses the question. A reunion is recorded as a meetup at most once per couple. | S |
 | FR-ORB-11 | On an anniversary or milestone day, Our Orbit shows a small celebration. | C |
 | FR-ORB-12 | Only the couple can read or change their "together since" date and meetups (NFR-SEC-1); meetups update live for both partners. | M |

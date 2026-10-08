@@ -109,7 +109,7 @@ calendar, pin, clock, image, heart, trash, send, copy, close, back chevron, eye,
 - `Planet(size, kind = Her | You)` and `GoldStar(size, glow)`
 - `OrbitGraphic` (rings + planets + star; animated variant for Splash)
 - `StarField` (twinkling background dots)
-- `TwoverseBottomBar` (4 tabs: Universe, Your Star, Ours, You & Her)
+- `TwoverseBottomBar` (5 tabs: Universe, Your Star, Ours, Our Orbit, You & Her; equal widths, one-line labels)
 - `SettingsRow` (title, optional subtitle, trailing switch or value + chevron)
 
 ## 7. Navigation
@@ -119,8 +119,8 @@ Splash → Welcome → SignIn → Pair → Home (tabs)
 Welcome → "I have a couple code" → Pair
 Birthday (first launch for the partner only) → Home
 
-Tabs (bottom bar): Home (Universe) · Compass (Your Star) · Vault (Ours) · Settings (You & Her)
-Home → Compass, Countdown, Vault, AddMemory
+Tabs (bottom bar): Home (Universe) · Compass (Your Star) · Vault (Ours) · Our Orbit · Settings (You & Her)
+Home → Compass (distance card), Countdown, Our Orbit (Together tile), Vault, AddMemory
 Vault → Memory, AddMemory
 Memory → back to Vault
 AddMemory → close/send returns to Vault
@@ -135,7 +135,7 @@ Countdown → back to Home
 | Welcome.dc.html | Welcome | Static orbit with 3 feature chips (lock, compass, calendar) |
 | SignIn.dc.html | Sign in | Google button, email, password with show/hide, forgot link |
 | Pair.dc.html | Connect your worlds | Couple code card with Share/Copy, waiting state, partner code input, Connect |
-| Home.dc.html | Our Universe | Distance card (live dot, number, dashed arc between planets, cities, updated time), Your Star + countdown tiles, Ours row, Send a memory button |
+| Home.dc.html | Our Universe | Distance card (live dot, number, dashed arc between planets, cities, updated time, her direction; the whole card opens Your Star), Until we meet + Together tiles of equal height, Ours row, Send a memory button. Planets: lavender (you) on the left above "You", rose (her) on the right above "Her" — the mockup has them the other way round |
 | Compass.dc.html | Your Star | Dial with 72 ticks, N/E/S/W, needle rotated to partner bearing (42° in mockup), distance + direction, status chips, tip card |
 | Countdown.dc.html | Until We Meet | Days, H/M/S tiles, "Getting closer" track, plan rows (date, place, time), Change date |
 | Vault.dc.html | Ours | Filter chips, 3-col grid, expiry badges, new dots, FAB add |
