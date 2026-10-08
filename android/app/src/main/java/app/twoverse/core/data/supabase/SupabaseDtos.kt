@@ -8,7 +8,9 @@ import app.twoverse.core.model.LocationSharing
 import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
+import app.twoverse.core.model.MyProfile
 import app.twoverse.core.model.ProfileSettings
+import app.twoverse.core.model.Pronouns
 import app.twoverse.core.model.Reunion
 import app.twoverse.core.model.ShootingStar
 import app.twoverse.core.model.StarContent
@@ -27,11 +29,76 @@ import java.util.Locale
 @Serializable
 internal data class ProfileDto(
     val id: String,
-    @SerialName("display_name") val displayName: String,
+    @SerialName("full_name") val fullName: String,
+    @SerialName("short_name") val shortName: String? = null,
+    val pronouns: String? = null,
     @SerialName("time_zone") val timeZone: String? = null,
 ) {
-    fun toModel() = UserProfile(id = id, displayName = displayName, timeZone = timeZone)
+    fun toModel() = UserProfile(
+        id = id,
+        fullName = fullName,
+        shortName = shortName,
+        pronouns = pronouns?.toPronouns(),
+        timeZone = timeZone,
+    )
+
+    companion object {
+        /** The profile columns clients may select; phone and sharing choices aren't among them. */
+        val Columns = listOf("id", "full_name", "short_name", "pronouns", "time_zone")
+    }
 }
+
+/** A row from get_my_profile(): the user's own profile, including phone and sharing choices. */
+@Serializable
+internal data class MyProfileDto(
+    @SerialName("full_name") val fullName: String,
+    @SerialName("short_name") val shortName: String,
+    val pronouns: String? = null,
+    val phone: String? = null,
+    @SerialName("share_email") val shareEmail: Boolean = false,
+    @SerialName("share_phone") val sharePhone: Boolean = false,
+) {
+    fun toModel(email: String?, pendingEmail: String?, canChangeEmail: Boolean) = MyProfile(
+        fullName = fullName,
+        shortName = shortName,
+        pronouns = pronouns?.toPronouns(),
+        phone = phone,
+        shareEmail = shareEmail,
+        sharePhone = sharePhone,
+        email = email,
+        pendingEmail = pendingEmail,
+        canChangeEmail = canChangeEmail,
+    )
+}
+
+/** A row from get_partner_profile(): email and phone are only there when the partner shares them. */
+@Serializable
+internal data class PartnerProfileDto(
+    val id: String,
+    @SerialName("full_name") val fullName: String,
+    @SerialName("short_name") val shortName: String? = null,
+    val pronouns: String? = null,
+    @SerialName("time_zone") val timeZone: String? = null,
+    val email: String? = null,
+    val phone: String? = null,
+    val nickname: String? = null,
+) {
+    fun toModel() = UserProfile(
+        id = id,
+        fullName = fullName,
+        shortName = shortName,
+        pronouns = pronouns?.toPronouns(),
+        timeZone = timeZone,
+        nickname = nickname,
+        email = email,
+        phone = phone,
+    )
+}
+
+/** The profiles.pronouns values: 'she', 'he', 'they'. */
+internal fun Pronouns.toColumn(): String = name.lowercase(Locale.ROOT)
+
+internal fun String.toPronouns(): Pronouns? = Pronouns.entries.firstOrNull { it.toColumn() == this }
 
 @Serializable
 internal data class ProfileSettingsDto(

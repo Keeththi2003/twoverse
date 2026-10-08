@@ -92,6 +92,10 @@ class SupabaseCoupleRepository @Inject constructor(
         Unit
     }
 
+    override fun refresh() {
+        refresh.tryEmit(Unit)
+    }
+
     override suspend fun reconnect(): DataResult<ReconnectResult> = supabaseCall {
         val status = supabase.postgrest.rpc("reconnect_couple").decodeAs<String>()
         refresh.tryEmit(Unit)
@@ -150,7 +154,7 @@ class SupabaseCoupleRepository @Inject constructor(
             .select { filter { neq("status", "pending") } }
             .decodeList<CoupleDto>()
         val active = rows.firstOrNull { it.status == "active" }
-        if (active != null) return CoupleState(active = activeCouple(userId, active), ended = null)
+        if (active != null) return CoupleState(active = activeCouple(active), ended = null)
         val now = clock.instant()
         val ended = rows
             .filter { it.status == "ended" && it.purgeAfter != null && parseTimestamp(it.purgeAfter).isAfter(now) }
@@ -158,13 +162,13 @@ class SupabaseCoupleRepository @Inject constructor(
         return CoupleState(active = null, ended = ended?.toEndedCouple(userId))
     }
 
-    private suspend fun activeCouple(userId: String, row: CoupleDto): Couple {
-        val partnerId = if (row.userA == userId) row.userB else row.userA
-        val partner = partnerId?.let { profileRepository.profile(it) } as? DataResult.Success
+    private suspend fun activeCouple(row: CoupleDto): Couple {
+        // Only what the partner shares, plus my nickname for them (FR-PRO-5).
+        val partner = (profileRepository.partnerProfile() as? DataResult.Success)?.value
             ?: error("Partner profile unavailable")
         return Couple(
             id = row.id,
-            partner = partner.value,
+            partner = partner,
             status = CoupleStatus.Active,
             connectedAt = row.connectedAt?.let(::parseTimestamp),
             togetherSince = row.togetherSince?.let(LocalDate::parse),
