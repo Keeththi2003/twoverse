@@ -29,7 +29,7 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
 
     override suspend fun signInWithEmail(email: String, password: String): DataResult<Unit> = signIn()
 
-    override suspend fun signUpWithEmail(displayName: String, email: String, password: String): DataResult<SignUpResult> =
+    override suspend fun signUpWithEmail(fullName: String, email: String, password: String): DataResult<SignUpResult> =
         respond {
             if (signUpResult == SignUpResult.SignedIn) state.value = AuthState.SignedIn(SampleData.me.id)
             signUpResult

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 2.3 |
+| Version | 2.4 |
 | Status | MVP scope agreed |
 | Platform | Android (min SDK 26), primary devices Samsung Galaxy |
 | Package | `app.twoverse` |
@@ -33,6 +33,11 @@ It is not a social network or a messaging app.
 |---|---|
 | Couple | A private connection between exactly two users |
 | Partner | The other user in the couple |
+| Full name | A user's whole name, from Google or the sign-up form; shown only on profile screens |
+| Short name | What a user likes to be called; by default the first word of their full name |
+| Nickname | A private name a user gives their partner; only that user sees it |
+| Display name | How the app names the partner: my nickname for them, else their short name, else the first word of their full name |
+| Us | The settings tab, titled "You & {partner's display name}" |
 | Our Universe | The home screen |
 | Your Star | The compass that points toward the partner |
 | Until We Meet | The shared reunion countdown |
@@ -102,7 +107,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | FR-AUTH-2 | Users can sign up and sign in with email and password. | S |
 | FR-AUTH-3 | Users can reset a forgotten password by email. | S |
 | FR-AUTH-4 | Sessions persist until the user logs out. | M |
-| FR-AUTH-5 | Users provide a display name at sign-up. | M |
+| FR-AUTH-5 | Users provide their full name at sign-up (or it comes from Google), see FR-PRO-1. | M |
 
 ### 3.3 Pairing (`FR-PAIR`)
 
@@ -163,7 +168,7 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | ID | Requirement | P |
 |---|---|---|
 | FR-VLT-1 | Show all accessible memories in a grid, newest first, with a count. | M |
-| FR-VLT-2 | Filters: All, From you, From her/him, Expiring. | S |
+| FR-VLT-2 | Filters: All, From you, From {partner's display name}, Expiring. | S |
 | FR-VLT-3 | Unviewed memories show a "new" indicator. | M |
 | FR-VLT-4 | Temporary memories show a remaining-time badge. | M |
 | FR-VLT-5 | Opening Ours requires device authentication (biometric or device PIN) when "Lock Ours" is on (default on). | M |
@@ -202,7 +207,8 @@ Priority: **M** = must have for MVP, **S** = should have, **C** = could have.
 | FR-NOT-3 | Notify one day before a temporary memory expires. | C |
 | FR-NOT-4 | Notify on the reunion day. | S |
 | FR-NOT-5 | The wake-up ping is a silent data message with no visible notification. | M |
-| FR-NOT-6 | Notify both partners on their anniversary ("Happy anniversary ✨ 2 years in orbit") and on day milestones (FR-ORB-6), at 08:00 in each partner's time zone. At most one such notification per person per day; the anniversary wins when both fall on the same day. Only the type and the number are sent. | S |
+| FR-NOT-6 | Notify both partners on their anniversary ("Happy anniversary ✨ 2 years in orbit") and on day milestones (FR-ORB-6), at 08:00 in each partner's time zone. At most one such notification per person per day; the anniversary wins when both fall on the same day. Only the type, the number and the partner's name and pronouns (FR-NOT-7) are sent. | S |
+| FR-NOT-7 | Notifications name the partner by the recipient's display name for them and use the partner's pronouns. The server sends only that name (at most 30 characters) and pronouns with the type; the app writes the text from its own string resources. | M |
 
 ### 3.11 Home-screen widget (`FR-WGT`)
 
@@ -224,7 +230,7 @@ birthday wish, an anniversary note, a good-luck message or anything else. It
 replaces the single birthday welcome of version 2.0; existing birthday welcomes
 become Shooting Stars.
 
-**Composing ("Send a Shooting Star", from You & Her and from Our Universe)**
+**Composing ("Send a Shooting Star", from Us and from Our Universe)**
 
 | ID | Requirement | P |
 |---|---|---|
@@ -245,7 +251,7 @@ become Shooting Stars.
 | FR-STAR-10 | Empty fields are hidden completely and the layout closes the gap. | M |
 | FR-STAR-11 | Long messages scroll; "Enter Twoverse" stays pinned at the bottom. On Full photo, the photo fills the screen edge to edge behind the system bars, "Enter Twoverse" sits on a gradient scrim so it is always readable, the text overlay appears only if a title or message is set, and the photo can be pinched to zoom. | M |
 | FR-STAR-12 | A star is shown once, on the first app open after it became visible (sent for the next open, or its time reached), and is then marked seen. Several waiting stars are shown one after another, oldest first. | M |
-| FR-STAR-13 | Received stars can be viewed again from a "Shooting Stars" list in You & Her. | S |
+| FR-STAR-13 | Received stars can be viewed again from a "Shooting Stars" list in Us. | S |
 | FR-STAR-14 | The composer, preview and viewer set `FLAG_SECURE`, like Ours (FR-VLT-6). | M |
 
 **Backend**
@@ -265,7 +271,7 @@ after it.
 | ID | Requirement | P |
 |---|---|---|
 | FR-ORB-1 | Either partner can set or change "together since", the date the relationship began. It can't be in the future, is never derived from the pairing date, and the backend records who changed it and when. | M |
-| FR-ORB-2 | After pairing (unless the partner already set it), and from You & Her, the app asks "When did your story begin?" with a date picker. Asking after pairing can be skipped; Our Universe then shows a gentle prompt to set it later. | M |
+| FR-ORB-2 | After pairing (unless the partner already set it), and from Our Orbit, the app asks "When did your story begin?" with a date picker. Asking after pairing can be skipped; Our Universe then shows a gentle prompt to set it later. | M |
 | FR-ORB-3 | Either partner can add, edit and delete meetups: start date (today or earlier), optional end date (on or after the start, for visits lasting several days), optional place (up to 100 characters) and note (up to 300 characters). | M |
 | FR-ORB-4 | Our Orbit, a bottom-bar tab also opened from the Together tile on Our Universe, shows: "In orbit since 14 February 2024", the duration in years, months and days ("2 years, 3 months, 5 days") and the total days, with the planets-and-orbit visual. | M |
 | FR-ORB-5 | Our Orbit shows the next anniversary with a countdown. An anniversary on 29 February falls on 28 February in years without one. | M |
@@ -277,17 +283,28 @@ after it.
 | FR-ORB-11 | On an anniversary or milestone day, Our Orbit shows a small celebration. | C |
 | FR-ORB-12 | Only the couple can read or change their "together since" date and meetups (NFR-SEC-1); meetups update live for both partners. | M |
 
-### 3.14 Settings — You & Her (`FR-SET`)
+### 3.14 Profile (`FR-PRO`)
 
 | ID | Requirement | P |
 |---|---|---|
-| FR-SET-1 | Show couple status and "connected since" date. | M |
-| FR-SET-2 | Toggles: Share my location, Lock Ours. | M |
+| FR-PRO-1 | Each user has a full name (from Google or the sign-up form) and a short name of at most 30 characters, which defaults to the first word of the full name. A user can give their partner a private nickname of at most 30 characters that only they see. Everywhere outside profile screens the partner is named by the display name: my nickname for them, else their short name, else the first word of their full name. Long names are shortened with an ellipsis. | M |
+| FR-PRO-2 | Pronouns are She/her, He/him or They/them. After sign-in, an "About you" step asks for the short name (prefilled) and pronouns; both are required. Existing users without pronouns see it once. | M |
+| FR-PRO-3 | Every text about the partner uses their display name and pronouns, with a separate string per pronoun (never pieced together). Without known pronouns, they/them is used; without a partner, "your partner". | M |
+| FR-PRO-4 | "Your profile" (top of Us) edits full name, short name, pronouns, an optional phone number and email. The phone number is stored in international format with its country code (default +94); there is no SMS verification. Changing the email sends a confirmation to the new address ("Check your new email to confirm") and the old email stays in use until it is confirmed. Google-only accounts show their email read-only. Switches "Share my email with partner" and "Share my phone number with partner" are off by default. | M |
+| FR-PRO-5 | Under the couple card, Us shows the partner's short name, full name and pronouns, and their email and phone only when shared. Tapping the phone opens the dialer; tapping the email opens mail. A "Nickname" row sets, edits or clears my nickname for them, noting "Only you see this". | M |
+| FR-PRO-6 | Only the user can edit their profile. The partner can read names, pronouns and time zone, never an unshared phone or email. Nicknames are readable and changeable only by the user who set them (NFR-SEC-1). | M |
+
+### 3.15 Settings — Us (`FR-SET`)
+
+| ID | Requirement | P |
+|---|---|---|
+| FR-SET-1 | Title "You & {partner's display name}", or "You & your partner" when unpaired. The couple card shows "Connected" and "In Twoverse since {date}". | M |
+| FR-SET-2 | Toggles: Share my location ("Only used for distance and Your Star"), Lock Ours. | M |
 | FR-SET-3 | Location precision, distance unit, appearance (System / Light / Dark). | M |
 | FR-SET-4 | Log out. | M |
 | FR-SET-5 | Disconnect from partner (FR-PAIR-7). | M |
 | FR-SET-6 | Request account deletion, which removes the user's account and data. | M |
-| FR-SET-7 | Show and change "together since" (FR-ORB-2). | M |
+| FR-SET-7 | "Your profile" and the partner's details (FR-PRO-4, FR-PRO-5). "Together since" is shown and changed in Our Orbit (FR-ORB-2), not in Us. | M |
 
 ---
 
@@ -335,7 +352,8 @@ after it.
 
 | Entity | Key fields |
 |---|---|
-| Profile | id, display_name, distance_unit, appearance, created_at |
+| Profile | id, full_name, short_name (1–30), pronouns (she / he / they, nullable until About you), phone (international format, nullable), share_email, share_phone (both default false), distance_unit, appearance, time_zone, created_at |
+| PartnerNickname | user_id, partner_id, nickname (1–30), updated_at; readable and changeable only by user_id |
 | Couple | id, user_a, user_b, status (pending / active / ended), connected_at, together_since (date, nullable), together_since_set_by, together_since_set_at |
 | CoupleCode | code, couple_id, created_by, expires_at, used_at |
 | Location | user_id (unique), lat, lng, accuracy_m, precision, sharing_enabled, updated_at |
@@ -381,6 +399,8 @@ after it.
 | "Together since" not set | "When did your story begin?" |
 | No meetups | "Every meeting brings your planets together" with "Add your first meetup" |
 | Date in the future | "Choose a date that isn't in the future." |
+| Phone number invalid | "Enter a phone number with its country code, like +94 77 123 4567." |
+| Email change requested | "Check your new email to confirm" |
 
 ---
 
@@ -398,7 +418,9 @@ after it.
 | Ours | FR-VLT |
 | Memory viewer | FR-VLT-8, FR-DEL |
 | New memory | FR-MEM |
-| You & Her (settings) | FR-SET |
+| About you | FR-PRO-2 |
+| Us (settings) | FR-SET, FR-PRO-5 |
+| Your profile | FR-PRO-4 |
 | Shooting Star (viewer) | FR-STAR-10 to FR-STAR-14 |
 | Send a Shooting Star (composer and preview) | FR-STAR-1 to FR-STAR-8, FR-STAR-14 |
 | Shooting Stars (sent and received list) | FR-STAR-9, FR-STAR-13 |

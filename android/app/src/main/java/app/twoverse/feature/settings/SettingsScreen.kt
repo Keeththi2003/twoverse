@@ -31,9 +31,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.defaultShortName
 import app.twoverse.core.common.formatDate
+import app.twoverse.core.common.toPartnerName
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.Planet
 import app.twoverse.core.designsystem.component.PlanetKind
@@ -41,16 +45,22 @@ import app.twoverse.core.designsystem.component.SettingsSwitchRow
 import app.twoverse.core.designsystem.component.SettingsValueRow
 import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoverseConfirmDialog
+import app.twoverse.core.designsystem.component.TwoverseTextFieldDialog
+import app.twoverse.core.designsystem.text.PronounStrings
+import app.twoverse.core.designsystem.text.labelRes
+import app.twoverse.core.designsystem.text.resFor
 import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
+import app.twoverse.core.model.Pronouns
+import app.twoverse.core.model.UserProfile
 import app.twoverse.core.model.UserSettings
 import java.time.LocalDate
 
 private val CouplePadding = 18.dp
-private val HerPlanetSize = 44.dp
+private val PartnerPlanetSize = 44.dp
 private val YouPlanetSize = 34.dp
 private val YouPlanetOffsetX = 30.dp
 private val YouPlanetOffsetY = 5.dp
@@ -60,7 +70,13 @@ private val ActionRowMinHeight = 54.dp
 private val SectionHeaderInset = 4.dp
 private const val DatePattern = "dMMMy"
 
-/** You & Her (FR-SET-1 to FR-SET-7). */
+private val StarsSendSubtitle = PronounStrings(
+    she = R.string.settings_stars_send_subtitle_she,
+    he = R.string.settings_stars_send_subtitle_he,
+    they = R.string.settings_stars_send_subtitle_they,
+)
+
+/** You & {partner} (FR-SET-1 to FR-SET-6, FR-PRO-4, FR-PRO-5). */
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
@@ -70,7 +86,6 @@ fun SettingsScreen(
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
     val settings = uiState.settings
-    val locale = LocalConfiguration.current.locales[0]
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -81,17 +96,31 @@ fun SettingsScreen(
             .padding(bottom = spacing.md),
     ) {
         Text(
-            text = stringResource(R.string.settings_title),
+            text = uiState.partnerDisplayName?.let { stringResource(R.string.settings_title, it) }
+                ?: stringResource(R.string.settings_title_unpaired),
             style = MaterialTheme.typography.headlineMedium,
             color = colors.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.semantics { heading() },
         )
         if (settings == null) return@Column
+        SettingsGroup(modifier = Modifier.padding(top = spacing.md)) {
+            SettingsValueRow(
+                title = stringResource(R.string.settings_your_profile),
+                value = "",
+                onClick = actions.onOpenProfile,
+            )
+        }
         CoupleCard(
             isConnected = uiState.isConnected,
             connectedSince = uiState.connectedSince,
             modifier = Modifier.padding(top = spacing.md),
         )
+        uiState.partner?.let { partner ->
+            SectionHeader(R.string.settings_partner_details)
+            PartnerDetails(partner = partner, actions = actions)
+        }
         SectionHeader(R.string.settings_privacy)
         SettingsGroup {
             SettingsSwitchRow(
@@ -117,20 +146,11 @@ fun SettingsScreen(
             )
         }
         if (uiState.isConnected) {
-            SectionHeader(R.string.settings_orbit)
-            SettingsGroup {
-                SettingsValueRow(
-                    title = stringResource(R.string.settings_together_since),
-                    value = uiState.togetherSince?.let { formatDate(it, DatePattern, locale) }
-                        ?: stringResource(R.string.settings_together_since_not_set),
-                    onClick = actions.onSetTogetherSince,
-                )
-            }
             SectionHeader(R.string.settings_stars)
             SettingsGroup {
                 SettingsValueRow(
                     title = stringResource(R.string.settings_stars_send),
-                    subtitle = stringResource(R.string.settings_stars_send_subtitle),
+                    subtitle = stringResource(StarsSendSubtitle.resFor(uiState.partner?.pronouns)),
                     value = "",
                     onClick = actions.onSendShootingStar,
                 )
@@ -180,7 +200,13 @@ fun SettingsScreen(
         }
     }
     if (settings != null) {
-        SettingsDialogs(openDialog = uiState.openDialog, settings = settings, actions = actions)
+        SettingsDialogs(
+            openDialog = uiState.openDialog,
+            settings = settings,
+            nicknameDraft = uiState.nicknameDraft,
+            hasNickname = uiState.partner?.nickname != null,
+            actions = actions,
+        )
     }
 }
 
@@ -193,8 +219,8 @@ private fun CoupleCard(isConnected: Boolean, connectedSince: LocalDate?, modifie
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.smd),
         ) {
-            Box(modifier = Modifier.size(width = PlanetsWidth, height = HerPlanetSize)) {
-                Planet(kind = PlanetKind.Her, size = HerPlanetSize)
+            Box(modifier = Modifier.size(width = PlanetsWidth, height = PartnerPlanetSize)) {
+                Planet(kind = PlanetKind.Her, size = PartnerPlanetSize)
                 Planet(
                     kind = PlanetKind.You,
                     size = YouPlanetSize,
@@ -220,6 +246,73 @@ private fun CoupleCard(isConnected: Boolean, connectedSince: LocalDate?, modifie
                 }
             }
         }
+    }
+}
+
+/** The partner's names, pronouns, shared contact details and my private nickname (FR-PRO-5). */
+@Composable
+private fun PartnerDetails(partner: UserProfile, actions: SettingsActions) {
+    val notShared = stringResource(R.string.settings_partner_not_shared)
+    val name = partner.toPartnerName().name
+    SettingsGroup {
+        DetailRow(
+            label = stringResource(R.string.settings_partner_short_name),
+            value = partner.shortName ?: defaultShortName(partner.fullName),
+        )
+        GroupDivider()
+        DetailRow(label = stringResource(R.string.settings_partner_full_name), value = partner.fullName)
+        GroupDivider()
+        DetailRow(
+            label = stringResource(R.string.settings_partner_pronouns),
+            value = stringResource(partner.pronouns?.labelRes() ?: R.string.settings_partner_pronouns_unknown),
+        )
+        GroupDivider()
+        DetailRow(
+            label = stringResource(R.string.settings_partner_email),
+            value = partner.email ?: notShared,
+            onClickLabel = stringResource(R.string.settings_partner_email_action, name),
+            onClick = partner.email?.let { email -> { actions.onEmailPartner(email) } },
+        )
+        GroupDivider()
+        DetailRow(
+            label = stringResource(R.string.settings_partner_phone),
+            value = partner.phone ?: notShared,
+            onClickLabel = stringResource(R.string.settings_partner_phone_action, name),
+            onClick = partner.phone?.let { phone -> { actions.onCallPartner(phone) } },
+        )
+        GroupDivider()
+        SettingsValueRow(
+            title = stringResource(R.string.settings_nickname),
+            subtitle = stringResource(R.string.settings_nickname_note),
+            value = partner.nickname ?: stringResource(R.string.settings_nickname_none),
+            onClick = { actions.onOpenDialog(SettingsDialog.Nickname) },
+        )
+    }
+}
+
+/** A read-only label and value; tappable (in the primary colour) when [onClick] is set. */
+@Composable
+private fun DetailRow(label: String, value: String, onClickLabel: String? = null, onClick: (() -> Unit)? = null) {
+    val colors = TwoverseTheme.colors
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = ActionRowMinHeight)
+            .then(if (onClick != null) Modifier.clickable(onClickLabel = onClickLabel, role = Role.Button, onClick = onClick) else Modifier)
+            .padding(horizontal = TwoverseTheme.spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.sm),
+    ) {
+        Text(text = label, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (onClick != null) colors.primary else colors.onSurfaceVariant,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -263,7 +356,13 @@ private fun ActionRow(@StringRes textRes: Int, color: Color, onClick: () -> Unit
 }
 
 @Composable
-private fun SettingsDialogs(openDialog: SettingsDialog?, settings: UserSettings, actions: SettingsActions) {
+private fun SettingsDialogs(
+    openDialog: SettingsDialog?,
+    settings: UserSettings,
+    nicknameDraft: String,
+    hasNickname: Boolean,
+    actions: SettingsActions,
+) {
     when (openDialog) {
         null -> Unit
         SettingsDialog.LocationPrecision -> ChoiceDialog(
@@ -289,6 +388,18 @@ private fun SettingsDialogs(openDialog: SettingsDialog?, settings: UserSettings,
             label = { it.labelRes() },
             onSelect = actions.onAppearanceSelected,
             onDismiss = actions.onDismissDialog,
+        )
+        SettingsDialog.Nickname -> TwoverseTextFieldDialog(
+            title = stringResource(R.string.settings_nickname_dialog_title),
+            value = nicknameDraft,
+            onValueChange = actions.onNicknameChange,
+            label = stringResource(R.string.settings_nickname_field),
+            confirmLabel = stringResource(R.string.settings_nickname_save),
+            onConfirm = actions.onSaveNickname,
+            onDismiss = actions.onDismissDialog,
+            note = stringResource(R.string.settings_nickname_note),
+            extraActionLabel = stringResource(R.string.settings_nickname_clear).takeIf { hasNickname },
+            onExtraAction = actions.onClearNickname,
         )
         SettingsDialog.LogOut -> TwoverseConfirmDialog(
             title = stringResource(R.string.settings_log_out_title),
@@ -350,22 +461,95 @@ private fun AppearanceMode.labelRes(): Int = when (this) {
     AppearanceMode.Dark -> R.string.settings_appearance_dark
 }
 
-@PreviewLightDark
+private val PreviewSettings = UserSettings(
+    shareLocation = true,
+    locationPrecision = LocationPrecision.Approximate,
+    lockOurs = true,
+    distanceUnit = DistanceUnit.Kilometres,
+    appearance = AppearanceMode.System,
+)
+
+private val PreviewPartner = UserProfile(
+    id = "user-partner",
+    fullName = "Ammu Perera",
+    shortName = "Ammu",
+    pronouns = Pronouns.She,
+    email = "ammu@example.com",
+    phone = "+94771234567",
+)
+
 @Composable
-private fun SettingsScreenPreview() {
+private fun SettingsPreview(partner: UserProfile?) {
     TwoverseTheme {
         SettingsScreen(
             uiState = SettingsUiState(
-                settings = UserSettings(
-                    shareLocation = true,
-                    locationPrecision = LocationPrecision.Approximate,
-                    lockOurs = true,
-                    distanceUnit = DistanceUnit.Kilometres,
-                    appearance = AppearanceMode.System,
-                ),
+                settings = PreviewSettings,
+                isConnected = partner != null,
+                connectedSince = LocalDate.of(2026, 9, 28).takeIf { partner != null },
+                partner = partner,
+            ),
+            actions = SettingsActions(),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun SettingsSheSharedPreview() {
+    SettingsPreview(partner = PreviewPartner)
+}
+
+@PreviewLightDark
+@Composable
+private fun SettingsHeNicknamePreview() {
+    SettingsPreview(
+        partner = PreviewPartner.copy(
+            fullName = "Keeththi Lan",
+            shortName = "Keeththi",
+            pronouns = Pronouns.He,
+            nickname = "Kanna",
+            email = null,
+            phone = null,
+        ),
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun SettingsTheyLongNamesPreview() {
+    SettingsPreview(
+        partner = PreviewPartner.copy(
+            fullName = "Alexandria Maximiliana Wickramasinghe-Ratnayake",
+            shortName = "Alexandria-Maximiliana-Wickr",
+            pronouns = Pronouns.They,
+            phone = null,
+        ),
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun SettingsNoPronounsPreview() {
+    SettingsPreview(partner = PreviewPartner.copy(pronouns = null, email = null))
+}
+
+@PreviewLightDark
+@Composable
+private fun SettingsUnpairedPreview() {
+    SettingsPreview(partner = null)
+}
+
+@PreviewLightDark
+@Composable
+private fun SettingsNicknameDialogPreview() {
+    TwoverseTheme {
+        SettingsScreen(
+            uiState = SettingsUiState(
+                settings = PreviewSettings,
                 isConnected = true,
-                connectedSince = LocalDate.of(2026, 2, 14),
-                togetherSince = LocalDate.of(2024, 2, 14),
+                partner = PreviewPartner.copy(nickname = "Chellam"),
+                openDialog = SettingsDialog.Nickname,
+                nicknameDraft = "Chellam",
             ),
             actions = SettingsActions(),
         )

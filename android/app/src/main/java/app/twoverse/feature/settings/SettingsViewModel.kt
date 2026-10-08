@@ -3,7 +3,9 @@ package app.twoverse.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.twoverse.core.data.AuthRepository
+import app.twoverse.core.common.MaxShortNameLength
 import app.twoverse.core.data.CoupleRepository
+import app.twoverse.core.data.ProfileRepository
 import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.model.AppearanceMode
@@ -28,6 +30,7 @@ class SettingsViewModel @Inject constructor(
     private val coupleRepository: CoupleRepository,
     private val authRepository: AuthRepository,
     private val pushRepository: PushRepository,
+    private val profileRepository: ProfileRepository,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -38,11 +41,12 @@ class SettingsViewModel @Inject constructor(
         settingsRepository.settings,
         coupleRepository.couple,
     ) { state, settings, couple ->
+        val isConnected = couple?.status == CoupleStatus.Active
         state.copy(
             settings = settings,
-            isConnected = couple?.status == CoupleStatus.Active,
+            isConnected = isConnected,
             connectedSince = couple?.connectedAt?.atZone(clock.zone)?.toLocalDate(),
-            togetherSince = couple?.togetherSince,
+            partner = couple?.partner?.takeIf { isConnected },
         )
     }.stateIn(
         scope = viewModelScope,
@@ -60,7 +64,22 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onOpenDialog(dialog: SettingsDialog) {
-        interaction.update { it.copy(openDialog = dialog) }
+        val nickname = uiState.value.partner?.nickname.orEmpty()
+        interaction.update { it.copy(openDialog = dialog, nicknameDraft = nickname) }
+    }
+
+    fun onNicknameChange(nickname: String) {
+        interaction.update { it.copy(nicknameDraft = nickname.take(MaxShortNameLength)) }
+    }
+
+    /** Only the user sees their nickname; every screen then uses it for the partner (FR-PRO-1). */
+    fun onSaveNickname() {
+        val nickname = interaction.value.nicknameDraft.trim().ifEmpty { null }
+        closeDialogThen { saveNickname(nickname) }
+    }
+
+    fun onClearNickname() {
+        closeDialogThen { saveNickname(null) }
     }
 
     fun onDismissDialog() {
@@ -98,6 +117,12 @@ class SettingsViewModel @Inject constructor(
 
     fun onDeleteAccountConfirmed() {
         closeDialogThen { exitOnSuccess(authRepository.deleteAccount(), SettingsExit.SignedOut) }
+    }
+
+    private suspend fun saveNickname(nickname: String?) {
+        val result = profileRepository.setPartnerNickname(nickname)
+        if (result is DataResult.Success) coupleRepository.refresh()
+        showFailure(result)
     }
 
     private fun showFailure(result: DataResult<Unit>) {

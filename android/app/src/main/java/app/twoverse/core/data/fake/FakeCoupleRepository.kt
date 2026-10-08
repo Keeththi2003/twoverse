@@ -67,6 +67,14 @@ class FakeCoupleRepository @Inject constructor() : CoupleRepository {
         ended.value = couple
     }
 
+    /** How often [refresh] was asked, for tests. */
+    var refreshCount = 0
+        private set
+
+    override fun refresh() {
+        refreshCount++
+    }
+
     /** What Realtime does when the couple changes, e.g. the partner sets "together since". */
     fun setCouple(couple: Couple?) {
         activeCouple.value = couple

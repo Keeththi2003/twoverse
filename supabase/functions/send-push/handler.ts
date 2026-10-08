@@ -3,6 +3,7 @@ import {
   COUNTED_PUSH_TYPES,
   type FcmMessage,
   MAX_PUSH_COUNT,
+  type PushTarget,
   type PushType,
   SERVER_PUSH_TYPES,
   USER_PUSH_TYPES,
@@ -15,9 +16,9 @@ export interface PushDeps {
   /** Shared secret for server-originated pushes (reunion day), from Supabase secrets. */
   internalSecret?: string;
   /** Runs prepare_partner_push as the calling user: the partner-only permission check. */
-  preparePartnerPush(authorization: string, kind: string): Promise<{ tokens: string[] } | { error: string }>;
-  /** Device tokens of the given users (server pushes only). */
-  pushTargets(userIds: string[]): Promise<string[]>;
+  preparePartnerPush(authorization: string, kind: string): Promise<{ targets: PushTarget[] } | { error: string }>;
+  /** Devices of the given users, with how each knows their partner (server pushes only). */
+  pushTargets(userIds: string[]): Promise<PushTarget[]>;
   removeTokens(tokens: string[]): Promise<void>;
   /** Null when FCM isn't configured (no service account secret). */
   send: ((message: FcmMessage) => Promise<SendResult>) | null;
@@ -45,7 +46,7 @@ export async function handle(req: Request, deps: PushDeps): Promise<Response> {
   const type = typeof body.type === "string" ? body.type : "";
 
   const internalHeader = req.headers.get("x-internal-secret");
-  let tokens: string[];
+  let targets: PushTarget[];
   let count: number | undefined;
   if (internalHeader !== null) {
     if (!deps.internalSecret || !constantTimeEquals(internalHeader, deps.internalSecret)) {
@@ -62,7 +63,7 @@ export async function handle(req: Request, deps: PushDeps): Promise<Response> {
       }
       count = value;
     }
-    tokens = await deps.pushTargets(userIds as string[]);
+    targets = await deps.pushTargets(userIds as string[]);
   } else {
     const authorization = req.headers.get("authorization") ?? "";
     if (!authorization.startsWith("Bearer ")) return json({ error: "unauthorized" }, 401);
@@ -71,13 +72,13 @@ export async function handle(req: Request, deps: PushDeps): Promise<Response> {
     if ("error" in prepared) {
       return json({ error: prepared.error }, ERROR_STATUS[prepared.error] ?? 500);
     }
-    tokens = prepared.tokens;
+    targets = prepared.targets;
   }
 
   if (deps.send === null) return json({ error: "push_not_configured" }, 503);
 
-  const results = await Promise.all(tokens.map((token) => deps.send!(buildMessage(type as PushType, token, count))));
-  const invalid = tokens.filter((_, i) => results[i] === "invalid_token");
+  const results = await Promise.all(targets.map((target) => deps.send!(buildMessage(type as PushType, target, count))));
+  const invalid = targets.filter((_, i) => results[i] === "invalid_token").map((target) => target.token);
   if (invalid.length > 0) await deps.removeTokens(invalid);
   return json({ sent: results.filter((r) => r === "ok").length }, 200);
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerName
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.IconTile
 import app.twoverse.core.designsystem.component.TwoverseCard
@@ -65,7 +66,7 @@ fun LocationSetupScreen(
             Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
                 IconTile(icon = content.icon, size = HeroTileSize, iconSize = HeroIconSize)
                 Text(
-                    text = stringResource(content.title),
+                    text = if (content.titleNamesPartner) stringResource(content.title, partnerName()) else stringResource(content.title),
                     style = MaterialTheme.typography.headlineLarge,
                     color = colors.onSurface,
                     modifier = Modifier.semantics { heading() },
@@ -113,6 +114,8 @@ private data class StepContent(
     @param:DrawableRes val icon: Int,
     @param:StringRes val title: Int,
     @param:StringRes val body: Int,
+    /** The title has a %1$s for the partner's name ("Share your location with Ammu"). */
+    val titleNamesPartner: Boolean = false,
     @param:StringRes val note: Int? = null,
     val primary: Pair<Int, () -> Unit>? = null,
     val secondary: Pair<Int, () -> Unit>? = null,
@@ -123,6 +126,7 @@ private fun LocationSetupStep.content(actions: LocationSetupActions, hasError: B
     LocationSetupStep.Explain -> StepContent(
         icon = R.drawable.ic_pin,
         title = R.string.location_setup_explain_title,
+        titleNamesPartner = true,
         body = R.string.location_setup_explain_body,
         note = R.string.location_setup_explain_note,
         primary = R.string.location_setup_continue to actions.onContinue,
@@ -152,6 +156,7 @@ private fun LocationSetupStep.content(actions: LocationSetupActions, hasError: B
     LocationSetupStep.Enabling -> StepContent(
         icon = R.drawable.ic_pin,
         title = R.string.location_setup_explain_title,
+        titleNamesPartner = true,
         body = R.string.location_setup_enabling,
         primary = if (hasError) R.string.location_setup_try_again to actions.onRetry else null,
         secondary = if (hasError) R.string.location_setup_not_now to actions.onNotNow else null,

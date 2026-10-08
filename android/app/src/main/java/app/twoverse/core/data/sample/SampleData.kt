@@ -8,6 +8,7 @@ import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
+import app.twoverse.core.model.Pronouns
 import app.twoverse.core.model.Reunion
 import app.twoverse.core.model.UserLocation
 import app.twoverse.core.model.UserProfile
@@ -26,8 +27,8 @@ object SampleData {
 
     private const val SUNSET_MEMORY_ID = "memory-9"
 
-    val me = UserProfile(id = "user-me", displayName = "You")
-    val partner = UserProfile(id = "user-partner", displayName = "Her")
+    val me = UserProfile(id = "user-me", fullName = "Keeththi Lan", shortName = "Keeththi", pronouns = Pronouns.He)
+    val partner = UserProfile(id = "user-partner", fullName = "Ammu Perera", shortName = "Ammu", pronouns = Pronouns.She)
 
     val couple = Couple(
         id = "couple-1",

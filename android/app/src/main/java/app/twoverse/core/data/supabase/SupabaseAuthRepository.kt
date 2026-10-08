@@ -52,12 +52,13 @@ class SupabaseAuthRepository @Inject constructor(
         }
     }
 
-    override suspend fun signUpWithEmail(displayName: String, email: String, password: String): DataResult<SignUpResult> =
+    override suspend fun signUpWithEmail(fullName: String, email: String, password: String): DataResult<SignUpResult> =
         supabaseCall {
             supabase.auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
-                data = buildJsonObject { put("display_name", displayName) }
+                // The profile trigger also sets the short name from it (FR-PRO-1).
+                data = buildJsonObject { put("full_name", fullName) }
             }
             if (supabase.auth.currentSessionOrNull() != null) SignUpResult.SignedIn else SignUpResult.ConfirmEmail
         }

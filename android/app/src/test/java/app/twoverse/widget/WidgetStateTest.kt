@@ -67,7 +67,7 @@ class WidgetStateTest {
         ),
     ) = OfflineSnapshot(
         ownerId = "me",
-        couple = Couple("couple", UserProfile("her", "Her", partnerTimeZone), CoupleStatus.Active, connectedAt = null),
+        couple = Couple("couple", UserProfile("her", "Ammu Perera", timeZone = partnerTimeZone), CoupleStatus.Active, connectedAt = null),
         sharing = LocationSharing(enabled = sharing),
         myLocation = location("me", latitude = 6.93, age = Duration.ofMinutes(1)),
         // North of the user.

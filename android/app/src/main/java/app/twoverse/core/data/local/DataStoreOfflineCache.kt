@@ -13,6 +13,7 @@ import app.twoverse.core.model.LocationSharing
 import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
+import app.twoverse.core.model.Pronouns
 import app.twoverse.core.model.Reunion
 import app.twoverse.core.model.UserLocation
 import app.twoverse.core.model.UserProfile
@@ -114,10 +115,15 @@ internal fun OfflineSnapshot.toCached() = CachedSnapshot(
         CachedCouple(
             id = it.id,
             partnerId = it.partner.id,
-            partnerName = it.partner.displayName,
+            partnerName = it.partner.fullName,
             connectedAt = it.connectedAt?.toString(),
             partnerTimeZone = it.partner.timeZone,
             togetherSince = it.togetherSince?.toString(),
+            partnerShortName = it.partner.shortName,
+            partnerPronouns = it.partner.pronouns?.name,
+            partnerNickname = it.partner.nickname,
+            partnerEmail = it.partner.email,
+            partnerPhone = it.partner.phone,
         )
     },
     sharing = sharing?.let { CachedSharing(it.enabled, it.precision.name) },
@@ -147,14 +153,29 @@ internal fun OfflineSnapshot.toCached() = CachedSnapshot(
 internal data class CachedCouple(
     val id: String,
     val partnerId: String,
+    /** The partner's full name. */
     val partnerName: String,
     val connectedAt: String? = null,
     val partnerTimeZone: String? = null,
     val togetherSince: String? = null,
+    val partnerShortName: String? = null,
+    val partnerPronouns: String? = null,
+    val partnerNickname: String? = null,
+    val partnerEmail: String? = null,
+    val partnerPhone: String? = null,
 ) {
     fun toModel() = Couple(
         id = id,
-        partner = UserProfile(id = partnerId, displayName = partnerName, timeZone = partnerTimeZone),
+        partner = UserProfile(
+            id = partnerId,
+            fullName = partnerName,
+            shortName = partnerShortName,
+            pronouns = Pronouns.entries.firstOrNull { it.name == partnerPronouns },
+            timeZone = partnerTimeZone,
+            nickname = partnerNickname,
+            email = partnerEmail,
+            phone = partnerPhone,
+        ),
         status = CoupleStatus.Active,
         connectedAt = connectedAt?.let(Instant::parse),
         togetherSince = togetherSince?.let(LocalDate::parse),

@@ -83,3 +83,11 @@ data class TogetherSinceRoute(val afterPairing: Boolean = false, val showShootin
  */
 @Serializable
 data class MeetupEditorRoute(val meetupId: String? = null, val fromReunion: Boolean = false)
+
+/** "About you": short name and pronouns, asked once after signing in (FR-PRO-2). */
+@Serializable
+data object AboutYouRoute
+
+/** Your profile, opened from Settings (FR-PRO-4). */
+@Serializable
+data object ProfileRoute

@@ -1,5 +1,6 @@
 package app.twoverse.core.data.push
 
+import app.twoverse.core.common.MaxShortNameLength
 import app.twoverse.core.data.local.OfflineCache
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -36,11 +37,19 @@ class TwoverseMessagingService : FirebaseMessagingService() {
             IncomingPush.ShootingStar -> {
                 // Lets the widget say a surprise is waiting, before the app is opened (FR-WGT-1).
                 runBlocking { markStarWaiting() }
-                notifications.show(push)
+                notifications.show(push, partnerName = partnerName(message))
             }
-            else -> notifications.show(push, count = message.data["count"]?.toIntOrNull()?.takeIf { it > 0 })
+            else -> notifications.show(
+                push,
+                count = message.data["count"]?.toIntOrNull()?.takeIf { it > 0 },
+                partnerName = partnerName(message),
+            )
         }
     }
+
+    /** How this user knows their partner, resolved by the server (FR-NOT-7); at most 30 characters. */
+    private fun partnerName(message: RemoteMessage): String? =
+        message.data["partner_name"]?.trim()?.take(MaxShortNameLength)?.takeIf { it.isNotEmpty() }
 
     private suspend fun markStarWaiting() {
         val ownerId = offlineCache.snapshot.first()?.ownerId ?: return

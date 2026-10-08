@@ -47,7 +47,7 @@ class SettingsViewModelTest {
     private val clock = Clock.fixed(Instant.parse("2026-09-26T12:00:00Z"), ZoneId.of("Asia/Colombo"))
 
     private fun TestScope.createViewModel(): SettingsViewModel {
-        val viewModel = SettingsViewModel(settingsRepository, coupleRepository, authRepository, pushRepository, clock)
+        val viewModel = SettingsViewModel(settingsRepository, coupleRepository, authRepository, pushRepository, profileRepository, clock)
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
         runCurrent()
         return viewModel
@@ -118,14 +118,79 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun showsWhenTheStoryBegan() = runTest(mainDispatcherRule.testDispatcher) {
+    fun showsThePartnerAndTheirDisplayName() = runTest(mainDispatcherRule.testDispatcher) {
         val viewModel = createViewModel()
-        assertNull(viewModel.uiState.value.togetherSince)
+        assertNull(viewModel.uiState.value.partner)
+        assertNull(viewModel.uiState.value.partnerDisplayName)
 
-        coupleRepository.setCouple(SampleData.couple.copy(togetherSince = LocalDate.of(2024, 2, 14)))
+        coupleRepository.setCouple(SampleData.couple)
+        runCurrent()
+        assertEquals(SampleData.partner, viewModel.uiState.value.partner)
+        assertEquals("Ammu", viewModel.uiState.value.partnerDisplayName)
+
+        coupleRepository.setCouple(SampleData.couple.copy(partner = SampleData.partner.copy(nickname = "Chellam")))
+        runCurrent()
+        assertEquals("Chellam", viewModel.uiState.value.partnerDisplayName)
+    }
+
+    @Test
+    fun theNicknameDialogStartsFromTheCurrentNickname() = runTest(mainDispatcherRule.testDispatcher) {
+        coupleRepository.setCouple(SampleData.couple.copy(partner = SampleData.partner.copy(nickname = "Chellam")))
+        val viewModel = createViewModel()
+
+        viewModel.onOpenDialog(SettingsDialog.Nickname)
         runCurrent()
 
-        assertEquals(LocalDate.of(2024, 2, 14), viewModel.uiState.value.togetherSince)
+        assertEquals(SettingsDialog.Nickname, viewModel.uiState.value.openDialog)
+        assertEquals("Chellam", viewModel.uiState.value.nicknameDraft)
+    }
+
+    @Test
+    fun savingANicknameTrimsItCapsItAndRefreshesTheCouple() = runTest(mainDispatcherRule.testDispatcher) {
+        coupleRepository.setCouple(SampleData.couple)
+        val viewModel = createViewModel()
+        viewModel.onOpenDialog(SettingsDialog.Nickname)
+
+        viewModel.onNicknameChange("x".repeat(40))
+        runCurrent()
+        assertEquals(30, viewModel.uiState.value.nicknameDraft.length)
+        viewModel.onNicknameChange("  Kanna  ")
+        viewModel.onSaveNickname()
+        runCurrent()
+
+        assertEquals(listOf<String?>("Kanna"), profileRepository.savedNicknames)
+        assertEquals(1, coupleRepository.refreshCount)
+        assertNull(viewModel.uiState.value.openDialog)
+    }
+
+    @Test
+    fun aBlankOrClearedNicknameRemovesIt() = runTest(mainDispatcherRule.testDispatcher) {
+        coupleRepository.setCouple(SampleData.couple)
+        val viewModel = createViewModel()
+
+        viewModel.onOpenDialog(SettingsDialog.Nickname)
+        viewModel.onNicknameChange("   ")
+        viewModel.onSaveNickname()
+        viewModel.onOpenDialog(SettingsDialog.Nickname)
+        viewModel.onClearNickname()
+        runCurrent()
+
+        assertEquals(listOf<String?>(null, null), profileRepository.savedNicknames)
+    }
+
+    @Test
+    fun aFailedNicknameShowsTheErrorAndKeepsTheCouple() = runTest(mainDispatcherRule.testDispatcher) {
+        coupleRepository.setCouple(SampleData.couple)
+        val viewModel = createViewModel()
+        profileRepository.failNextWith(DataError.Network)
+
+        viewModel.onOpenDialog(SettingsDialog.Nickname)
+        viewModel.onNicknameChange("Kanna")
+        viewModel.onSaveNickname()
+        runCurrent()
+
+        assertEquals(DataError.Network, viewModel.uiState.value.error)
+        assertEquals(0, coupleRepository.refreshCount)
     }
 
     @Test

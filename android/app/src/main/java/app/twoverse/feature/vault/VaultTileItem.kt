@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerName
 import app.twoverse.R
 import app.twoverse.core.common.ExpiryBadge
 import app.twoverse.core.designsystem.text.longText
@@ -113,9 +114,11 @@ private fun ExpiryBadge.shortText(): String = when (this) {
 private fun tileDescription(tile: VaultTile): String {
     val parts = buildList {
         add(
-            stringResource(
-                if (tile.sender == MemorySender.Me) R.string.vault_tile_from_you else R.string.vault_tile_from_her,
-            ),
+            if (tile.sender == MemorySender.Me) {
+                stringResource(R.string.vault_tile_from_you)
+            } else {
+                stringResource(R.string.vault_tile_from_partner, partnerName())
+            },
         )
         if (tile.isNew) add(stringResource(R.string.vault_tile_new))
         tile.expiryBadge?.let { add(stringResource(R.string.vault_tile_expires_in, it.longText())) }
