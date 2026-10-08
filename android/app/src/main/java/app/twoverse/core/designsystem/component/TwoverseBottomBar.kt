@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import app.twoverse.R
@@ -39,7 +40,6 @@ data class TwoverseBottomBarItem(
 
 private val BarTopPadding = 10.dp
 private val BarBottomPadding = 8.dp
-private val ItemMinWidth = 72.dp
 private val IconSize = 24.dp
 
 /** Tab bar. Which tabs it shows is decided in `navigation/`. */
@@ -59,14 +59,15 @@ fun TwoverseBottomBar(
                 .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(top = BarTopPadding, bottom = BarBottomPadding)
                 .selectableGroup(),
-            horizontalArrangement = Arrangement.SpaceAround,
         ) {
             items.forEachIndexed { index, item ->
                 val selected = index == selectedIndex
                 val contentColor = if (selected) colors.primary else colors.onSurfaceVariant
+                // Equal widths, so five tabs share a 360 dp screen; each label stays on one line.
                 Column(
                     modifier = Modifier
-                        .sizeIn(minWidth = ItemMinWidth, minHeight = TwoverseTheme.spacing.minTouchTarget)
+                        .weight(1f)
+                        .sizeIn(minHeight = TwoverseTheme.spacing.minTouchTarget)
                         .clip(TwoverseTheme.shapes.iconTile)
                         .selectable(selected = selected, role = Role.Tab, onClick = { onItemSelected(index) }),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,6 +83,9 @@ fun TwoverseBottomBar(
                         text = item.label,
                         style = MaterialTheme.typography.labelSmall,
                         color = contentColor,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -98,6 +102,7 @@ private fun TwoverseBottomBarPreview() {
                 TwoverseBottomBarItem(stringResource(R.string.nav_universe), R.drawable.ic_orbit),
                 TwoverseBottomBarItem(stringResource(R.string.nav_your_star), R.drawable.ic_compass),
                 TwoverseBottomBarItem(stringResource(R.string.nav_ours), R.drawable.ic_lock),
+                TwoverseBottomBarItem(stringResource(R.string.nav_our_orbit), R.drawable.ic_our_orbit),
                 TwoverseBottomBarItem(stringResource(R.string.nav_you_and_her), R.drawable.ic_person),
             ),
             selectedIndex = 0,

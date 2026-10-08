@@ -8,7 +8,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun OrbitRoute(
-    onBack: () -> Unit,
     onSetTogetherSince: () -> Unit,
     onAddMeetup: () -> Unit,
     onEditMeetup: (meetupId: String) -> Unit,
@@ -19,7 +18,6 @@ fun OrbitRoute(
     OrbitScreen(
         uiState = uiState,
         actions = OrbitActions(
-            onBack = onBack,
             onSetTogetherSince = onSetTogetherSince,
             onAddMeetup = onAddMeetup,
             onEditMeetup = onEditMeetup,

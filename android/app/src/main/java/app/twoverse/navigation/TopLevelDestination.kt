@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import app.twoverse.R
 
-/** The four bottom-bar tabs (DESIGN.md §7). */
+/** The five bottom-bar tabs (DESIGN.md §7), in this order. */
 enum class TopLevelDestination(
     val route: Any,
     @param:StringRes val labelRes: Int,
@@ -13,5 +13,6 @@ enum class TopLevelDestination(
     Home(HomeRoute, R.string.nav_universe, R.drawable.ic_orbit),
     Compass(CompassRoute, R.string.nav_your_star, R.drawable.ic_compass),
     Vault(VaultRoute, R.string.nav_ours, R.drawable.ic_lock),
+    Orbit(OrbitRoute, R.string.nav_our_orbit, R.drawable.ic_our_orbit),
     Settings(SettingsRoute, R.string.nav_you_and_her, R.drawable.ic_person),
 }

@@ -33,6 +33,19 @@ class DistanceFormatTest {
     }
 
     @Test
+    fun thousandsAreGroupedForTheLocale() {
+        assertEquals("14,285", formatDistance(14_285.2, DistanceUnit.Kilometres, Locale.US))
+        assertEquals("14.285", formatDistance(14_285.2, DistanceUnit.Kilometres, Locale.GERMANY))
+        assertEquals("999", formatDistance(999.0, DistanceUnit.Kilometres, Locale.US))
+        assertEquals("1,000", formatDistance(999.6, DistanceUnit.Kilometres, Locale.US))
+    }
+
+    @Test
+    fun longDistancesInMilesAreGroupedToo() {
+        assertEquals("8,876", formatDistance(14_285.0, DistanceUnit.Miles, Locale.US))
+    }
+
+    @Test
     fun decimalSeparatorFollowsLocale() {
         assertEquals("94,6", formatDistance(94.6, DistanceUnit.Kilometres, Locale.GERMANY))
     }

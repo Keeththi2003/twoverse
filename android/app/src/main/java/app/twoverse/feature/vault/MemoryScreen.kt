@@ -1,6 +1,5 @@
 package app.twoverse.feature.vault
 
-import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.common.ExpiryBadge
 import app.twoverse.core.designsystem.component.Planet
@@ -320,7 +320,7 @@ private fun MemoryDetails(
 @Composable
 private fun sentAtText(sentAt: LocalDateTime): String {
     val locale = LocalConfiguration.current.locales[0]
-    val date = sentAt.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
+    val date = formatDate(sentAt, DatePattern, locale)
     val time = sentAt.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale))
     return stringResource(R.string.memory_date_time, date, time)
 }

@@ -1,16 +1,14 @@
 package app.twoverse.feature.orbit
 
-import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import app.twoverse.R
+import app.twoverse.core.common.formatDate
 import app.twoverse.core.model.Meetup
 import java.time.LocalDate
 import java.time.Period
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 
 // Display text shared by the Our Orbit screens.
@@ -26,16 +24,13 @@ internal fun periodText(period: Period): String {
     return if (parts.isEmpty()) stringResource(R.string.orbit_first_day) else parts.joinToString(stringResource(R.string.orbit_list_separator))
 }
 
-/** "14 February 2024" in the user's locale. */
+/** "22 June 2025" in the device locale's order. */
 @Composable
-internal fun longDate(date: LocalDate): String =
-    date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(LocalConfiguration.current.locales[0]))
+internal fun longDate(date: LocalDate): String = formatDate(date, LongDatePattern, LocalConfiguration.current.locales[0])
 
+/** "22 Jun 2025". */
 @Composable
-internal fun shortDate(date: LocalDate): String {
-    val locale = LocalConfiguration.current.locales[0]
-    return date.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, ShortDatePattern), locale))
-}
+internal fun shortDate(date: LocalDate): String = formatDate(date, ShortDatePattern, LocalConfiguration.current.locales[0])
 
 /** "Today", "Tomorrow" or "in 23 days". */
 @Composable
@@ -56,4 +51,5 @@ internal fun meetupDates(meetup: Meetup): String {
 /** Both the first and last day count. */
 internal val Meetup.lengthDays: Long get() = ChronoUnit.DAYS.between(startDate, lastDay) + 1
 
+private const val LongDatePattern = "dMMMMy"
 private const val ShortDatePattern = "dMMMy"

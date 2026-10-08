@@ -1,6 +1,5 @@
 package app.twoverse.feature.settings
 
-import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +33,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.Planet
 import app.twoverse.core.designsystem.component.PlanetKind
@@ -48,7 +48,6 @@ import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.UserSettings
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private val CouplePadding = 18.dp
 private val HerPlanetSize = 44.dp
@@ -76,8 +75,8 @@ fun SettingsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
-            .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = spacing.screenHorizontal)
             .padding(bottom = spacing.md),
     ) {
@@ -122,7 +121,7 @@ fun SettingsScreen(
             SettingsGroup {
                 SettingsValueRow(
                     title = stringResource(R.string.settings_together_since),
-                    value = uiState.togetherSince?.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
+                    value = uiState.togetherSince?.let { formatDate(it, DatePattern, locale) }
                         ?: stringResource(R.string.settings_together_since_not_set),
                     onClick = actions.onSetTogetherSince,
                 )
@@ -212,9 +211,7 @@ private fun CoupleCard(isConnected: Boolean, connectedSince: LocalDate?, modifie
                 )
                 if (isConnected && connectedSince != null) {
                     val locale = LocalConfiguration.current.locales[0]
-                    val date = connectedSince.format(
-                        DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale),
-                    )
+                    val date = formatDate(connectedSince, DatePattern, locale)
                     Text(
                         text = stringResource(R.string.settings_connected_since, date),
                         style = MaterialTheme.typography.bodySmall,

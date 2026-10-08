@@ -1,18 +1,16 @@
 package app.twoverse.feature.home
 
+import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.common.LocationUnavailableReason
-import app.twoverse.core.data.fake.FakeHeadingSource
 import app.twoverse.core.data.fake.FakeLocationPermissionChecker
 import app.twoverse.core.data.fake.FakeLocationRepository
 import app.twoverse.core.data.fake.FakeMemoryRepository
 import app.twoverse.core.data.fake.FakeOrbitRepository
 import app.twoverse.core.data.fake.FakeProfileRepository
 import app.twoverse.core.data.fake.FakeReunionRepository
-import app.twoverse.core.data.sensors.CompassHeading
 import app.twoverse.core.data.settings.DefaultSettingsRepository
 import app.twoverse.core.model.DistanceUnit
-import app.twoverse.core.model.HeadingReading
 import app.twoverse.core.model.LocationPermissionStatus
 import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.ReunionPlan
@@ -43,7 +41,6 @@ class HomeViewModelTest {
     private val locationRepository = FakeLocationRepository()
     private val preferences = InMemoryUserPreferences()
     private val permissions = FakeLocationPermissionChecker()
-    private val headingSource = FakeHeadingSource()
     private val reunionRepository = FakeReunionRepository()
     private val orbitRepository = FakeOrbitRepository()
     private var clock: Clock = Clock.fixed(Instant.now(), ZoneOffset.UTC)
@@ -58,26 +55,11 @@ class HomeViewModelTest {
             orbitRepository = orbitRepository,
             permissions = permissions,
             preferences = preferences,
-            compassHeading = CompassHeading(headingSource, Clock.systemUTC()),
             clock = clock,
         )
         backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.uiState.collect {} }
-        backgroundScope.launch(mainDispatcherRule.testDispatcher) { viewModel.miniNeedleRotation.collect { miniNeedle = it } }
         runCurrent()
         return viewModel.uiState.value as HomeUiState.Success
-    }
-
-    private var miniNeedle: Float? = null
-
-    @Test
-    fun miniCompassFollowsThePhone() = runTest(mainDispatcherRule.testDispatcher) {
-        state()
-        assertEquals(42f, miniNeedle ?: 0f, 0.2f)
-
-        headingSource.readings.emit(HeadingReading(magneticDegrees = 42.0, isAccurate = true))
-        runCurrent()
-
-        assertEquals(0f, miniNeedle ?: 99f, 0.2f)
     }
 
     @Test
@@ -87,6 +69,23 @@ class HomeViewModelTest {
         assertEquals(SharingStatus.On, state.sharingStatus)
         assertEquals("94.6", state.distance)
         assertEquals(LocationFreshness.Live, state.freshness)
+    }
+
+    @Test
+    fun theDistanceCardShowsHerDirectionAndBearing() = runTest(mainDispatcherRule.testDispatcher) {
+        val state = state()
+
+        assertEquals(CompassDirection.NorthEast, state.partnerDirection)
+        assertEquals(42, state.partnerBearing)
+    }
+
+    @Test
+    fun withoutHerLocationThereIsNoDirection() = runTest(mainDispatcherRule.testDispatcher) {
+        locationRepository.partner.value = null
+        val state = state()
+
+        assertNull(state.partnerDirection)
+        assertNull(state.partnerBearing)
     }
 
     @Test

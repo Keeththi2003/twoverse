@@ -1,6 +1,5 @@
 package app.twoverse.feature.pairing
 
-import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.OrDivider
 import app.twoverse.core.designsystem.component.Planet
@@ -57,7 +57,6 @@ import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.DataError
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private val ExpiryIconSize = 16.dp
 private val WaitingHerSize = 14.dp
@@ -188,9 +187,7 @@ fun PairScreen(
 private fun ReconnectCard(reconnect: PairReconnect, onReconnect: () -> Unit, modifier: Modifier = Modifier) {
     val colors = TwoverseTheme.colors
     val locale = LocalConfiguration.current.locales[0]
-    val date = reconnect.deleteOn.format(
-        DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, ReconnectDatePattern), locale),
-    )
+    val date = formatDate(reconnect.deleteOn, ReconnectDatePattern, locale)
     TwoverseCard(shape = TwoverseTheme.shapes.cardSmall, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(TwoverseTheme.spacing.md)) {
             Text(

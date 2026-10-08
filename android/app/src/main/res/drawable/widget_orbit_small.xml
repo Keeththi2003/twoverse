@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Small widget: her planet, your planet, dashed arc and gold star. Generated to match DESIGN.md §2 planet and star gradients; the arc follows the theme (@color/widget_arc). -->
+<!-- Small widget: your planet (left), hers (right), dashed arc and gold star. Generated to match DESIGN.md §2 planet and star gradients; the arc follows the theme (@color/widget_arc). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="120dp" android:height="48dp"
@@ -23,18 +23,18 @@
             </gradient>
         </aapt:attr>
     </path>
-    <path android:pathData="M4.00,36.00 a10.00,10.00 0 1,0 20.00,0 a10.00,10.00 0 1,0 -20.00,0 Z">
+    <path android:pathData="M96.00,36.00 a10.00,10.00 0 1,0 20.00,0 a10.00,10.00 0 1,0 -20.00,0 Z">
         <aapt:attr name="android:fillColor">
-            <gradient android:type="radial" android:centerX="10.40" android:centerY="32.00" android:gradientRadius="19.52">
+            <gradient android:type="radial" android:centerX="102.40" android:centerY="32.00" android:gradientRadius="19.52">
                 <item android:offset="0" android:color="#FFFFE0E8" />
                 <item android:offset="0.55" android:color="#FFE0607E" />
                 <item android:offset="1" android:color="#FF9E3552" />
             </gradient>
         </aapt:attr>
     </path>
-    <path android:pathData="M98.00,36.00 a8.00,8.00 0 1,0 16.00,0 a8.00,8.00 0 1,0 -16.00,0 Z">
+    <path android:pathData="M6.00,36.00 a8.00,8.00 0 1,0 16.00,0 a8.00,8.00 0 1,0 -16.00,0 Z">
         <aapt:attr name="android:fillColor">
-            <gradient android:type="radial" android:centerX="103.12" android:centerY="32.80" android:gradientRadius="15.61">
+            <gradient android:type="radial" android:centerX="11.12" android:centerY="32.80" android:gradientRadius="15.61">
                 <item android:offset="0" android:color="#FFF1E9FF" />
                 <item android:offset="0.55" android:color="#FF9D86D0" />
                 <item android:offset="1" android:color="#FF5E4A94" />

@@ -1,6 +1,5 @@
 package app.twoverse.feature.star
 
-import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBackButton
 import app.twoverse.core.designsystem.component.TwoverseCard
@@ -39,7 +39,6 @@ import app.twoverse.core.model.DataError
 import app.twoverse.core.model.StarLayout
 import app.twoverse.core.model.StarStatus
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 private const val DateTimePattern = "EEEdMMMjmm"
 private const val HeadlineMaxLines = 2
@@ -179,7 +178,7 @@ private fun StarCard(item: StarListItem, onClick: (() -> Unit)?, footer: @Compos
 @Composable
 private fun statusText(item: StarListItem): String {
     val locale = LocalConfiguration.current.locales[0]
-    val time = item.time.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DateTimePattern), locale))
+    val time = formatDate(item.time, DateTimePattern, locale)
     return when (item.status) {
         StarStatus.Scheduled -> stringResource(R.string.stars_status_scheduled, time)
         StarStatus.Waiting -> stringResource(R.string.stars_status_waiting)

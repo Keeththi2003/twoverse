@@ -44,6 +44,8 @@ fun TwoverseCard(
     shape: Shape = TwoverseTheme.shapes.card,
     color: Color = TwoverseTheme.colors.surface,
     onClick: (() -> Unit)? = null,
+    /** What tapping does, for screen readers ("Open Your Star"). */
+    onClickLabel: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -51,7 +53,7 @@ fun TwoverseCard(
             .twoverseCardDepth(shape)
             .clip(shape)
             .background(color)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+            .then(if (onClick != null) Modifier.clickable(onClickLabel = onClickLabel, onClick = onClick) else Modifier),
         content = content,
     )
 }

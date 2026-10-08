@@ -59,7 +59,8 @@ fun StarField(
     twinkle: Boolean = true,
 ) {
     val colors = TwoverseTheme.colors
-    val progress = twinkleProgress(twinkle)
+    val animate = twinkle && rememberAnimationsEnabled()
+    val progress = twinkleProgress(animate)
 
     Canvas(modifier = modifier) {
         stars.forEachIndexed { index, star ->

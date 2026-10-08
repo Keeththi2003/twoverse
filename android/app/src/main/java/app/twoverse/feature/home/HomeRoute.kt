@@ -30,7 +30,6 @@ fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val shouldAskNotifications by viewModel.shouldAskNotificationPermission.collectAsStateWithLifecycle()
-    val miniNeedleRotation by viewModel.miniNeedleRotation.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
@@ -50,7 +49,6 @@ fun HomeRoute(
         onSendMemory = onSendMemory,
         onSendShootingStar = onSendShootingStar,
         onOpenLocationSetup = onOpenLocationSetup,
-        miniNeedleRotation = { miniNeedleRotation },
         modifier = modifier,
         orbitActions = HomeOrbitActions(
             onOpenOrbit = onOpenOrbit,
