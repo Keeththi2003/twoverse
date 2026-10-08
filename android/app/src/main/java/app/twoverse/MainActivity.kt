@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.twoverse.core.common.EXTRA_LAUNCH_SCREEN
 import app.twoverse.core.data.AuthDeepLinkHandler
+import app.twoverse.core.designsystem.text.LocalPartnerName
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.LaunchScreen
@@ -42,6 +44,8 @@ class MainActivity : FragmentActivity() {
             val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
             val isPasswordRecovery by viewModel.isPasswordRecovery.collectAsStateWithLifecycle()
             val requestedScreen by viewModel.requestedScreen.collectAsStateWithLifecycle()
+            val partner by viewModel.partner.collectAsStateWithLifecycle()
+            val needsAboutYou by viewModel.needsAboutYou.collectAsStateWithLifecycle()
             val darkTheme = when (appearance) {
                 AppearanceMode.System -> isSystemInDarkTheme()
                 AppearanceMode.Light -> false
@@ -53,14 +57,18 @@ class MainActivity : FragmentActivity() {
                 onDispose {}
             }
             TwoverseTheme(darkTheme = darkTheme) {
-                TwoverseNavHost(
-                    startsSignedIn = startsOnScreen != null,
-                    requestedScreen = requestedScreen,
-                    onRequestedScreenShown = viewModel::onLaunchScreenShown,
-                    isOffline = isOffline,
-                    isPasswordRecovery = isPasswordRecovery,
-                    onPasswordRecoveryShown = viewModel::onPasswordRecoveryShown,
-                )
+                // Every screen names the partner the same way (FR-PRO-1).
+                CompositionLocalProvider(LocalPartnerName provides partner) {
+                    TwoverseNavHost(
+                        startsSignedIn = startsOnScreen != null,
+                        requestedScreen = requestedScreen,
+                        onRequestedScreenShown = viewModel::onLaunchScreenShown,
+                        isOffline = isOffline,
+                        isPasswordRecovery = isPasswordRecovery,
+                        onPasswordRecoveryShown = viewModel::onPasswordRecoveryShown,
+                        needsAboutYou = needsAboutYou,
+                    )
+                }
             }
         }
     }
