@@ -67,8 +67,8 @@ fun CompassScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .safeDrawingPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.xl)
                 .padding(bottom = spacing.md),
             horizontalAlignment = Alignment.CenterHorizontally,

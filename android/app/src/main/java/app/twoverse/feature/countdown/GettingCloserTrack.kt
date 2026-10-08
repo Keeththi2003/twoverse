@@ -19,14 +19,15 @@ import app.twoverse.core.designsystem.component.PlanetKind
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 
 private val TrackHeight = 40.dp
-private val TrackStart = 20.dp
-private val TrackEndInset = 16.dp
+/** The line starts at the centre of your planet and ends at the centre of hers. */
+private val TrackStart = 16.dp
+private val TrackEndInset = 20.dp
 private val TrackStroke = 2.dp
 private val HerSize = 40.dp
 private val YouSize = 30.dp
 private val YouTop = 5.dp
 
-/** Line between her planet and yours, filled up to [progress] (0..1). */
+/** Line from your planet (left) to hers (right), filled up to [progress] (0..1), as on Home. */
 @Composable
 internal fun GettingCloserTrack(progress: Float, modifier: Modifier = Modifier) {
     val colors = TwoverseTheme.colors
@@ -48,13 +49,15 @@ internal fun GettingCloserTrack(progress: Float, modifier: Modifier = Modifier) 
                 strokeWidth = TrackStroke.toPx(),
             )
         }
-        Planet(kind = PlanetKind.Her, size = HerSize)
         Planet(
             kind = PlanetKind.You,
             size = YouSize,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(y = YouTop),
+            modifier = Modifier.offset(y = YouTop),
+        )
+        Planet(
+            kind = PlanetKind.Her,
+            size = HerSize,
+            modifier = Modifier.align(Alignment.TopEnd),
         )
     }
 }
