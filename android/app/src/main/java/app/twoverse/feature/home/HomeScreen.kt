@@ -35,9 +35,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerString
+import app.twoverse.core.designsystem.text.partnerNameStart
+import app.twoverse.core.designsystem.text.PronounStrings
 import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.common.CompassDirection
@@ -233,8 +237,8 @@ private fun DistanceCard(uiState: HomeUiState.Success, onClick: () -> Unit) {
                     .padding(top = spacing.xs),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                PersonCity(nameRes = R.string.home_you, city = uiState.myCity)
-                PersonCity(nameRes = R.string.home_her, city = uiState.partnerCity)
+                PersonCity(name = stringResource(R.string.home_you), city = uiState.myCity, modifier = Modifier.weight(1f, fill = false))
+                PersonCity(name = partnerNameStart(), city = uiState.partnerCity, modifier = Modifier.weight(1f, fill = false))
             }
             Row(
                 modifier = Modifier
@@ -292,10 +296,11 @@ private fun DirectionLabel(direction: CompassDirection?, bearing: Int?, freshnes
     ) {
         DirectionNeedle(bearingDegrees = bearing.toFloat())
         Text(
-            text = stringResource(
-                if (freshness == LocationFreshness.Outdated) R.string.home_direction_last_known else R.string.home_star_direction,
-                name,
-            ),
+            text = if (freshness == LocationFreshness.Outdated) {
+                stringResource(R.string.home_direction_last_known, name)
+            } else {
+                partnerString(StarDirection, name)
+            },
             style = MaterialTheme.typography.labelMedium,
             color = colors.onSurface,
         )
@@ -379,9 +384,8 @@ private fun DistanceValue(distance: String?, unit: DistanceUnit, unavailableReas
 }
 
 @Composable
-private fun PersonCity(nameRes: Int, city: String?) {
+private fun PersonCity(name: String, city: String?, modifier: Modifier = Modifier) {
     val colors = TwoverseTheme.colors
-    val name = stringResource(nameRes)
     val separator = stringResource(R.string.home_city_separator)
     Text(
         text = buildAnnotatedString {
@@ -395,6 +399,9 @@ private fun PersonCity(nameRes: Int, city: String?) {
         },
         style = MaterialTheme.typography.labelMedium,
         color = colors.onSurface,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
     )
 }
 
@@ -577,6 +584,9 @@ private fun MeetupQuestionCard(date: LocalDate, actions: HomeOrbitActions) {
 }
 
 private const val QuestionDatePattern = "dMMMM"
+
+/** "She's north-east", "He's north-east", "They're north-east". */
+private val StarDirection = PronounStrings(R.string.home_star_direction_she, R.string.home_star_direction_he, R.string.home_star_direction_they)
 
 private fun DayPeriod.greetingRes(): Int = when (this) {
     DayPeriod.Morning -> R.string.home_greeting_morning

@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerNameStart
+import app.twoverse.core.designsystem.text.partnerName
 import app.twoverse.R
 import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.ElapsedTime
@@ -81,7 +83,7 @@ fun CompassScreen(
                     modifier = Modifier.semantics { heading() },
                 )
                 Text(
-                    text = stringResource(R.string.compass_subtitle),
+                    text = stringResource(R.string.compass_subtitle, partnerName()),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
                     color = colors.onSurfaceVariant,
                     modifier = Modifier.padding(top = spacing.xs),
@@ -106,10 +108,10 @@ fun CompassScreen(
             StatusChips(uiState = uiState)
             Spacer(modifier = Modifier.height(spacing.lg))
             TipCard(
-                textRes = when {
-                    !uiState.hasCompassSensor -> R.string.compass_no_sensor
-                    uiState.isCalibrated -> R.string.compass_tip
-                    else -> R.string.compass_calibrate_hint
+                text = when {
+                    !uiState.hasCompassSensor -> stringResource(R.string.compass_no_sensor, partnerName())
+                    uiState.isCalibrated -> stringResource(R.string.compass_tip)
+                    else -> stringResource(R.string.compass_calibrate_hint)
                 },
             )
         }
@@ -175,7 +177,7 @@ private fun StatusChips(uiState: CompassUiState.Success) {
             TwoverseStatusChip(text = stringResource(R.string.compass_calibrated), dotColor = colors.gold)
         }
         uiState.partnerUpdatedAgo?.let { updatedAgo ->
-            TwoverseStatusChip(text = stringResource(R.string.compass_partner_location, updatedAgo.shortText()))
+            TwoverseStatusChip(text = stringResource(R.string.compass_partner_location, partnerNameStart(), updatedAgo.shortText()))
         }
     }
 }
@@ -193,7 +195,7 @@ private fun NoCompassDirection(direction: CompassDirection?) {
 }
 
 @Composable
-private fun TipCard(textRes: Int) {
+private fun TipCard(text: String) {
     val colors = TwoverseTheme.colors
     val shape = TwoverseTheme.shapes.cardSmall
     val border = if (colors.isDark) Modifier.border(1.dp, colors.outline, shape) else Modifier
@@ -213,7 +215,7 @@ private fun TipCard(textRes: Int) {
             modifier = Modifier.size(TipIconSize),
         )
         Text(
-            text = stringResource(textRes),
+            text = text,
             style = MaterialTheme.typography.bodySmall,
             color = colors.onSurfaceVariant,
         )
