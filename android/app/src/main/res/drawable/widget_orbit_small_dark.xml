@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixed dark copy of widget_orbit_small, for when the app's Appearance forces dark (FR-WGT-5). -->
+<!-- Small widget: your planet (left), hers (right), dashed arc and gold star. Generated to match DESIGN.md §2 planet and star gradients; the arc follows the theme (@color/widget_arc_dark). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp" android:height="48dp"
+    android:viewportWidth="120" android:viewportHeight="48">
+    <path android:pathData="M24.00,34.00 L25.44,32.43 L26.88,30.93 M29.77,28.11 L31.40,26.64 L32.85,25.40 M36.12,22.84 L37.93,21.56 L39.57,20.50 M43.22,18.42 L45.05,17.53 L46.88,16.74 M50.73,15.40 L52.75,14.88 L54.78,14.48 M58.84,14.04 L60.87,14.00 L62.91,14.08 M66.99,14.61 L69.04,15.06 L70.90,15.57 M74.82,16.96 L76.69,17.78 L78.56,18.70 M82.13,20.73 L83.82,21.81 L85.51,22.98 M88.72,25.40 L90.42,26.80 L91.93,28.11 M94.96,30.93 L96.48,32.43 L97.81,33.80" android:strokeColor="@color/widget_arc_dark" android:strokeWidth="1.6" android:strokeLineCap="round" android:fillColor="#00000000" />
+    <path android:pathData="M48.00,14.00 a12.00,12.00 0 1,0 24.00,0 a12.00,12.00 0 1,0 -24.00,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="60.00" android:centerY="14.00" android:gradientRadius="12.00">
+                <item android:offset="0" android:color="#73E8B04A" />
+                <item android:offset="0.45" android:color="#33E8B04A" />
+                <item android:offset="1" android:color="#00E8B04A" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M55.00,14.00 a5.00,5.00 0 1,0 10.00,0 a5.00,5.00 0 1,0 -10.00,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="58.50" android:centerY="12.50" android:gradientRadius="9.19">
+                <item android:offset="0" android:color="#FFFFF3D1" />
+                <item android:offset="0.6" android:color="#FFE8B04A" />
+                <item android:offset="1" android:color="#FFC98A22" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M96.00,36.00 a10.00,10.00 0 1,0 20.00,0 a10.00,10.00 0 1,0 -20.00,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="102.40" android:centerY="32.00" android:gradientRadius="19.52">
+                <item android:offset="0" android:color="#FFFFE0E8" />
+                <item android:offset="0.55" android:color="#FFE0607E" />
+                <item android:offset="1" android:color="#FF9E3552" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M6.00,36.00 a8.00,8.00 0 1,0 16.00,0 a8.00,8.00 0 1,0 -16.00,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="11.12" android:centerY="32.80" android:gradientRadius="15.61">
+                <item android:offset="0" android:color="#FFF1E9FF" />
+                <item android:offset="0.55" android:color="#FF9D86D0" />
+                <item android:offset="1" android:color="#FF5E4A94" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

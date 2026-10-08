@@ -48,12 +48,16 @@ class TwoverseWidget : GlanceAppWidget() {
     /** Saved data only: no network, so it also works offline (FR-WGT-2, NFR-REL-1). */
     private fun stateFlow(entryPoint: WidgetEntryPoint): Flow<WidgetState> {
         val clock = entryPoint.clock()
+        val preferences = entryPoint.userPreferences()
         return combine(
             entryPoint.offlineCache().snapshot,
-            entryPoint.userPreferences().distanceUnit,
+            preferences.distanceUnit,
+            preferences.appearance,
             entryPoint.networkMonitor().isOnline,
             clock.ticks(RefreshMillis),
-        ) { snapshot, unit, online, now -> widgetState(snapshot, unit, online, now, clock.zone) }
+        ) { snapshot, unit, appearance, online, now ->
+            widgetState(snapshot, unit, online, now, clock.zone, appearance = appearance)
+        }
     }
 
     private fun open(context: Context, screen: LaunchScreen) = actionStartActivity(

@@ -2,7 +2,6 @@ package app.twoverse.widget
 
 import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.ElapsedTime
-import app.twoverse.core.common.Anniversary
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.common.PartnerName
 import app.twoverse.core.common.LocationUnavailableReason
@@ -10,12 +9,14 @@ import app.twoverse.core.common.ReunionPhase
 import app.twoverse.core.common.countdownProgress
 import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
-import app.twoverse.core.common.nextAnniversary
+import app.twoverse.core.common.nextDayMilestone
 import app.twoverse.core.common.partnerPosition
+import app.twoverse.core.common.previousDayMilestone
 import app.twoverse.core.common.reunionPhase
 import app.twoverse.core.common.toPartnerName
 import app.twoverse.core.common.togetherDuration
 import app.twoverse.core.data.local.OfflineSnapshot
+import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.isNew
 import java.time.DateTimeException
@@ -61,11 +62,27 @@ data class WidgetState(
     val isOffline: Boolean,
     /** The partner's name and pronouns, as the app shows them (FR-PRO-1); null when unpaired. */
     val partner: PartnerName? = null,
-    /** How long they've been together; null when "together since" isn't set, so that part is left out (FR-WGT-8). */
+    /** How long they've been together; null when "together since" isn't set (FR-WGT-8). */
     val orbit: WidgetOrbit? = null,
+    /** The app's Appearance setting, which the widget follows (FR-WGT-5). */
+    val appearance: AppearanceMode = AppearanceMode.System,
 ) {
     val isPaired: Boolean get() = location != WidgetLocation.NotPaired
+
+    /** The big card at the bottom of the medium and large widget (FR-WGT-8). */
+    val card: WidgetCard
+        get() = when {
+            !isPaired -> WidgetCard.None
+            orbit != null -> WidgetCard.Together
+            else -> WidgetCard.UntilWeMeet
+        }
+
+    /** The reunion as a small line above the Together card; null when it is in the card or not set. */
+    val reunionLine: WidgetReunion? get() = reunion.takeIf { card == WidgetCard.Together }
 }
+
+/** Together when "together since" is set, else Until we meet in its place; none when not paired. */
+enum class WidgetCard { Together, UntilWeMeet, None }
 
 data class WidgetReunion(
     val daysUntil: Long,
@@ -77,16 +94,18 @@ data class WidgetReunion(
 )
 
 data class WidgetOrbit(
+    /** The day the relationship began ("Since 22 Jun 2025"). */
+    val since: LocalDate,
     /** The day number; the start date is day 1 (FR-ORB). */
     val totalDays: Long,
     val period: Period,
     val timesMet: Int,
-    /** The next anniversary, only when it is within [AnniversarySoonDays]. */
-    val anniversary: Anniversary?,
+    /** The next day milestone (100, 365, 500, 1000, then every 1000) and how far away it is (FR-ORB-6). */
+    val nextMilestone: Long,
+    val daysToMilestone: Long,
+    /** Progress from the previous milestone to [nextMilestone], 0..1. */
+    val milestoneProgress: Float,
 )
-
-/** The large widget mentions the next anniversary from this many days before it. */
-internal const val AnniversarySoonDays = 30L
 
 /**
  * The widget reads only the data saved on the device, so it works without a connection.
@@ -100,6 +119,7 @@ internal fun widgetState(
     now: Instant,
     zone: ZoneId,
     locale: Locale = Locale.getDefault(),
+    appearance: AppearanceMode = AppearanceMode.System,
 ): WidgetState {
     val couple = snapshot?.couple
     val position = partnerPosition(
@@ -124,14 +144,17 @@ internal fun widgetState(
         direction = position.bearingDegrees?.takeIf { available }?.let(CompassDirection::fromBearing),
         partnerTimeZone = couple?.partner?.timeZone?.let { differentZone(it, zone, now) },
         reunion = couple?.let { snapshot.reunion }?.let { reunion ->
+            val date = reunion.meetAt.atZone(zone).toLocalDate()
+            // The whole reunion day reads "Today's the day", also before the meeting time.
+            val isToday = date == now.atZone(zone).toLocalDate()
             when (reunionPhase(reunion.meetAt, now, zone)) {
                 ReunionPhase.Past -> null
-                ReunionPhase.Today -> WidgetReunion(0, reunion.meetAt.atZone(zone).toLocalDate(), isToday = true, progress = 1f)
+                ReunionPhase.Today -> WidgetReunion(0, date, isToday = true, progress = 1f)
                 ReunionPhase.Upcoming -> WidgetReunion(
                     daysUntil = countdownUntil(reunion.meetAt, now).days,
-                    date = reunion.meetAt.atZone(zone).toLocalDate(),
-                    isToday = false,
-                    progress = countdownProgress(reunion.dateSetAt, reunion.meetAt, now),
+                    date = date,
+                    isToday = isToday,
+                    progress = if (isToday) 1f else countdownProgress(reunion.dateSetAt, reunion.meetAt, now),
                 )
             }
         },
@@ -142,14 +165,21 @@ internal fun widgetState(
         orbit = couple?.togetherSince?.let { since ->
             val today = now.atZone(zone).toLocalDate()
             togetherDuration(since, today)?.let { duration ->
+                val day = duration.totalDays
+                val next = nextDayMilestone(day)
+                val previous = previousDayMilestone(next)
                 WidgetOrbit(
-                    totalDays = duration.totalDays,
+                    since = since,
+                    totalDays = day,
                     period = duration.period,
                     timesMet = snapshot.meetups?.size ?: 0,
-                    anniversary = nextAnniversary(since, today).takeIf { it.daysUntil <= AnniversarySoonDays },
+                    nextMilestone = next,
+                    daysToMilestone = next - day,
+                    milestoneProgress = (day - previous).toFloat() / (next - previous),
                 )
             }
         },
+        appearance = appearance,
     )
 }
 

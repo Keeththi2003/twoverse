@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixed light copy of widget_ic_heart, for when the app's Appearance forces light (FR-WGT-5). -->
+<!-- ic_heart in the muted text colour, so widgets need no tint (which RemoteViews can't apply before Android 12). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"
+        android:strokeWidth="1.8"
+        android:strokeColor="@color/widget_text_muted_light"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

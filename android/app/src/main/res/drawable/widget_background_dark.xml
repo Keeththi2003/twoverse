@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixed dark copy of widget_background, for when the app's Appearance forces dark (FR-WGT-5). -->
+<!-- Widget background before Android 12, which has no system widget radius (FR-WGT-5). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_background_dark" />
+    <corners android:radius="24dp" />
+</shape>
