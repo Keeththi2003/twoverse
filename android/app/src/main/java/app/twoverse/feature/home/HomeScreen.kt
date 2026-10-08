@@ -1,6 +1,5 @@
 package app.twoverse.feature.home
 
-import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.DayPeriod
@@ -56,7 +56,6 @@ import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.DistanceUnit
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private val DistanceCardHorizontalPadding = 22.dp
 private val TilePadding = 18.dp
@@ -544,7 +543,7 @@ data class HomeOrbitActions(
 private fun MeetupQuestionCard(date: LocalDate, actions: HomeOrbitActions) {
     val colors = TwoverseTheme.colors
     val locale = LocalConfiguration.current.locales[0]
-    val day = date.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, QuestionDatePattern), locale))
+    val day = formatDate(date, QuestionDatePattern, locale)
     TwoverseCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(TilePadding),
