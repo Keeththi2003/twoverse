@@ -26,6 +26,8 @@ sealed interface HomeUiState {
         val myCity: String?,
         val partnerCity: String?,
         val partnerDirection: CompassDirection?,
+        /** Her bearing from this user in whole degrees from north (FR-CMP-1); null with no direction. */
+        val partnerBearing: Int? = null,
         /** Whole days until the reunion, or null when no date is set. */
         val daysUntilReunion: Long?,
         val memoryCount: Int,

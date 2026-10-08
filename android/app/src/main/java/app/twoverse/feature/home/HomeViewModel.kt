@@ -6,7 +6,6 @@ import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.DayPeriod
 import app.twoverse.core.common.countdownUntil
 import app.twoverse.core.common.formatDistance
-import app.twoverse.core.common.initialBearingDegrees
 import app.twoverse.core.common.ReunionPhase
 import app.twoverse.core.common.partnerPosition
 import app.twoverse.core.common.reunionPhase
@@ -19,8 +18,6 @@ import app.twoverse.core.data.OrbitRepository
 import app.twoverse.core.data.ReunionRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.data.local.UserPreferences
-import app.twoverse.core.data.sensors.CompassHeading
-import app.twoverse.core.model.HeadingSample
 import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
@@ -33,10 +30,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Clock
+import kotlin.math.roundToInt
 import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
@@ -50,28 +47,8 @@ class HomeViewModel @Inject constructor(
     orbitRepository: OrbitRepository,
     private val permissions: LocationPermissionChecker,
     private val preferences: UserPreferences,
-    compassHeading: CompassHeading,
     private val clock: Clock,
 ) : ViewModel() {
-
-    /**
-     * The Your Star tile's needle: bearing to the partner minus where the phone points, live while
-     * Home is visible (FR-CMP-3). Without a compass sensor it shows the bearing from north.
-     * Separate from [uiState] because it changes about 50 times a second.
-     */
-    val miniNeedleRotation: StateFlow<Float?> = combine(
-        locationRepository.myLocation,
-        locationRepository.partnerLocation,
-        compassHeading.headings(locationRepository.myLocation)
-            .map<HeadingSample, HeadingSample?> { it }
-            .onStart { emit(null) },
-    ) { mine, partner, heading ->
-        if (mine == null || partner == null) {
-            null
-        } else {
-            (initialBearingDegrees(mine, partner) - (heading?.degrees ?: 0.0)).toFloat()
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     /** True until the notification permission has been asked for once (Android 13+). */
     val shouldAskNotificationPermission: StateFlow<Boolean> = preferences.notificationPermissionAsked
@@ -131,6 +108,7 @@ class HomeViewModel @Inject constructor(
             myCity = mine?.city,
             partnerCity = partner?.city,
             partnerDirection = position.bearingDegrees?.let(CompassDirection::fromBearing),
+            partnerBearing = position.bearingDegrees?.let { (it.roundToInt() % FullCircle + FullCircle) % FullCircle },
             daysUntilReunion = reunion?.let { countdownUntil(it.meetAt, now).days },
             memoryCount = memories.size,
             newMemoryCount = memories.count { it.sender == MemorySender.Partner && it.viewedAt == null },
@@ -162,6 +140,7 @@ class HomeViewModel @Inject constructor(
     private data class OrbitInputs(val since: LocalDate?, val meetups: List<Meetup>, val dismissed: Instant?)
 
     private companion object {
+        const val FullCircle = 360
         const val StopTimeoutMillis = 5_000L
     }
 }
