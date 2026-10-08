@@ -47,7 +47,7 @@ select tests.authenticate_as('a@test.dev');
 select throws_ok($$select public.prepare_partner_push('anything')$$, 'P0001', 'not_allowed', 'unknown kinds are refused');
 select throws_ok($$select public.prepare_partner_push('reunion_day')$$, 'P0001', 'not_allowed', 'reunion-day pushes are server-only');
 select results_eq(
-    $$select * from public.prepare_partner_push('wake_up')$$,
+    $$select fcm_token from public.prepare_partner_push('wake_up')$$,
     $$values ('token-b'::text)$$,
     'a wake-up ping goes only to the partner''s devices'
 );
@@ -60,14 +60,14 @@ select lives_ok($$select public.prepare_partner_push('wake_up')$$, 'a ping is al
 
 select tests.authenticate_as('b@test.dev');
 select results_eq(
-    $$select * from public.prepare_partner_push('wake_up')$$,
+    $$select fcm_token from public.prepare_partner_push('wake_up')$$,
     $$values ('shared-phone'::text)$$,
     'the partner''s limit is separate and reaches the caller''s partner'
 );
 
 select tests.authenticate_as('c@test.dev');
 select results_eq(
-    $$select * from public.prepare_partner_push('new_memory')$$,
+    $$select fcm_token from public.prepare_partner_push('new_memory')$$,
     $$values ('token-d'::text)$$,
     'another couple only ever reaches their own partner'
 );

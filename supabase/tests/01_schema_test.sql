@@ -17,11 +17,11 @@ select tests.create_user('email@test.dev', '{"display_name": "Keeththi"}');
 select tests.create_user('google@test.dev', '{"full_name": "Google Person"}');
 select tests.create_user('plain.name@test.dev');
 
-select is((select display_name from public.profiles where id = tests.user_id('email@test.dev')), 'Keeththi',
-    'profile uses display_name metadata');
-select is((select display_name from public.profiles where id = tests.user_id('google@test.dev')), 'Google Person',
+select is((select full_name from public.profiles where id = tests.user_id('email@test.dev')), 'Keeththi',
+    'profile uses display_name metadata from older sign-up forms');
+select is((select full_name from public.profiles where id = tests.user_id('google@test.dev')), 'Google Person',
     'profile falls back to full_name from Google');
-select is((select display_name from public.profiles where id = tests.user_id('plain.name@test.dev')), 'plain.name',
+select is((select full_name from public.profiles where id = tests.user_id('plain.name@test.dev')), 'plain.name',
     'profile falls back to the email local part');
 
 -- One open couple per user, across both columns (BR-1, FR-PAIR-4)

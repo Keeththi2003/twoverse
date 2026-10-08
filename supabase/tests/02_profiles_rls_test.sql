@@ -11,7 +11,7 @@ select tests.create_couple(tests.user_id('c@test.dev'), tests.user_id('d@test.de
 select tests.authenticate_as('a@test.dev');
 
 select results_eq(
-    'select display_name from public.profiles order by display_name',
+    'select full_name from public.profiles order by full_name',
     $$values ('A'), ('B')$$,
     'a user reads their own and their partner''s profile only'
 );
@@ -20,20 +20,20 @@ select is_empty(
     'another couple''s profile is invisible'
 );
 
-update public.profiles set display_name = 'A2' where id = tests.user_id('a@test.dev');
-update public.profiles set display_name = 'hacked' where id = tests.user_id('b@test.dev');
-update public.profiles set display_name = 'hacked' where id = tests.user_id('c@test.dev');
+update public.profiles set full_name = 'A2' where id = tests.user_id('a@test.dev');
+update public.profiles set full_name = 'hacked' where id = tests.user_id('b@test.dev');
+update public.profiles set full_name = 'hacked' where id = tests.user_id('c@test.dev');
 select throws_ok(
-    format($$insert into public.profiles (id, display_name) values (%L, 'x')$$, gen_random_uuid()),
+    format($$insert into public.profiles (id, full_name) values (%L, 'x')$$, gen_random_uuid()),
     '42501', null,
     'profiles cannot be inserted by clients'
 );
 delete from public.profiles where id = tests.user_id('b@test.dev');
 
 select tests.clear_authentication();
-select is((select display_name from public.profiles where id = tests.user_id('a@test.dev')), 'A2', 'a user can edit their own profile');
-select is((select display_name from public.profiles where id = tests.user_id('b@test.dev')), 'B', 'a user cannot edit their partner''s profile');
-select is((select display_name from public.profiles where id = tests.user_id('c@test.dev')), 'C', 'a user cannot edit another couple''s profile');
+select is((select full_name from public.profiles where id = tests.user_id('a@test.dev')), 'A2', 'a user can edit their own profile');
+select is((select full_name from public.profiles where id = tests.user_id('b@test.dev')), 'B', 'a user cannot edit their partner''s profile');
+select is((select full_name from public.profiles where id = tests.user_id('c@test.dev')), 'C', 'a user cannot edit another couple''s profile');
 select isnt_empty(format('select 1 from public.profiles where id = %L', tests.user_id('b@test.dev')), 'profiles cannot be deleted by clients');
 
 select set_config('role', 'anon', true);
