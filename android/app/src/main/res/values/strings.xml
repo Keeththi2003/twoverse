@@ -5,7 +5,7 @@
     <string name="nav_your_star">Your Star</string>
     <string name="nav_ours">Ours</string>
     <string name="nav_our_orbit">Our Orbit</string>
-    <string name="nav_you_and_her">You &amp; Her</string>
+    <string name="nav_us">Us</string>
 
     <string name="splash_tagline">A private universe for two.</string>
     <string name="splash_connecting">Connecting your worlds…</string>
@@ -36,7 +36,7 @@
     <string name="sign_up_title">Create your account</string>
     <string name="sign_up_subtitle">Your partner will see this name.</string>
     <string name="sign_up_name_label">Your name</string>
-    <string name="sign_up_name_placeholder">What should she call you?</string>
+    <string name="sign_up_name_placeholder">Your full name</string>
     <string name="sign_up_password_placeholder">At least 6 characters</string>
     <string name="sign_up_button">Create account</string>
     <string name="sign_up_have_account">Already have an account?</string>
@@ -78,8 +78,8 @@
     <string name="pair_invalid_code">This couple code is invalid or has expired.</string>
     <string name="pair_connect">Connect</string>
     <string name="pair_connected">You\'re connected</string>
-    <string name="pair_reconnect_title">Reconnect with her?</string>
-    <string name="pair_reconnect_partner_asked">She wants to reconnect</string>
+    <string name="pair_reconnect_title">Reconnect with your partner?</string>
+    <string name="pair_reconnect_partner_asked">Your partner wants to reconnect</string>
     <string name="pair_reconnect_body">Your memories, countdown and Shooting Stars are kept until %1$s.</string>
     <string name="pair_reconnect_open">Reconnect</string>
     <string name="pair_log_out">Log out</string>
@@ -87,8 +87,8 @@
     <string name="pair_log_out_message">You can sign in again at any time to connect with your partner.</string>
     <string name="reconnect_title">Reconnect</string>
     <string name="reconnect_body">Your memories, countdown and Shooting Stars are kept until %1$s. You both need to confirm to reconnect.</string>
-    <string name="reconnect_partner_asked">She wants to reconnect. Confirm by %1$s to bring back your memories, countdown and Shooting Stars.</string>
-    <string name="reconnect_waiting">Waiting for her to confirm…</string>
+    <string name="reconnect_partner_asked">Your partner wants to reconnect. Confirm by %1$s to bring back your memories, countdown and Shooting Stars.</string>
+    <string name="reconnect_waiting">Waiting for your partner to confirm…</string>
     <string name="reconnect_note">Location sharing stays off until you turn it on again. Connecting with someone new instead deletes your shared data for good.</string>
     <string name="reconnect_ask">Ask to reconnect</string>
     <string name="reconnect_confirm">Reconnect</string>
@@ -108,11 +108,12 @@
     <string name="home_miles_apart">miles apart</string>
     <string name="home_distance_unavailable">Distance unavailable</string>
     <string name="home_you">You</string>
-    <string name="home_her">Her</string>
     <string name="home_city_separator">" · "</string>
     <string name="home_updated_ago">Updated %1$s ago</string>
     <string name="home_last_seen">Last seen %1$s ago</string>
-    <string name="home_star_direction">She\'s %1$s</string>
+    <string name="home_star_direction_she">She\'s %1$s</string>
+    <string name="home_star_direction_he">He\'s %1$s</string>
+    <string name="home_star_direction_they">They\'re %1$s</string>
     <string name="home_direction_last_known">Last known: %1$s</string>
     <string name="home_direction_degrees">%1$d°</string>
     <string name="home_distance_open_star">Open Your Star</string>
@@ -136,14 +137,14 @@
     <string name="home_send_star">Send a Shooting Star</string>
 
     <string name="compass_title">Your Star</string>
-    <string name="compass_subtitle">Turn with your phone. The star always points to her.</string>
+    <string name="compass_subtitle">Turn with your phone. The star always points to %1$s.</string>
     <string name="compass_distance">%1$s %2$s</string>
     <string name="compass_direction_bearing">%1$s · %2$d°</string>
     <string name="compass_calibrated">Compass calibrated</string>
     <string name="compass_calibrate_hint">Move your phone in a figure-8 to calibrate.</string>
-    <string name="compass_partner_location">Her location · %1$s</string>
+    <string name="compass_partner_location">%1$s\'s location · %2$s</string>
     <string name="compass_last_known_direction">Last known direction</string>
-    <string name="compass_no_sensor">This phone has no compass sensor, so Twoverse shows her direction as text.</string>
+    <string name="compass_no_sensor">This phone has no compass sensor, so Twoverse shows %1$s\'s direction as text.</string>
     <string name="compass_tip">Hold your phone flat and away from metal for the most accurate direction.</string>
     <string name="compass_dial_description">Compass pointing %1$s toward your partner</string>
     <string name="compass_dial_no_direction">Compass without a direction to your partner</string>
@@ -232,7 +233,7 @@
     <string name="vault_subtitle">%1$s · only you two can open these</string>
     <string name="vault_filter_all">All</string>
     <string name="vault_filter_from_you">From you</string>
-    <string name="vault_filter_from_her">From her</string>
+    <string name="vault_filter_from_partner">From %1$s</string>
     <string name="vault_filter_expiring">Expiring</string>
     <string name="vault_empty">Nothing here yet. Send your first memory.</string>
     <string name="vault_filter_empty">No memories here yet.</string>
@@ -240,7 +241,7 @@
     <string name="vault_badge_hours">%dh</string>
     <string name="vault_badge_days">%dd</string>
     <string name="vault_tile_from_you">Memory from you</string>
-    <string name="vault_tile_from_her">Memory from her</string>
+    <string name="vault_tile_from_partner">Memory from %1$s</string>
     <string name="vault_tile_new">new</string>
     <string name="vault_tile_expires_in">expires in %1$s</string>
     <string name="vault_locked_title">Ours is locked</string>
@@ -251,10 +252,10 @@
 
     <string name="memory_photo_placeholder">Photo</string>
     <string name="memory_photo_from_you">Photo you sent</string>
-    <string name="memory_photo_from_her">Photo from her</string>
+    <string name="memory_photo_from_partner">Photo from %1$s</string>
     <string name="memory_more_options">More options</string>
     <string name="memory_expires_in">Expires in %1$s</string>
-    <string name="memory_from_her">From Her</string>
+    <string name="memory_from_partner">From %1$s</string>
     <string name="memory_from_you">From you</string>
     <string name="memory_date_time">%1$s · %2$s</string>
     <string name="memory_keep_forever">Keep forever</string>
@@ -264,7 +265,9 @@
     <string name="memory_delete_message">It will be removed for both of you, including the photo. This can\'t be undone.</string>
     <string name="memory_hide">Hide</string>
     <string name="memory_hide_title">Hide this memory?</string>
-    <string name="memory_hide_message">It will disappear from your Ours. She sent it, so she still has it.</string>
+    <string name="memory_hide_message_she">It will disappear from your Ours. %1$s sent it, so she still has it.</string>
+    <string name="memory_hide_message_he">It will disappear from your Ours. %1$s sent it, so he still has it.</string>
+    <string name="memory_hide_message_they">It will disappear from your Ours. %1$s sent it, so they still have it.</string>
     <string name="memory_expired">This memory has expired.</string>
 
     <string name="add_memory_title">New memory</string>
@@ -273,28 +276,33 @@
     <string name="add_memory_photo_note">It stays inside Ours, never in your gallery.</string>
     <string name="add_memory_chosen_photo">Chosen photo</string>
     <string name="add_memory_caption_label">Caption</string>
-    <string name="add_memory_caption_placeholder">Write something for her…</string>
+    <string name="add_memory_caption_placeholder">Write something for %1$s…</string>
     <string name="add_memory_caption_count">%1$d/%2$d</string>
     <string name="add_memory_expiry_label">Disappears after</string>
     <string name="add_memory_expiry_never">Never</string>
     <string name="add_memory_expiry_24h">24 h</string>
     <string name="add_memory_expiry_7d">7 days</string>
     <string name="add_memory_expiry_30d">30 days</string>
-    <string name="add_memory_keep_title">Let her keep it forever</string>
-    <string name="add_memory_keep_subtitle">She can save it in Ours permanently.</string>
-    <string name="add_memory_send">Send to her</string>
-    <string name="add_memory_send_note">She gets a notification, never a preview of the photo.</string>
+    <string name="add_memory_keep_title">Let %1$s keep it forever</string>
+    <string name="add_memory_keep_subtitle_she">She can save it in Ours permanently.</string>
+    <string name="add_memory_keep_subtitle_he">He can save it in Ours permanently.</string>
+    <string name="add_memory_keep_subtitle_they">They can save it in Ours permanently.</string>
+    <string name="add_memory_send">Send to %1$s</string>
+    <string name="add_memory_send_note_she">She gets a notification, never a preview of the photo.</string>
+    <string name="add_memory_send_note_he">He gets a notification, never a preview of the photo.</string>
+    <string name="add_memory_send_note_they">They get a notification, never a preview of the photo.</string>
     <string name="add_memory_upload_failed">Couldn\'t send your memory. Try again.</string>
     <string name="add_memory_sending">Sending… %1$d%%</string>
     <string name="add_memory_retry">Try again</string>
 
-    <string name="settings_title">You &amp; Her</string>
+    <string name="settings_title">You &amp; %1$s</string>
+    <string name="settings_title_unpaired">You &amp; your partner</string>
     <string name="settings_connected">Connected</string>
     <string name="settings_not_connected">Not connected</string>
-    <string name="settings_connected_since">Together in Twoverse since %1$s</string>
+    <string name="settings_connected_since">In Twoverse since %1$s</string>
     <string name="settings_privacy">Privacy</string>
     <string name="settings_share_location">Share my location</string>
-    <string name="settings_share_location_subtitle">Only used for distance and your star</string>
+    <string name="settings_share_location_subtitle">Only used for distance and Your Star</string>
     <string name="settings_location_precision">Location precision</string>
     <string name="settings_precision_approximate">Approximate</string>
     <string name="settings_precision_precise">Precise</string>
@@ -320,7 +328,9 @@
     <string name="settings_delete_account_message">Your account and all of your data will be removed. This can\'t be undone.</string>
     <string name="settings_stars">Shooting Stars</string>
     <string name="settings_stars_send">Send a Shooting Star</string>
-    <string name="settings_stars_send_subtitle">A surprise she sees once, now or at a time you choose</string>
+    <string name="settings_stars_send_subtitle_she">A surprise she sees once, now or at a time you choose</string>
+    <string name="settings_stars_send_subtitle_he">A surprise he sees once, now or at a time you choose</string>
+    <string name="settings_stars_send_subtitle_they">A surprise they see once, now or at a time you choose</string>
     <string name="settings_stars_list">Shooting Stars</string>
     <string name="settings_stars_list_subtitle">The ones you sent and the ones you received</string>
 
@@ -329,7 +339,9 @@
     <string name="star_photo_description">A photo for you</string>
     <string name="star_composer_title">Send a Shooting Star</string>
     <string name="star_composer_edit_title">Edit Shooting Star</string>
-    <string name="star_composer_intro">A surprise she sees once, full screen: the next time she opens Twoverse, or at the time you choose.</string>
+    <string name="star_composer_intro_she">A surprise %1$s sees once, full screen: the next time she opens Twoverse, or at the time you choose.</string>
+    <string name="star_composer_intro_he">A surprise %1$s sees once, full screen: the next time he opens Twoverse, or at the time you choose.</string>
+    <string name="star_composer_intro_they">A surprise %1$s sees once, full screen: the next time they open Twoverse, or at the time you choose.</string>
     <string name="star_composer_layout">Layout</string>
     <string name="star_composer_template">Template</string>
     <string name="star_composer_when">When to show it</string>
@@ -369,7 +381,7 @@
     <string name="star_fit_fit">Fit whole image</string>
     <string name="star_when_next_open">Next open</string>
     <string name="star_when_date_time">Date and time</string>
-    <string name="star_when_next_open_description">The next time she opens Twoverse</string>
+    <string name="star_when_next_open_description">The next time %1$s opens Twoverse</string>
     <string name="star_when_date">Date</string>
     <string name="star_when_time">Time</string>
     <string name="star_problem_photo_required">Add a photo for a full photo Shooting Star.</string>
@@ -383,17 +395,17 @@
     <string name="stars_sent">Sent</string>
     <string name="stars_received">Received</string>
     <string name="stars_sent_empty">You haven\'t sent a Shooting Star yet.</string>
-    <string name="stars_received_empty">No Shooting Stars yet. When she sends you one, you can see it again here.</string>
+    <string name="stars_received_empty">No Shooting Stars yet. When %1$s sends you one, you can see it again here.</string>
     <string name="stars_status_scheduled">Shows %1$s</string>
     <string name="stars_status_waiting">Waiting to be opened</string>
     <string name="stars_status_seen">Seen</string>
     <string name="stars_edit">Edit</string>
     <string name="stars_delete">Delete</string>
     <string name="stars_delete_title">Delete this Shooting Star?</string>
-    <string name="stars_delete_message">She won\'t see it. This can\'t be undone.</string>
+    <string name="stars_delete_message">%1$s won\'t see it. This can\'t be undone.</string>
 
-    <string name="location_setup_explain_title">Share your location with her</string>
-    <string name="location_setup_explain_body">Twoverse uses your location only to show the distance between you and to point Your Star. Only your latest position is kept, never a history, and you can turn sharing off any time in You &amp; Her.</string>
+    <string name="location_setup_explain_title">Share your location with %1$s</string>
+    <string name="location_setup_explain_body">Twoverse uses your location only to show the distance between you and to point Your Star. Only your latest position is kept, never a history, and you can turn sharing off any time in Us.</string>
     <string name="location_setup_explain_note">If you choose \"Only this time\", sharing pauses the next time you open Twoverse until you allow it again.</string>
     <string name="location_setup_continue">Continue</string>
     <string name="location_setup_not_now">Not now</string>
@@ -420,14 +432,14 @@
     <string name="notification_channel_memories">Ours</string>
     <string name="notification_channel_memories_description">When you receive a new memory</string>
     <string name="notification_partner_joined_title">You\'re connected</string>
-    <string name="notification_partner_joined_body">Your partner joined your universe.</string>
+    <string name="notification_partner_joined_body">%1$s joined your universe.</string>
     <string name="notification_reunion_day_title">Today\'s the day</string>
-    <string name="notification_reunion_day_body">You\'re meeting today. Enjoy every moment together.</string>
+    <string name="notification_reunion_day_body">You\'re meeting %1$s today. Enjoy every moment together.</string>
     <string name="notification_new_memory_title">Ours</string>
-    <string name="notification_new_memory_body">You received a new memory</string>
+    <string name="notification_new_memory_body">%1$s sent you a memory</string>
     <string name="notification_channel_stars">Shooting Stars</string>
     <string name="notification_channel_stars_description">When a surprise from your partner is waiting</string>
-    <string name="notification_star_title">Shooting Star</string>
+    <string name="notification_star_title">A Shooting Star from %1$s</string>
     <string name="notification_star_body">Something special is waiting for you ✨</string>
 
     <string name="offline_banner">You\'re offline. Showing the latest saved information.</string>
@@ -435,12 +447,12 @@
     <string name="widget_name">Twoverse</string>
     <string name="widget_description">See how far apart you are and when you\'ll meet.</string>
     <string name="widget_distance_label">Distance between you</string>
-    <string name="widget_orbit_description">Your planet and hers, joined by your star</string>
+    <string name="widget_orbit_description">Your planet and %1$s\'s, joined by your star</string>
     <string name="widget_updated">Updated %1$s</string>
     <string name="widget_last_seen">Last seen %1$s</string>
     <string name="widget_offline">Offline · saved data</string>
     <string name="widget_offline_short">Offline</string>
-    <string name="widget_not_paired">Connect with her in Twoverse</string>
+    <string name="widget_not_paired">Connect with your partner in Twoverse</string>
     <string name="widget_sharing_off">Location sharing is off</string>
     <plurals name="widget_days_until">
         <item quantity="one">%d day until we meet</item>
@@ -546,7 +558,7 @@
     <string name="orbit_meetup_delete_message">It\'s removed for both of you.</string>
     <string name="orbit_meetup_delete">Delete</string>
     <string name="orbit_story_title">When did your story begin?</string>
-    <string name="orbit_story_body">The day it all started for you two, not the day you paired in Twoverse. You can change it any time in You &amp; Her.</string>
+    <string name="orbit_story_body">The day it all started for you two, not the day you paired in Twoverse. You can change it any time in Our Orbit.</string>
     <string name="orbit_story_date_label">Together since</string>
     <string name="orbit_story_choose_date">Choose the date</string>
     <string name="orbit_story_save">Save</string>
@@ -574,9 +586,6 @@
     <string name="home_meetup_question_body">Add it to your meetups in Our Orbit.</string>
     <string name="home_meetup_question_yes">Yes, add it</string>
     <string name="home_meetup_question_no">No</string>
-    <string name="settings_orbit">Our Orbit</string>
-    <string name="settings_together_since">Together since</string>
-    <string name="settings_together_since_not_set">Not set</string>
     <string name="notification_channel_orbit">Our Orbit</string>
     <string name="notification_channel_orbit_description">Your anniversary and milestone days</string>
     <string name="notification_anniversary_title">Happy anniversary ✨</string>
@@ -613,4 +622,65 @@
         <item quantity="other">Anniversary in %d days</item>
     </plurals>
     <string name="widget_anniversary_today">Happy anniversary ✨</string>
+
+    <!-- Partner names and pronouns (FR-PRO) -->
+    <string name="partner_fallback_name">your partner</string>
+    <string name="partner_fallback_name_start">Your partner</string>
+    <string name="pronouns_she">She/her</string>
+    <string name="pronouns_he">He/him</string>
+    <string name="pronouns_they">They/them</string>
+
+    <!-- About you (FR-PRO-2) -->
+    <string name="about_you_title">About you</string>
+    <string name="about_you_body">How should Twoverse talk about you to your partner?</string>
+    <string name="about_you_short_name">What you like to be called</string>
+    <string name="about_you_short_name_placeholder">Keeththi</string>
+    <string name="about_you_pronouns">Your pronouns</string>
+    <string name="about_you_continue">Continue</string>
+    <string name="about_you_problem_name">Add the name you like to be called.</string>
+    <string name="about_you_problem_pronouns">Choose your pronouns.</string>
+
+    <!-- Your profile (FR-PRO-4) -->
+    <string name="settings_your_profile">Your profile</string>
+    <string name="profile_title">Your profile</string>
+    <string name="profile_full_name">Full name</string>
+    <string name="profile_short_name">What you like to be called</string>
+    <string name="profile_pronouns">Pronouns</string>
+    <string name="profile_phone">Phone number (optional)</string>
+    <string name="profile_phone_placeholder">+94 77 123 4567</string>
+    <string name="profile_phone_invalid">Enter a phone number with its country code, like +94 77 123 4567.</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_email_google">Your Google account\'s email. Change it in your Google account.</string>
+    <string name="profile_email_change">Change email</string>
+    <string name="profile_email_new">New email</string>
+    <string name="profile_email_invalid">Enter a valid email address.</string>
+    <string name="profile_email_pending">Check %1$s to confirm. Until then you keep using %2$s.</string>
+    <string name="profile_email_sent">Check your new email to confirm</string>
+    <string name="profile_sharing">Sharing with your partner</string>
+    <string name="profile_share_email">Share my email with partner</string>
+    <string name="profile_share_phone">Share my phone number with partner</string>
+    <string name="profile_share_phone_needs_number">Add a phone number to share it.</string>
+    <string name="profile_save">Save</string>
+    <string name="profile_saved">Saved</string>
+    <string name="profile_problem_full_name">Add your full name.</string>
+    <string name="profile_problem_short_name">Add the name you like to be called.</string>
+
+    <!-- Partner details in Settings (FR-PRO-5) -->
+    <string name="settings_partner_details">Your partner</string>
+    <string name="settings_partner_short_name">Name</string>
+    <string name="settings_partner_full_name">Full name</string>
+    <string name="settings_partner_pronouns">Pronouns</string>
+    <string name="settings_partner_pronouns_unknown">Not set</string>
+    <string name="settings_partner_email">Email</string>
+    <string name="settings_partner_phone">Phone</string>
+    <string name="settings_partner_email_action">Email %1$s</string>
+    <string name="settings_partner_phone_action">Call %1$s</string>
+    <string name="settings_partner_not_shared">Not shared</string>
+    <string name="settings_nickname">Nickname</string>
+    <string name="settings_nickname_none">Add a nickname</string>
+    <string name="settings_nickname_note">Only you see this</string>
+    <string name="settings_nickname_dialog_title">Your nickname for them</string>
+    <string name="settings_nickname_field">Nickname</string>
+    <string name="settings_nickname_save">Save</string>
+    <string name="settings_nickname_clear">Remove nickname</string>
 </resources>
