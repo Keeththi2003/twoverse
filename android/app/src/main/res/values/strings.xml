@@ -472,11 +472,6 @@
     <!-- Our Orbit (FR-ORB) -->
     <string name="orbit_title">Our Orbit</string>
     <string name="orbit_since">In orbit since %1$s</string>
-    <plurals name="orbit_total_days">
-        <item quantity="one">%d day together</item>
-        <item quantity="other">%d days together</item>
-    </plurals>
-    <string name="orbit_change_date">Change date</string>
     <string name="orbit_not_set_title">When did your story begin?</string>
     <string name="orbit_not_set_body">Add the day it all started, and Twoverse counts your days, anniversaries and milestones.</string>
     <string name="orbit_set_date">Add your date</string>
@@ -521,19 +516,29 @@
     </plurals>
     <string name="orbit_today">Today</string>
     <string name="orbit_tomorrow">Tomorrow</string>
-    <plurals name="orbit_times_met_label">
-        <item quantity="one">time met</item>
-        <item quantity="other">times met</item>
-    </plurals>
-    <plurals name="orbit_days_in_person_label">
-        <item quantity="one">day together in person</item>
-        <item quantity="other">days together in person</item>
-    </plurals>
     <string name="orbit_last_met_label">Last met</string>
     <string name="orbit_last_met_never">Not yet</string>
     <string name="orbit_meetups">Meetups</string>
-    <string name="orbit_add_meetup">Add a meetup</string>
-    <string name="orbit_meetups_empty">No meetups yet. Add the times you\'ve met.</string>
+    <string name="orbit_meetups_empty">Every meeting brings your planets together</string>
+    <string name="orbit_add_first_meetup">Add your first meetup</string>
+    <string name="orbit_add_meetup_short">Add</string>
+    <string name="orbit_change_date_description">Change the date your story began</string>
+    <string name="orbit_milestone_progress">Day %1$d of %2$d</string>
+    <string name="orbit_stat_times_met">Times met</string>
+    <string name="orbit_stat_days_together">Days together</string>
+    <string name="orbit_stat_last_met_description">Last met: %1$s</string>
+    <plurals name="orbit_days_together_label">
+        <item quantity="one">day together</item>
+        <item quantity="other">days together</item>
+    </plurals>
+    <plurals name="orbit_stat_times_met_description">
+        <item quantity="one">Met %d time</item>
+        <item quantity="other">Met %d times</item>
+    </plurals>
+    <plurals name="orbit_stat_days_together_description">
+        <item quantity="one">%d day together in person</item>
+        <item quantity="other">%d days together in person</item>
+    </plurals>
     <string name="orbit_meetup_range">%1$s – %2$s</string>
     <string name="orbit_detail_separator">" · "</string>
     <string name="orbit_meetup_delete_description">Delete the meetup on %1$s</string>
