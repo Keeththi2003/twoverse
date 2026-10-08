@@ -74,7 +74,7 @@ private fun TwoverseStatusChipPreview() {
     TwoversePreviewBackground {
         Row(horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.xs)) {
             TwoverseStatusChip(text = "Location on", dotColor = TwoverseTheme.colors.gold)
-            TwoverseStatusChip(text = "Her location · 12s ago")
+            TwoverseStatusChip(text = "Ammu's location · 12s ago")
         }
     }
 }

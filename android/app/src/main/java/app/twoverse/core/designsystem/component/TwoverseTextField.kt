@@ -171,7 +171,7 @@ private fun TwoverseTextFieldPreview() {
                 value = "",
                 onValueChange = {},
                 label = "Caption",
-                placeholder = "Write something for her…",
+                placeholder = "Write something for Ammu…",
                 singleLine = false,
             )
         }
