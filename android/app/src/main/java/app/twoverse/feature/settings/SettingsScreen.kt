@@ -72,6 +72,7 @@ private val YouPlanetRing = 3.dp
 private val PlanetsWidth = 66.dp
 private val ActionRowMinHeight = 54.dp
 private val SectionHeaderInset = 4.dp
+private val CreditLineGap = 6.dp
 private const val DatePattern = "dMMMy"
 
 private val StarsSendSubtitle = PronounStrings(
@@ -236,20 +237,31 @@ private fun AboutSection(versionName: String, versionCode: Int) {
             .fillMaxWidth()
             .padding(top = TwoverseTheme.spacing.lg),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.xxs),
+        verticalArrangement = Arrangement.spacedBy(CreditLineGap),
     ) {
         Text(
             text = stringResource(R.string.settings_credit, stringResource(R.string.developer_name)),
-            style = MaterialTheme.typography.bodyMedium,
+            style = TwoverseTheme.textStyles.credit,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
         )
-        Text(
-            text = stringResource(R.string.settings_credit_tagline),
-            style = MaterialTheme.typography.labelSmall,
-            color = colors.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
+        val heartDescription = stringResource(R.string.settings_credit_heart_description)
+        Row(horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.xxs)) {
+            Text(
+                text = stringResource(R.string.settings_credit_tagline),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.alignByBaseline(),
+            )
+            Text(
+                text = stringResource(R.string.settings_credit_heart),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.primary,
+                modifier = Modifier
+                    .alignByBaseline()
+                    .semantics { contentDescription = heartDescription },
+            )
+        }
     }
 }
 
