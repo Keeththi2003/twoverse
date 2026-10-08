@@ -82,6 +82,22 @@ class OrbitViewModelTest {
     }
 
     @Test
+    fun theMilestoneBarShowsTodayAgainstTheNextMilestone() = runTest(mainDispatcherRule.testDispatcher) {
+        repository.setTogetherSince(LocalDate.of(2025, 6, 22))
+
+        // 9 October 2026 is day 475 since 22 June 2025.
+        val progress = createViewModel(today = LocalDate.of(2026, 10, 9)).uiState.value.milestoneProgress
+
+        assertEquals(MilestoneProgress(day = 475, milestone = 500), progress)
+        assertEquals(0.95f, progress?.fraction ?: 0f, 0.0001f)
+    }
+
+    @Test
+    fun withoutADateThereIsNoMilestoneBar() = runTest(mainDispatcherRule.testDispatcher) {
+        assertNull(createViewModel().uiState.value.milestoneProgress)
+    }
+
+    @Test
     fun celebratesTheAnniversary() = runTest(mainDispatcherRule.testDispatcher) {
         repository.setTogetherSince(LocalDate.of(2024, 2, 14))
 
