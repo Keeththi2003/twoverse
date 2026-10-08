@@ -25,4 +25,7 @@ interface CoupleRepository {
 
     /** Asks to reconnect, or confirms the partner's request; both must confirm (SRS 12). */
     suspend fun reconnect(): DataResult<ReconnectResult>
+
+    /** Re-reads the couple, e.g. after my nickname for the partner changed (FR-PRO-1). */
+    fun refresh()
 }
