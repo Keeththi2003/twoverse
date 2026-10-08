@@ -1,6 +1,5 @@
 package app.twoverse.feature.countdown
 
-import android.text.format.DateFormat
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +27,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.IconTile
 import app.twoverse.core.designsystem.component.SettingsSwitchRow
@@ -90,7 +90,7 @@ fun EditReunionScreen(
                 PickerRow(
                     icon = R.drawable.ic_calendar,
                     label = stringResource(R.string.edit_reunion_date),
-                    value = uiState.date?.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
+                    value = uiState.date?.let { formatDate(it, DatePattern, locale) }
                         ?: stringResource(R.string.edit_reunion_choose_date),
                     onClick = { actions.onOpenPicker(ReunionPicker.Date) },
                 )

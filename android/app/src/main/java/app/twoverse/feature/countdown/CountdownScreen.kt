@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.dateLocale
 import app.twoverse.R
 import app.twoverse.core.common.CountdownTime
 import app.twoverse.core.designsystem.component.GoldStar
@@ -316,8 +317,10 @@ private fun PlanRowItem(row: PlanRow) {
 }
 
 /** Locale-aware "Saturday, 10 October". */
-private fun dateFormatter(locale: Locale): DateTimeFormatter =
-    DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale)
+private fun dateFormatter(locale: Locale): DateTimeFormatter {
+    val formatLocale = dateLocale(locale)
+    return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(formatLocale, DatePattern), formatLocale)
+}
 
 @PreviewLightDark
 @Composable

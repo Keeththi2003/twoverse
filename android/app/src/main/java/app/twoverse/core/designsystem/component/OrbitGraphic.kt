@@ -49,8 +49,9 @@ private val InnerRingStroke = 1.dp
 private val InnerRingDash = 4.dp
 
 /**
- * Rings, gold star and both planets. `animated = true` spins the planets around the star
- * once every 28 s (Splash). Planets are drawn upright, so their highlight never rotates.
+ * Rings, gold star and both planets. `animated = true` spins the planets around the star once
+ * every 28 s (Splash, Our Orbit), unless the user turned animations off. Planets are drawn upright,
+ * so their highlight never rotates.
  */
 @Composable
 fun OrbitGraphic(
@@ -66,7 +67,7 @@ fun OrbitGraphic(
     showShadows: Boolean = true,
 ) {
     val outline = TwoverseTheme.colors.outline
-    val rotation = orbitRotation(animated)
+    val rotation = orbitRotation(animated && rememberAnimationsEnabled())
 
     Box(modifier = modifier.size(size), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.fillMaxSize()) {
