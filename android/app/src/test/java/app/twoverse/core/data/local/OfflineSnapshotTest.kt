@@ -38,7 +38,7 @@ class OfflineSnapshotTest {
         ownerId = "me",
         couple = Couple(
             "couple",
-            UserProfile("her", "Her", timeZone = "Europe/London"),
+            UserProfile("her", "Ammu Perera", timeZone = "Europe/London"),
             CoupleStatus.Active,
             connectedAt = now,
             togetherSince = LocalDate.of(2024, 2, 29),
