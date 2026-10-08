@@ -1,6 +1,5 @@
 package app.twoverse.feature.star
 
-import android.text.format.DateFormat
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -42,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.IconTile
 import app.twoverse.core.designsystem.component.SegmentedOptions
@@ -348,7 +348,7 @@ private fun ScheduleEditor(schedule: StarSchedule, actions: StarComposerActions)
                 PickerRow(
                     icon = R.drawable.ic_calendar,
                     label = stringResource(R.string.star_when_date),
-                    value = schedule.date.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale)),
+                    value = formatDate(schedule.date, DatePattern, locale),
                     onClick = { actions.onOpenPicker(StarPicker.Date) },
                 )
                 PickerRow(

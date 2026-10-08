@@ -1,14 +1,13 @@
 package app.twoverse.widget
 
 import android.content.Context
-import android.text.format.DateFormat
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.common.ElapsedTime
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.designsystem.text.labelRes
 import app.twoverse.core.model.DistanceUnit
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 // Widget text, built with a Context because Glance has no Compose string resources.
@@ -63,7 +62,7 @@ internal fun Context.daysLabel(days: Long): String = resources.getQuantityString
 
 internal fun Context.reunionDate(date: LocalDate): String {
     val locale = locale()
-    return date.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
+    return formatDate(date, DatePattern, locale)
 }
 
 /** "845 days together". */
