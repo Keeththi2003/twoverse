@@ -4,6 +4,22 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { createFcmSender } from "./fcm.ts";
 import { handle } from "./handler.ts";
+import type { PushTarget } from "./message.ts";
+
+interface TargetRow {
+  fcm_token: string;
+  partner_name: string | null;
+  partner_pronouns: string | null;
+}
+
+/** Rows from prepare_partner_push and push_targets. */
+function toTargets(data: unknown): PushTarget[] {
+  return ((data as TargetRow[] | null) ?? []).map((row) => ({
+    token: row.fcm_token,
+    partnerName: row.partner_name,
+    partnerPronouns: row.partner_pronouns,
+  }));
+}
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -26,12 +42,12 @@ Deno.serve((req) =>
         const known = ["not_authenticated", "not_paired", "not_allowed", "rate_limited"];
         return { error: known.includes(error.message) ? error.message : (error.code === "PGRST301" ? "not_authenticated" : "internal") };
       }
-      return { tokens: (data as string[] | null) ?? [] };
+      return { targets: toTargets(data) };
     },
     async pushTargets(userIds) {
       const { data, error } = await serviceClient.rpc("push_targets", { p_user_ids: userIds });
       if (error) throw error;
-      return ((data as { fcm_token: string }[] | null) ?? []).map((row) => row.fcm_token);
+      return toTargets(data);
     },
     async removeTokens(tokens) {
       await serviceClient.rpc("remove_device_tokens", { p_tokens: tokens });

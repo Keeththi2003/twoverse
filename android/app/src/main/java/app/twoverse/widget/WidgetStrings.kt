@@ -5,6 +5,9 @@ import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.common.ElapsedTime
 import app.twoverse.core.common.LocationFreshness
+import app.twoverse.core.common.PartnerName
+import app.twoverse.core.designsystem.text.PronounStrings
+import app.twoverse.core.designsystem.text.resFor
 import app.twoverse.core.designsystem.text.labelRes
 import app.twoverse.core.model.DistanceUnit
 import java.time.LocalDate
@@ -47,10 +50,18 @@ internal fun Context.locationMessage(location: WidgetLocation): String? = when (
     WidgetLocation.Available -> null
 }
 
-/** "She's north-east". */
+/** "She's north-east", "He's north-east" or "They're north-east", for the partner's pronouns (FR-PRO-2). */
 internal fun Context.directionText(state: WidgetState): String? = state.direction?.let {
-    getString(R.string.home_star_direction, getString(it.labelRes()).lowercase(locale()))
+    getString(StarDirection.resFor(state.partner?.pronouns), getString(it.labelRes()).lowercase(locale()))
 }
+
+/** The partner's name, or "your partner" (FR-PRO-1). */
+internal fun Context.partnerLabel(partner: PartnerName?): String = partner?.name ?: getString(R.string.partner_fallback_name)
+
+/** "Ammu", or "Your partner" at the start of a label. */
+internal fun Context.partnerLabelStart(partner: PartnerName?): String = partner?.name ?: getString(R.string.partner_fallback_name_start)
+
+private val StarDirection = PronounStrings(R.string.home_star_direction_she, R.string.home_star_direction_he, R.string.home_star_direction_they)
 
 internal fun Context.daysUntilText(reunion: WidgetReunion): String = if (reunion.isToday) {
     getString(R.string.widget_reunion_today)

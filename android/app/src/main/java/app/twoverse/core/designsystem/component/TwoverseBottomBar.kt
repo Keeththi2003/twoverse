@@ -103,7 +103,7 @@ private fun TwoverseBottomBarPreview() {
                 TwoverseBottomBarItem(stringResource(R.string.nav_your_star), R.drawable.ic_compass),
                 TwoverseBottomBarItem(stringResource(R.string.nav_ours), R.drawable.ic_lock),
                 TwoverseBottomBarItem(stringResource(R.string.nav_our_orbit), R.drawable.ic_our_orbit),
-                TwoverseBottomBarItem(stringResource(R.string.nav_you_and_her), R.drawable.ic_person),
+                TwoverseBottomBarItem(stringResource(R.string.nav_us), R.drawable.ic_person),
             ),
             selectedIndex = 0,
             onItemSelected = {},

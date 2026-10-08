@@ -48,15 +48,34 @@ class TwoverseNotifications @Inject constructor(
 
     /**
      * Shows the notification for a visible push; its text never includes content from the push
-     * (FR-NOT-1). Anniversary and milestone pushes carry only their number ([count], FR-NOT-6).
+     * (FR-NOT-1). Anniversary and milestone pushes carry only their number ([count], FR-NOT-6), and
+     * visible pushes carry the partner's name as the recipient knows them ([partnerName], FR-NOT-7).
      */
-    fun show(push: IncomingPush, count: Int? = null) {
+    fun show(push: IncomingPush, count: Int? = null, partnerName: String? = null) {
+        val name = partnerName ?: context.getString(R.string.partner_fallback_name)
+        val nameStart = partnerName ?: context.getString(R.string.partner_fallback_name_start)
         val (channel, title, body) = when (push) {
             IncomingPush.WakeUp -> return
-            IncomingPush.PartnerJoined -> texts(Channel.Partner, R.string.notification_partner_joined_title, R.string.notification_partner_joined_body)
-            IncomingPush.ReunionDay -> texts(Channel.Reunion, R.string.notification_reunion_day_title, R.string.notification_reunion_day_body)
-            IncomingPush.NewMemory -> texts(Channel.Memories, R.string.notification_new_memory_title, R.string.notification_new_memory_body)
-            IncomingPush.ShootingStar -> texts(Channel.Stars, R.string.notification_star_title, R.string.notification_star_body)
+            IncomingPush.PartnerJoined -> Triple(
+                Channel.Partner,
+                context.getString(R.string.notification_partner_joined_title),
+                context.getString(R.string.notification_partner_joined_body, nameStart),
+            )
+            IncomingPush.ReunionDay -> Triple(
+                Channel.Reunion,
+                context.getString(R.string.notification_reunion_day_title),
+                context.getString(R.string.notification_reunion_day_body, name),
+            )
+            IncomingPush.NewMemory -> Triple(
+                Channel.Memories,
+                context.getString(R.string.notification_new_memory_title),
+                context.getString(R.string.notification_new_memory_body, nameStart),
+            )
+            IncomingPush.ShootingStar -> Triple(
+                Channel.Stars,
+                context.getString(R.string.notification_star_title, name),
+                context.getString(R.string.notification_star_body),
+            )
             IncomingPush.Anniversary -> Triple(
                 Channel.Orbit,
                 context.getString(R.string.notification_anniversary_title),
@@ -85,9 +104,6 @@ class TwoverseNotifications @Inject constructor(
             .build()
         NotificationManagerCompat.from(context).notify(push.ordinal, notification)
     }
-
-    private fun texts(channel: Channel, @StringRes titleRes: Int, @StringRes bodyRes: Int) =
-        Triple(channel, context.getString(titleRes), context.getString(bodyRes))
 
     /** Opens the app on the screen that fits the notification. */
     private fun openIntent(push: IncomingPush): PendingIntent? {

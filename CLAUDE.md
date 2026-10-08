@@ -96,7 +96,7 @@ app/twoverse/
 │   └── common/                 # formatters, time utilities, Result/error types
 └── feature/
     ├── splash/  onboarding/  auth/  pairing/  home/
-    ├── compass/  countdown/  vault/  settings/  star/  orbit/
+    ├── compass/  countdown/  vault/  settings/  star/  orbit/  profile/
 ```
 
 **Boundaries:** features never import other features. Shared code goes in `core/`.

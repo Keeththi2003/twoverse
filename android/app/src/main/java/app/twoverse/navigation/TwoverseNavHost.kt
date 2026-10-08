@@ -10,11 +10,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
@@ -44,6 +47,8 @@ import app.twoverse.feature.orbit.OrbitRoute as OrbitFeatureRoute
 import app.twoverse.feature.orbit.TogetherSinceRoute as TogetherSinceFeatureRoute
 import app.twoverse.feature.pairing.PairRoute as PairFeatureRoute
 import app.twoverse.feature.pairing.ReconnectRoute as ReconnectFeatureRoute
+import app.twoverse.feature.profile.AboutYouRoute as AboutYouFeatureRoute
+import app.twoverse.feature.profile.ProfileRoute as ProfileFeatureRoute
 import app.twoverse.feature.settings.SettingsRoute as SettingsFeatureRoute
 import app.twoverse.feature.splash.SplashDestination
 import app.twoverse.feature.splash.SplashRoute as SplashFeatureRoute
@@ -60,6 +65,7 @@ import kotlinx.coroutines.launch
  * when a notification or the widget opened the app; [requestedScreen] then opens the screen it
  * asked for (FR-NOT, FR-WGT-4). [isOffline] shows the offline banner above every screen.
  * [isPasswordRecovery] opens Reset password after a reset link (FR-AUTH-3).
+ * [needsAboutYou] asks for the short name and pronouns once signed in (FR-PRO-2).
  */
 @Composable
 fun TwoverseNavHost(
@@ -70,6 +76,7 @@ fun TwoverseNavHost(
     isOffline: Boolean = false,
     isPasswordRecovery: Boolean = false,
     onPasswordRecoveryShown: () -> Unit = {},
+    needsAboutYou: Boolean = false,
 ) {
     val navController = rememberNavController()
     val currentOnPasswordRecoveryShown by rememberUpdatedState(onPasswordRecoveryShown)
@@ -96,6 +103,15 @@ fun TwoverseNavHost(
     val connectedMessage = stringResource(R.string.pair_connected)
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
+    // Saving About you refreshes the profile a moment later; don't ask again in between.
+    var aboutYouDone by remember { mutableStateOf(false) }
+    LaunchedEffect(needsAboutYou, destination) {
+        if (!needsAboutYou) {
+            aboutYouDone = false
+        } else if (!aboutYouDone && destination != null && destination.isSignedInScreen()) {
+            navController.navigate(AboutYouRoute) { launchSingleTop = true }
+        }
+    }
     val selectedTab = TopLevelDestination.entries.indexOfFirst { tab ->
         destination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true
     }
@@ -130,6 +146,14 @@ fun TwoverseNavHost(
                 onConnected = { scope.launch { snackbarHostState.showSnackbar(connectedMessage) } },
             )
             tabsGraph(navController)
+            composable<AboutYouRoute> {
+                AboutYouFeatureRoute(
+                    onDone = {
+                        aboutYouDone = true
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
@@ -274,8 +298,11 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onSendShootingStar = { navController.navigate(StarComposerRoute()) },
             onOpenShootingStars = { navController.navigate(ShootingStarsRoute) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
-            onSetTogetherSince = { navController.navigate(TogetherSinceRoute()) },
+            onOpenProfile = { navController.navigate(ProfileRoute) },
         )
+    }
+    composable<ProfileRoute> {
+        ProfileFeatureRoute(onBack = { navController.popBackStack() })
     }
     composable<StarComposerRoute> {
         StarComposerFeatureRoute(onDone = { navController.popBackStack() })
@@ -323,6 +350,11 @@ private fun TwoverseSnackbarHost(hostState: SnackbarHostState) {
         )
     }
 }
+
+/** Screens shown before signing in, and About you itself, never open About you. */
+private fun NavDestination.isSignedInScreen(): Boolean =
+    listOf(SplashRoute::class, WelcomeRoute::class, SignInRoute::class, SignUpRoute::class, ResetPasswordRoute::class, AboutYouRoute::class)
+        .none { hasRoute(it) }
 
 private fun SplashDestination.toRoute(): Any = when (this) {
     SplashDestination.Welcome -> WelcomeRoute

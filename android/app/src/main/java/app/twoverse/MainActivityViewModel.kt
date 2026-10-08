@@ -2,6 +2,10 @@ package app.twoverse
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.twoverse.core.common.PartnerName
+import app.twoverse.core.common.toPartnerName
+import app.twoverse.core.data.CoupleRepository
+import app.twoverse.core.data.ProfileRepository
 import app.twoverse.core.data.SettingsRepository
 import app.twoverse.core.data.network.NetworkMonitor
 import app.twoverse.core.model.AppearanceMode
@@ -15,12 +19,27 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-/** App-wide state the activity needs: the chosen appearance (FR-SET-3) and connectivity (NFR-REL-1). */
+/**
+ * App-wide state the activity needs: the chosen appearance (FR-SET-3), connectivity (NFR-REL-1),
+ * the partner's name for every screen and whether to ask About you (FR-PRO-1, FR-PRO-2).
+ */
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     settingsRepository: SettingsRepository,
     networkMonitor: NetworkMonitor,
+    coupleRepository: CoupleRepository,
+    profileRepository: ProfileRepository,
 ) : ViewModel() {
+
+    /** The partner as every screen names them: my nickname, else their short name (FR-PRO-1). */
+    val partner: StateFlow<PartnerName?> = coupleRepository.couple
+        .map { it?.partner?.toPartnerName() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /** Signed in without pronouns yet: the About you step must be completed (FR-PRO-2). */
+    val needsAboutYou: StateFlow<Boolean> = profileRepository.myProfile
+        .map { it != null && it.pronouns == null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val appearance: StateFlow<AppearanceMode> = settingsRepository.settings
         .map { it.appearance }

@@ -43,6 +43,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerString
+import app.twoverse.core.designsystem.text.partnerName
+import app.twoverse.core.designsystem.text.PronounStrings
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.SegmentedOptions
 import app.twoverse.core.designsystem.component.SettingsSwitchRow
@@ -56,6 +59,16 @@ import coil3.compose.AsyncImage
 import kotlin.math.roundToInt
 
 private val PhotoAreaHeight = 200.dp
+
+/** "She can save it in Ours permanently." (FR-MEM-5) */
+private val KeepSubtitle = PronounStrings(
+    R.string.add_memory_keep_subtitle_she,
+    R.string.add_memory_keep_subtitle_he,
+    R.string.add_memory_keep_subtitle_they,
+)
+
+/** "She gets a notification, never a preview of the photo." (FR-NOT-1) */
+private val SendNote = PronounStrings(R.string.add_memory_send_note_she, R.string.add_memory_send_note_he, R.string.add_memory_send_note_they)
 private val PhotoBorderWidth = 2.dp
 private val PhotoDash = 6.dp
 
@@ -108,7 +121,7 @@ fun AddMemoryScreen(
                     value = uiState.caption,
                     onValueChange = onCaptionChange,
                     label = stringResource(R.string.add_memory_caption_label),
-                    placeholder = stringResource(R.string.add_memory_caption_placeholder),
+                    placeholder = stringResource(R.string.add_memory_caption_placeholder, partnerName()),
                     singleLine = false,
                     textStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
                     modifier = Modifier.padding(top = spacing.lg),
@@ -148,8 +161,8 @@ fun AddMemoryScreen(
                             .padding(top = spacing.md),
                     ) {
                         SettingsSwitchRow(
-                            title = stringResource(R.string.add_memory_keep_title),
-                            subtitle = stringResource(R.string.add_memory_keep_subtitle),
+                            title = stringResource(R.string.add_memory_keep_title, partnerName()),
+                            subtitle = partnerString(KeepSubtitle),
                             checked = uiState.allowKeep,
                             onCheckedChange = onAllowKeepChange,
                         )
@@ -173,14 +186,14 @@ fun AddMemoryScreen(
                     UploadProgress(progress = uiState.uploadProgress, modifier = Modifier.padding(bottom = spacing.sm))
                 }
                 TwoversePrimaryButton(
-                    text = stringResource(if (uiState.sendFailed) R.string.add_memory_retry else R.string.add_memory_send),
+                    text = if (uiState.sendFailed) stringResource(R.string.add_memory_retry) else stringResource(R.string.add_memory_send, partnerName()),
                     onClick = onSend,
                     enabled = uiState.canSend,
                     leadingIcon = R.drawable.ic_send,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Text(
-                    text = stringResource(R.string.add_memory_send_note),
+                    text = partnerString(SendNote),
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Normal),
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,

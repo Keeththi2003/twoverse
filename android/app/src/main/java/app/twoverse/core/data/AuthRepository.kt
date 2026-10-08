@@ -15,7 +15,7 @@ interface AuthRepository {
     suspend fun signInWithEmail(email: String, password: String): DataResult<Unit>
 
     /** Email sign-up with the display name shown to the partner (FR-AUTH-2, FR-AUTH-5). */
-    suspend fun signUpWithEmail(displayName: String, email: String, password: String): DataResult<SignUpResult>
+    suspend fun signUpWithEmail(fullName: String, email: String, password: String): DataResult<SignUpResult>
 
     /** Sends a reset email that opens the app through the auth-callback deep link (FR-AUTH-3). */
     suspend fun sendPasswordReset(email: String): DataResult<Unit>

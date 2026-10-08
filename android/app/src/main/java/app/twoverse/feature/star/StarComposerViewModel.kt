@@ -3,6 +3,7 @@ package app.twoverse.feature.star
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.twoverse.core.common.defaultShortName
 import app.twoverse.core.data.AuthRepository
 import app.twoverse.core.data.ProfileRepository
 import app.twoverse.core.data.ShootingStarRepository
@@ -170,9 +171,11 @@ class StarComposerViewModel @Inject constructor(
         }
     }
 
+    /** Signed with what this user likes to be called (FR-PRO-1). */
     private suspend fun myDisplayName(): String? {
         val auth = authRepository.authState.first { it !is AuthState.Loading } as? AuthState.SignedIn ?: return null
-        return (profileRepository.profile(auth.userId) as? DataResult.Success)?.value?.displayName
+        val me = (profileRepository.profile(auth.userId) as? DataResult.Success)?.value ?: return null
+        return me.shortName ?: defaultShortName(me.fullName)
     }
 
     /** A star whose time has already come is simply waiting, like one sent for the next open. */

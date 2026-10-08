@@ -25,6 +25,8 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import app.twoverse.core.designsystem.text.partnerNameStart
+import app.twoverse.core.designsystem.text.partnerName
 import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBackButton
@@ -101,7 +103,7 @@ fun ShootingStarsScreen(
                 TwoverseTextButton(text = stringResource(R.string.common_retry), onClick = actions.onRetry)
             }
             uiState.isLoading -> Unit
-            uiState.sent.isEmpty() -> EmptyText(R.string.stars_sent_empty)
+            uiState.sent.isEmpty() -> EmptyText(stringResource(R.string.stars_sent_empty))
             else -> uiState.sent.forEach { item ->
                 SentStarCard(item = item, onEdit = { actions.onEdit(item.id) }, onDelete = { actions.onDelete(item.id) })
             }
@@ -109,7 +111,7 @@ fun ShootingStarsScreen(
 
         SectionHeader(R.string.stars_received)
         if (uiState.received.isEmpty()) {
-            EmptyText(R.string.stars_received_empty)
+            EmptyText(stringResource(R.string.stars_received_empty, partnerName()))
         } else {
             uiState.received.forEach { item ->
                 StarCard(item = item, onClick = { actions.onOpenReceived(item.id) })
@@ -119,7 +121,7 @@ fun ShootingStarsScreen(
     if (uiState.pendingDeleteId != null) {
         TwoverseConfirmDialog(
             title = stringResource(R.string.stars_delete_title),
-            message = stringResource(R.string.stars_delete_message),
+            message = stringResource(R.string.stars_delete_message, partnerNameStart()),
             confirmLabel = stringResource(R.string.stars_delete),
             onConfirm = actions.onDeleteConfirmed,
             onDismiss = actions.onDeleteDismissed,
@@ -199,9 +201,9 @@ private fun SectionHeader(@StringRes text: Int) {
 }
 
 @Composable
-private fun EmptyText(@StringRes text: Int) {
+private fun EmptyText(text: String) {
     Text(
-        text = stringResource(text),
+        text = text,
         style = MaterialTheme.typography.bodyMedium,
         color = TwoverseTheme.colors.onSurfaceVariant,
     )

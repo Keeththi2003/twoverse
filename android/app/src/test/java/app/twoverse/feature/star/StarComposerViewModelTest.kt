@@ -66,7 +66,7 @@ class StarComposerViewModelTest {
 
         assertFalse(viewModel.state.isLoading)
         assertFalse(viewModel.state.isEditing)
-        assertEquals(SampleData.me.displayName, viewModel.state.signature)
+        assertEquals(SampleData.me.shortName, viewModel.state.signature)
         assertEquals(StarLayout.PhotoMessage, viewModel.state.layout)
         assertEquals(StarSchedule.NextOpen, viewModel.state.schedule)
     }
@@ -81,7 +81,7 @@ class StarComposerViewModelTest {
         assertEquals("For you", viewModel.state.eyebrow)
         assertEquals("Happy Birthday", viewModel.state.title)
         assertEquals("My words", viewModel.state.message)
-        assertEquals(SampleData.me.displayName, viewModel.state.signature)
+        assertEquals(SampleData.me.shortName, viewModel.state.signature)
         assertEquals(StarTemplate.Birthday, viewModel.state.template)
 
         viewModel.onTemplateSelected(StarTemplate.Blank, StarTemplateText(eyebrow = "", title = ""))

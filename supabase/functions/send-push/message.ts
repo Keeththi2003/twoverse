@@ -26,6 +26,18 @@ export const COUNTED_PUSH_TYPES: ReadonlySet<string> = new Set(["anniversary", "
 /** Upper bound for that number, so a bad request can't put anything else into a push. */
 export const MAX_PUSH_COUNT = 100_000;
 
+/** One device to notify, with how its owner knows their partner (FR-NOT-7). */
+export interface PushTarget {
+  token: string;
+  /** The recipient's nickname for their partner, else the partner's short name. */
+  partnerName?: string | null;
+  /** The partner's pronouns: she, he or they. */
+  partnerPronouns?: string | null;
+}
+
+const PRONOUNS: ReadonlySet<string> = new Set(["she", "he", "they"]);
+const MAX_NAME_LENGTH = 30;
+
 export interface FcmMessage {
   token: string;
   data: Record<string, string>;
@@ -36,12 +48,18 @@ export interface FcmMessage {
  * Data-only messages: the app builds the notification from its own strings, so a push can
  * never carry a photo, caption or any other content (FR-NOT-1). The wake-up ping is silent
  * (FR-NOT-5); high priority lets the partner's phone wake to upload its location. Anniversary and
- * milestone pushes add only their number.
+ * milestone pushes add their number, and visible pushes add how the recipient knows their partner
+ * (name and pronouns) so the text can say "Ammu sent you a memory" (FR-NOT-7).
  */
-export function buildMessage(type: PushType, token: string, count?: number): FcmMessage {
+export function buildMessage(type: PushType, target: PushTarget, count?: number): FcmMessage {
+  const token = target.token;
   if (type === "wake_up") {
     return { token, data: { type }, android: { priority: "HIGH", ttl: "60s", collapse_key: "wake_up" } };
   }
-  const data: Record<string, string> = count === undefined ? { type } : { type, count: String(count) };
+  const data: Record<string, string> = { type };
+  if (count !== undefined) data.count = String(count);
+  const name = target.partnerName?.trim().slice(0, MAX_NAME_LENGTH);
+  if (name) data.partner_name = name;
+  if (target.partnerPronouns && PRONOUNS.has(target.partnerPronouns)) data.partner_pronouns = target.partnerPronouns;
   return { token, data, android: { priority: "HIGH", ttl: "86400s" } };
 }

@@ -12,9 +12,9 @@ function fakeDeps(overrides: Partial<PushDeps> = {}) {
     internalSecret: "internal-secret",
     preparePartnerPush: (_authorization, kind) => {
       prepared.push(kind);
-      return Promise.resolve({ tokens: ["partner-token"] });
+      return Promise.resolve({ targets: [{ token: "partner-token", partnerName: "Kanna", partnerPronouns: "she" }] });
     },
-    pushTargets: () => Promise.resolve(["target-token"]),
+    pushTargets: () => Promise.resolve([{ token: "target-token", partnerName: "Ammu", partnerPronouns: "he" }]),
     removeTokens: (tokens) => {
       removed.push(tokens);
       return Promise.resolve();
@@ -77,20 +77,20 @@ Deno.test("server pushes need the internal secret", async () => {
   assertEquals(sent.map((m) => m.token), ["target-token"]);
 });
 
-Deno.test("a shooting star push is a server push that carries only its type", async () => {
+Deno.test("a shooting star push is a server push that carries only its type and the partner label", async () => {
   const { deps, sent } = fakeDeps();
   const response = await handle(post({ type: "shooting_star", user_ids: [USER_A] }, { "x-internal-secret": "internal-secret" }), deps);
   assertEquals(response.status, 200);
-  assertEquals(sent[0].data, { type: "shooting_star" });
+  assertEquals(sent[0].data, { type: "shooting_star", partner_name: "Ammu", partner_pronouns: "he" });
 });
 
-Deno.test("anniversary and milestone pushes carry only their type and number", async () => {
+Deno.test("anniversary and milestone pushes carry only their type, number and partner label", async () => {
   const { deps, sent } = fakeDeps();
   const secret = { "x-internal-secret": "internal-secret" };
   assertEquals((await handle(post({ type: "anniversary", count: 2, user_ids: [USER_A], note: "x" }, secret), deps)).status, 200);
-  assertEquals(sent[0].data, { type: "anniversary", count: "2" });
+  assertEquals(sent[0].data, { type: "anniversary", count: "2", partner_name: "Ammu", partner_pronouns: "he" });
   assertEquals((await handle(post({ type: "orbit_milestone", count: 1000, user_ids: [USER_A] }, secret), deps)).status, 200);
-  assertEquals(sent[1].data, { type: "orbit_milestone", count: "1000" });
+  assertEquals(sent[1].data, { type: "orbit_milestone", count: "1000", partner_name: "Ammu", partner_pronouns: "he" });
 });
 
 Deno.test("anniversary and milestone pushes need a sensible number and are server-only", async () => {
@@ -116,11 +116,25 @@ Deno.test("server pushes only send server types to valid user ids", async () => 
   assertEquals((await handle(post({ type: "reunion_day", user_ids: ["not-a-uuid"] }, secret), deps)).status, 400);
 });
 
-Deno.test("messages carry only the type: no notification, photo or caption", async () => {
+Deno.test("messages carry only the type and partner label: no notification, photo or caption", async () => {
   const { deps, sent } = fakeDeps();
   await handle(post({ type: "new_memory", caption: "secret words", image_url: "x" }, signedIn), deps);
-  assertEquals(sent[0].data, { type: "new_memory" });
+  assertEquals(sent[0].data, { type: "new_memory", partner_name: "Kanna", partner_pronouns: "she" });
   assertEquals(Object.keys(sent[0]).sort(), ["android", "data", "token"]);
+});
+
+Deno.test("the partner label is trimmed, capped and only uses known pronouns", async () => {
+  const { deps, sent } = fakeDeps({
+    pushTargets: () => Promise.resolve([{ token: "t", partnerName: `  ${"x".repeat(40)}  `, partnerPronouns: "it" }]),
+  });
+  await handle(post({ type: "reunion_day", user_ids: [USER_A] }, { "x-internal-secret": "internal-secret" }), deps);
+  assertEquals(sent[0].data, { type: "reunion_day", partner_name: "x".repeat(30) });
+});
+
+Deno.test("the silent wake-up carries no partner label", async () => {
+  const { deps, sent } = fakeDeps();
+  await handle(post({ type: "wake_up" }, signedIn), deps);
+  assertEquals(sent[0].data, { type: "wake_up" });
 });
 
 Deno.test("the wake-up ping is a short-lived high-priority data message", async () => {

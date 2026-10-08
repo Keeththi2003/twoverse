@@ -41,6 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerString
+import app.twoverse.core.designsystem.text.partnerName
+import app.twoverse.core.designsystem.text.PronounStrings
 import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.IconTile
@@ -72,6 +75,9 @@ private val PickerIconSize = 18.dp
 private val PhotoIconSize = 28.dp
 private const val MessageCounterFrom = 900
 private const val DatePattern = "EEEEdMMMMy"
+
+/** "A surprise Ammu sees once, full screen: the next time she opens Twoverse…" */
+private val ComposerIntro = PronounStrings(R.string.star_composer_intro_she, R.string.star_composer_intro_he, R.string.star_composer_intro_they)
 
 /** "Send a Shooting Star": layout, template, the layout's fields, when to show, preview (FR-STAR-1 to FR-STAR-8). */
 @Composable
@@ -140,7 +146,7 @@ private fun ComposerForm(uiState: StarComposerUiState, actions: StarComposerActi
                     )
                 }
                 Text(
-                    text = stringResource(R.string.star_composer_intro),
+                    text = partnerString(ComposerIntro, partnerName()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.onSurfaceVariant,
                 )
@@ -340,7 +346,7 @@ private fun ScheduleEditor(schedule: StarSchedule, actions: StarComposerActions)
         )
         when (schedule) {
             StarSchedule.NextOpen -> Text(
-                text = stringResource(R.string.star_when_next_open_description),
+                text = stringResource(R.string.star_when_next_open_description, partnerName()),
                 style = MaterialTheme.typography.bodySmall,
                 color = TwoverseTheme.colors.onSurfaceVariant,
             )

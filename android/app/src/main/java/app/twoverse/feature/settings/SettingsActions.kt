@@ -20,8 +20,14 @@ data class SettingsActions(
     val onSendShootingStar: () -> Unit = {},
     /** Sent and received Shooting Stars (FR-STAR-9, FR-STAR-13). */
     val onOpenShootingStars: () -> Unit = {},
-    /** "When did your story begin?" (FR-SET-7, FR-ORB-2). */
-    val onSetTogetherSince: () -> Unit = {},
+    /** Your profile (FR-PRO-4). */
+    val onOpenProfile: () -> Unit = {},
+    val onNicknameChange: (String) -> Unit = {},
+    val onSaveNickname: () -> Unit = {},
+    val onClearNickname: () -> Unit = {},
+    /** Opens mail or the dialer for the partner's shared email or phone (FR-PRO-5). */
+    val onEmailPartner: (String) -> Unit = {},
+    val onCallPartner: (String) -> Unit = {},
     /** Turning sharing on goes through the permission flow (FR-LOC-1). */
     val onOpenLocationSetup: () -> Unit = {},
 )

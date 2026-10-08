@@ -4,6 +4,7 @@ import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.ElapsedTime
 import app.twoverse.core.common.Anniversary
 import app.twoverse.core.common.LocationFreshness
+import app.twoverse.core.common.PartnerName
 import app.twoverse.core.common.LocationUnavailableReason
 import app.twoverse.core.common.ReunionPhase
 import app.twoverse.core.common.countdownProgress
@@ -12,6 +13,7 @@ import app.twoverse.core.common.formatDistance
 import app.twoverse.core.common.nextAnniversary
 import app.twoverse.core.common.partnerPosition
 import app.twoverse.core.common.reunionPhase
+import app.twoverse.core.common.toPartnerName
 import app.twoverse.core.common.togetherDuration
 import app.twoverse.core.data.local.OfflineSnapshot
 import app.twoverse.core.model.DistanceUnit
@@ -57,6 +59,8 @@ data class WidgetState(
     val hasWaitingStar: Boolean,
     /** No connection: the widget says it shows saved data. */
     val isOffline: Boolean,
+    /** The partner's name and pronouns, as the app shows them (FR-PRO-1); null when unpaired. */
+    val partner: PartnerName? = null,
     /** How long they've been together; null when "together since" isn't set, so that part is left out (FR-WGT-8). */
     val orbit: WidgetOrbit? = null,
 ) {
@@ -134,6 +138,7 @@ internal fun widgetState(
         newMemoryCount = couple?.let { snapshot.memories?.count { it.isNew } } ?: 0,
         hasWaitingStar = couple != null && snapshot.hasWaitingStar == true,
         isOffline = !isOnline,
+        partner = couple?.partner?.toPartnerName(),
         orbit = couple?.togetherSince?.let { since ->
             val today = now.atZone(zone).toLocalDate()
             togetherDuration(since, today)?.let { duration ->

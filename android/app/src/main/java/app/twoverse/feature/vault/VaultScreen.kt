@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.designsystem.text.partnerName
 import app.twoverse.R
 import app.twoverse.core.common.ExpiryBadge
 import app.twoverse.core.designsystem.component.TwoverseChip
@@ -158,7 +159,7 @@ private fun FilterChips(
     ) {
         VaultFilter.entries.forEach { filter ->
             TwoverseChip(
-                label = stringResource(filter.labelRes()),
+                label = filter.label(),
                 selected = filter == selected,
                 onClick = { onFilterSelected(filter) },
             )
@@ -215,11 +216,12 @@ private fun AddMemoryButton(onClick: () -> Unit, modifier: Modifier = Modifier) 
     }
 }
 
-private fun VaultFilter.labelRes(): Int = when (this) {
-    VaultFilter.All -> R.string.vault_filter_all
-    VaultFilter.FromMe -> R.string.vault_filter_from_you
-    VaultFilter.FromPartner -> R.string.vault_filter_from_her
-    VaultFilter.Expiring -> R.string.vault_filter_expiring
+@Composable
+private fun VaultFilter.label(): String = when (this) {
+    VaultFilter.All -> stringResource(R.string.vault_filter_all)
+    VaultFilter.FromMe -> stringResource(R.string.vault_filter_from_you)
+    VaultFilter.FromPartner -> stringResource(R.string.vault_filter_from_partner, partnerName())
+    VaultFilter.Expiring -> stringResource(R.string.vault_filter_expiring)
 }
 
 @PreviewLightDark
