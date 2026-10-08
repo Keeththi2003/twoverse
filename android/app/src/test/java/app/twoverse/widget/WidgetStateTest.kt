@@ -116,6 +116,13 @@ class WidgetStateTest {
     }
 
     @Test
+    fun longDistancesUseTheLocaleThousandsSeparator() {
+        val farAway = snapshot().copy(partnerLocation = location("her", latitude = -60.0, age = Duration.ofSeconds(30)))
+
+        assertEquals("7,442", state(farAway).distance)
+    }
+
+    @Test
     fun usesTheChosenUnit() {
         val state = state(snapshot(), DistanceUnit.Miles)
 
