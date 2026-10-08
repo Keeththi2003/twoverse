@@ -42,7 +42,6 @@ import app.twoverse.core.designsystem.component.OrbitGraphic
 import app.twoverse.core.designsystem.component.OrbitPosition
 import app.twoverse.core.designsystem.component.OrbitRing
 import app.twoverse.core.designsystem.component.StarField
-import app.twoverse.core.designsystem.component.TwoverseBackButton
 import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoverseCircleIconButton
 import app.twoverse.core.designsystem.component.TwoverseConfirmDialog
@@ -64,7 +63,6 @@ private val TilePadding = 16.dp
 
 /** Everything Our Orbit can ask for. */
 data class OrbitActions(
-    val onBack: () -> Unit = {},
     val onSetTogetherSince: () -> Unit = {},
     val onAddMeetup: () -> Unit = {},
     val onEditMeetup: (String) -> Unit = {},
@@ -73,7 +71,10 @@ data class OrbitActions(
     val onDeleteDismissed: () -> Unit = {},
 )
 
-/** Our Orbit: how long you have been together, what's next, and the times you met (FR-ORB-4 to FR-ORB-8, FR-ORB-11). */
+/**
+ * Our Orbit, a bottom-bar tab: how long you have been together, what's next, and the times you met
+ * (FR-ORB-4 to FR-ORB-8, FR-ORB-11).
+ */
 @Composable
 fun OrbitScreen(uiState: OrbitUiState, actions: OrbitActions, modifier: Modifier = Modifier) {
     val colors = TwoverseTheme.colors
@@ -82,21 +83,18 @@ fun OrbitScreen(uiState: OrbitUiState, actions: OrbitActions, modifier: Modifier
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
-            .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = spacing.screenHorizontal)
             .padding(bottom = spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            TwoverseBackButton(onClick = actions.onBack)
-            Text(
-                text = stringResource(R.string.orbit_title),
-                style = MaterialTheme.typography.headlineSmall,
-                color = colors.onSurface,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
+        Text(
+            text = stringResource(R.string.orbit_title),
+            style = MaterialTheme.typography.headlineMedium,
+            color = colors.onSurface,
+            modifier = Modifier.semantics { heading() },
+        )
         if (uiState.isLoading) return@Column
         HeroCard(since = uiState.togetherSince, duration = uiState.duration, onSetTogetherSince = actions.onSetTogetherSince)
         uiState.celebration?.let { CelebrationCard(it) }
