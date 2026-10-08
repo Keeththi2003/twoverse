@@ -118,6 +118,16 @@ class OrbitMathTest {
     }
 
     @Test
+    fun theMilestoneBeforeEachOne() {
+        assertEquals(0L, previousDayMilestone(100))
+        assertEquals(100L, previousDayMilestone(365))
+        assertEquals(365L, previousDayMilestone(500))
+        assertEquals(500L, previousDayMilestone(1000))
+        assertEquals(1000L, previousDayMilestone(2000))
+        assertEquals(2000L, previousDayMilestone(3000))
+    }
+
+    @Test
     fun dayOneHundredIsNinetyNineDaysAfterTheStart() {
         val since = date("2024-01-01")
 

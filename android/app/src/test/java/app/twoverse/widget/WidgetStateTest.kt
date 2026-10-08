@@ -4,6 +4,7 @@ import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.ElapsedTime
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.data.local.OfflineSnapshot
+import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.Couple
 import app.twoverse.core.model.CoupleStatus
 import app.twoverse.core.model.DistanceUnit
@@ -240,10 +241,95 @@ class WidgetStateTest {
     }
 
     @Test
-    fun theAnniversaryShowsOnlyWithinThirtyDays() {
-        assertEquals(30L, state(withSince("2024-10-28")).orbit?.anniversary?.daysUntil)
-        assertNull(state(withSince("2024-10-29")).orbit?.anniversary)
-        assertEquals(0L, state(withSince("2024-09-28")).orbit?.anniversary?.daysUntil)
+    fun theTogetherCardCountsDownToTheNextDayMilestone() {
+        // Day 475, since 11 June 2025: 25 days to 500, from 365.
+        val orbit = state(withSince("2025-06-11")).orbit
+
+        assertEquals(LocalDate.of(2025, 6, 11), orbit?.since)
+        assertEquals(475L, orbit?.totalDays)
+        assertEquals(500L, orbit?.nextMilestone)
+        assertEquals(25L, orbit?.daysToMilestone)
+        assertEquals(110f / 135f, orbit?.milestoneProgress)
+    }
+
+    @Test
+    fun onAMilestoneDayTheBarIsFull() {
+        // Day 500, since 17 May 2025.
+        val orbit = state(withSince("2025-05-17")).orbit
+
+        assertEquals(500L, orbit?.totalDays)
+        assertEquals(0L, orbit?.daysToMilestone)
+        assertEquals(1f, orbit?.milestoneProgress)
+    }
+
+    @Test
+    fun beforeDayOneHundredTheBarStartsAtZero() {
+        // Day 1, today.
+        val orbit = state(withSince("2026-09-28")).orbit
+
+        assertEquals(100L, orbit?.nextMilestone)
+        assertEquals(99L, orbit?.daysToMilestone)
+        assertEquals(0.01f, orbit?.milestoneProgress)
+    }
+
+    // Which card and line the medium and large widget show (FR-WGT-8)
+
+    @Test
+    fun withTogetherSinceTheBigCardIsTogetherAndTheReunionIsTheLineAboveIt() {
+        val state = state(withSince("2025-06-11"))
+
+        assertEquals(WidgetCard.Together, state.card)
+        assertEquals(16L, state.reunionLine?.daysUntil)
+    }
+
+    @Test
+    fun withoutAReunionDateTheLineIsHidden() {
+        val state = state(withSince("2025-06-11").copy(reunion = null))
+
+        assertEquals(WidgetCard.Together, state.card)
+        assertNull(state.reunionLine)
+    }
+
+    @Test
+    fun withoutTogetherSinceTheBigCardIsUntilWeMeetAndThereIsNoLine() {
+        val state = state(withSince(null))
+
+        assertEquals(WidgetCard.UntilWeMeet, state.card)
+        assertNull(state.reunionLine)
+        assertEquals(16L, state.reunion?.daysUntil)
+    }
+
+    @Test
+    fun onTheReunionDayTheLineSaysSo() {
+        val today = snapshot().reunion?.copy(meetAt = now + Duration.ofHours(2))
+
+        val line = state(withSince("2025-06-11").copy(reunion = today)).reunionLine
+
+        assertTrue(line?.isToday == true)
+    }
+
+    @Test
+    fun notPairedHasNoCardAndNoLine() {
+        val state = state(withSince("2025-06-11").copy(couple = null))
+
+        assertEquals(WidgetCard.None, state.card)
+        assertNull(state.reunionLine)
+    }
+
+    @Test
+    fun sharingOffStillShowsTheCards() {
+        val state = state(withSince("2025-06-11").copy(sharing = LocationSharing(enabled = false)))
+
+        assertEquals(WidgetLocation.SharingOff, state.location)
+        assertNull(state.distance)
+        assertEquals(WidgetCard.Together, state.card)
+    }
+
+    @Test
+    fun theAppearanceSettingIsPassedThrough() {
+        assertEquals(AppearanceMode.System, state(snapshot()).appearance)
+        val dark = widgetState(snapshot(), DistanceUnit.Kilometres, true, now, colombo, Locale.US, AppearanceMode.Dark)
+        assertEquals(AppearanceMode.Dark, dark.appearance)
     }
 
     @Test
