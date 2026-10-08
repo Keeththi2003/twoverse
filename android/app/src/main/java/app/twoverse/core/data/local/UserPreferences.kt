@@ -3,6 +3,7 @@ package app.twoverse.core.data.local
 import app.twoverse.core.model.AppearanceMode
 import app.twoverse.core.model.DistanceUnit
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 /** Display preferences stored on this device (DataStore), so they survive restarts. */
 interface UserPreferences {
@@ -25,4 +26,9 @@ interface UserPreferences {
     val notificationPermissionAsked: Flow<Boolean>
 
     suspend fun setNotificationPermissionAsked()
+
+    /** The passed reunion whose "Did you meet?" question was answered No on this device (FR-ORB-10). */
+    val dismissedMeetupQuestion: Flow<Instant?>
+
+    suspend fun setDismissedMeetupQuestion(reunionAt: Instant)
 }

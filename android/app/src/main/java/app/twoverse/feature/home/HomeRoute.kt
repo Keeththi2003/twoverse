@@ -22,6 +22,9 @@ fun HomeRoute(
     onSendMemory: () -> Unit,
     onSendShootingStar: () -> Unit,
     onOpenLocationSetup: () -> Unit,
+    onOpenOrbit: () -> Unit,
+    onSetTogetherSince: () -> Unit,
+    onRecordMeetup: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -49,5 +52,11 @@ fun HomeRoute(
         onOpenLocationSetup = onOpenLocationSetup,
         miniNeedleRotation = { miniNeedleRotation },
         modifier = modifier,
+        orbitActions = HomeOrbitActions(
+            onOpenOrbit = onOpenOrbit,
+            onSetTogetherSince = onSetTogetherSince,
+            onMeetupQuestionYes = onRecordMeetup,
+            onMeetupQuestionNo = viewModel::onMeetupQuestionDismissed,
+        ),
     )
 }

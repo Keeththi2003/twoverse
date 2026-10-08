@@ -9,6 +9,7 @@ import app.twoverse.core.model.CoupleStatus
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.LocationSharing
+import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.Reunion
@@ -22,6 +23,7 @@ import org.junit.Test
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import java.util.Locale
 
@@ -204,5 +206,46 @@ class WidgetStateTest {
     fun aWaitingShootingStarIsFlagged() {
         assertTrue(state(snapshot().copy(hasWaitingStar = true)).hasWaitingStar)
         assertFalse(state(snapshot().copy(hasWaitingStar = null)).hasWaitingStar)
+    }
+
+    // Our Orbit (FR-WGT-8). "now" is 28 September 2026 in Colombo.
+
+    private fun withSince(since: String?) =
+        snapshot().copy(couple = snapshot().couple?.copy(togetherSince = since?.let(LocalDate::parse)))
+
+    @Test
+    fun withoutTogetherSinceTheOrbitPartIsLeftOut() {
+        assertNull(state(withSince(null)).orbit)
+    }
+
+    @Test
+    fun showsDaysTogetherAndTimesMet() {
+        val meetups = listOf(
+            Meetup("a", LocalDate.of(2026, 9, 1), null, null, null),
+            Meetup("b", LocalDate.of(2026, 9, 20), LocalDate.of(2026, 9, 22), null, null),
+        )
+
+        val orbit = state(withSince("2024-06-23").copy(meetups = meetups)).orbit
+
+        assertEquals(Period.of(2, 3, 5), orbit?.period)
+        assertEquals(828L, orbit?.totalDays)
+        assertEquals(2, orbit?.timesMet)
+    }
+
+    @Test
+    fun theAnniversaryShowsOnlyWithinThirtyDays() {
+        assertEquals(30L, state(withSince("2024-10-28")).orbit?.anniversary?.daysUntil)
+        assertNull(state(withSince("2024-10-29")).orbit?.anniversary)
+        assertEquals(0L, state(withSince("2024-09-28")).orbit?.anniversary?.daysUntil)
+    }
+
+    @Test
+    fun aDateNotBegunHereIsLeftOut() {
+        assertNull(state(withSince("2026-09-29")).orbit)
+    }
+
+    @Test
+    fun withoutACoupleThereIsNoOrbit() {
+        assertNull(state(withSince("2024-06-23").copy(couple = null)).orbit)
     }
 }

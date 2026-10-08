@@ -4,6 +4,7 @@ import app.twoverse.core.data.fake.FakeAuthRepository
 import app.twoverse.core.data.fake.FakeCoupleRepository
 import app.twoverse.core.data.fake.FakePushRepository
 import app.twoverse.core.data.fake.FakeShootingStarRepository
+import app.twoverse.core.data.sample.SampleData
 import app.twoverse.core.model.AuthState
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.EndedCouple
@@ -92,6 +93,19 @@ class PairViewModelTest {
         assertTrue(viewModel.uiState.value.isConnected)
         assertTrue(viewModel.uiState.value.hasWaitingStar)
         assertEquals(listOf("send:PartnerJoined"), pushRepository.calls)
+    }
+
+    @Test
+    fun afterConnectingTheStoryDateIsAskedUnlessThePartnerSetIt() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+
+        coupleRepository.simulatePartnerJoined()
+        runCurrent()
+        assertTrue(viewModel.uiState.value.askTogetherSince)
+
+        coupleRepository.setCouple(SampleData.couple.copy(togetherSince = LocalDate.of(2024, 2, 14)))
+        runCurrent()
+        assertFalse(viewModel.uiState.value.askTogetherSince)
     }
 
     @Test

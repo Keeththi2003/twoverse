@@ -15,6 +15,12 @@ enum class IncomingPush(val type: String, val opens: LaunchScreen?) {
 
     /** A Shooting Star became visible; opening the app shows it (FR-STAR-17). */
     ShootingStar("shooting_star", LaunchScreen.ShootingStar),
+
+    /** Their anniversary; the push carries the number of years (FR-NOT-6). */
+    Anniversary("anniversary", LaunchScreen.Orbit),
+
+    /** A day milestone such as day 1000; the push carries the day number (FR-NOT-6). */
+    OrbitMilestone("orbit_milestone", LaunchScreen.Orbit),
     ;
 
     companion object {

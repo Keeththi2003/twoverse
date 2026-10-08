@@ -65,3 +65,21 @@ data class MemoryRoute(val memoryId: String)
 
 @Serializable
 data object AddMemoryRoute
+
+/** Our Orbit: together since, milestones and meetups (FR-ORB-4 to FR-ORB-8). */
+@Serializable
+data object OrbitRoute
+
+/**
+ * "When did your story begin?" (FR-ORB-2). [afterPairing] makes it skippable and continues into the
+ * app, to the waiting Shooting Star when [showShootingStarNext]. Read by `TogetherSinceViewModel` (`AfterPairingKey`).
+ */
+@Serializable
+data class TogetherSinceRoute(val afterPairing: Boolean = false, val showShootingStarNext: Boolean = false)
+
+/**
+ * Adds a meetup, edits [meetupId], or with [fromReunion] records the passed reunion (FR-ORB-3, FR-ORB-10).
+ * Read by `MeetupEditorViewModel` under the same names (`MeetupIdKey`, `FromReunionKey`).
+ */
+@Serializable
+data class MeetupEditorRoute(val meetupId: String? = null, val fromReunion: Boolean = false)

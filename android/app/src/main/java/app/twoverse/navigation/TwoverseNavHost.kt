@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.TwoverseBottomBar
 import app.twoverse.core.designsystem.component.TwoverseBottomBarItem
@@ -38,6 +39,9 @@ import app.twoverse.feature.countdown.EditReunionRoute as EditReunionFeatureRout
 import app.twoverse.feature.home.HomeRoute as HomeFeatureRoute
 import app.twoverse.feature.location.LocationSetupRoute as LocationSetupFeatureRoute
 import app.twoverse.feature.onboarding.WelcomeRoute as WelcomeFeatureRoute
+import app.twoverse.feature.orbit.MeetupEditorRoute as MeetupEditorFeatureRoute
+import app.twoverse.feature.orbit.OrbitRoute as OrbitFeatureRoute
+import app.twoverse.feature.orbit.TogetherSinceRoute as TogetherSinceFeatureRoute
 import app.twoverse.feature.pairing.PairRoute as PairFeatureRoute
 import app.twoverse.feature.pairing.ReconnectRoute as ReconnectFeatureRoute
 import app.twoverse.feature.settings.SettingsRoute as SettingsFeatureRoute
@@ -77,6 +81,7 @@ fun TwoverseNavHost(
             LaunchScreen.Vault -> navController.navigateToTab(TopLevelDestination.Vault)
             LaunchScreen.Countdown -> navController.navigate(CountdownRoute) { launchSingleTop = true }
             LaunchScreen.ShootingStar -> navController.navigate(ShootingStarRoute()) { launchSingleTop = true }
+            LaunchScreen.Orbit -> navController.navigate(OrbitRoute) { launchSingleTop = true }
         }
         currentOnRequestedScreenShown()
     }
@@ -172,8 +177,12 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
             } else {
                 null
             },
-            onConnected = { showShootingStar ->
-                if (showShootingStar) {
+            onConnected = { showShootingStar, askTogetherSince ->
+                if (askTogetherSince) {
+                    navController.navigateClearingBackStack(
+                        TogetherSinceRoute(afterPairing = true, showShootingStarNext = showShootingStar),
+                    )
+                } else if (showShootingStar) {
                     navController.navigateClearingBackStack(ShootingStarRoute())
                 } else {
                     navController.navigateClearingBackStack(HomeRoute)
@@ -182,6 +191,21 @@ private fun NavGraphBuilder.onboardingGraph(navController: NavHostController, on
             },
             onReconnect = { navController.navigate(ReconnectRoute) },
             onSignedOut = { navController.navigateClearingBackStack(WelcomeRoute) },
+        )
+    }
+    composable<TogetherSinceRoute> { entry ->
+        val route = entry.toRoute<TogetherSinceRoute>()
+        TogetherSinceFeatureRoute(
+            onDone = {
+                when {
+                    !route.afterPairing -> navController.popBackStack()
+                    route.showShootingStarNext -> navController.navigateClearingBackStack(ShootingStarRoute())
+                    else -> {
+                        navController.navigateClearingBackStack(HomeRoute)
+                        onConnected()
+                    }
+                }
+            },
         )
     }
     composable<ReconnectRoute> {
@@ -216,7 +240,21 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onSendMemory = { navController.navigate(AddMemoryRoute) },
             onSendShootingStar = { navController.navigate(StarComposerRoute()) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
+            onOpenOrbit = { navController.navigate(OrbitRoute) },
+            onSetTogetherSince = { navController.navigate(TogetherSinceRoute()) },
+            onRecordMeetup = { navController.navigate(MeetupEditorRoute(fromReunion = true)) },
         )
+    }
+    composable<OrbitRoute> {
+        OrbitFeatureRoute(
+            onBack = { navController.popBackStack() },
+            onSetTogetherSince = { navController.navigate(TogetherSinceRoute()) },
+            onAddMeetup = { navController.navigate(MeetupEditorRoute()) },
+            onEditMeetup = { id -> navController.navigate(MeetupEditorRoute(meetupId = id)) },
+        )
+    }
+    composable<MeetupEditorRoute> {
+        MeetupEditorFeatureRoute(onDone = { navController.popBackStack() })
     }
     composable<LocationSetupRoute> {
         LocationSetupFeatureRoute(onDone = { navController.popBackStack() })
@@ -237,6 +275,7 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onSendShootingStar = { navController.navigate(StarComposerRoute()) },
             onOpenShootingStars = { navController.navigate(ShootingStarsRoute) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
+            onSetTogetherSince = { navController.navigate(TogetherSinceRoute()) },
         )
     }
     composable<StarComposerRoute> {

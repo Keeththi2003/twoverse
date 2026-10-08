@@ -20,6 +20,8 @@ data class SettingsActions(
     val onSendShootingStar: () -> Unit = {},
     /** Sent and received Shooting Stars (FR-STAR-9, FR-STAR-13). */
     val onOpenShootingStars: () -> Unit = {},
+    /** "When did your story begin?" (FR-SET-7, FR-ORB-2). */
+    val onSetTogetherSince: () -> Unit = {},
     /** Turning sharing on goes through the permission flow (FR-LOC-1). */
     val onOpenLocationSetup: () -> Unit = {},
 )

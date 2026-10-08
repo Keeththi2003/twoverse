@@ -12,6 +12,7 @@ import app.twoverse.core.data.HeadingSource
 import app.twoverse.core.data.LocationPermissionChecker
 import app.twoverse.core.data.LocationRepository
 import app.twoverse.core.data.MemoryRepository
+import app.twoverse.core.data.OrbitRepository
 import app.twoverse.core.data.ProfileRepository
 import app.twoverse.core.data.PushRepository
 import app.twoverse.core.data.PushTokenSource
@@ -33,6 +34,7 @@ import app.twoverse.core.data.supabase.SupabaseAuthRepository
 import app.twoverse.core.data.supabase.SupabaseCoupleRepository
 import app.twoverse.core.data.supabase.SupabaseLocationRepository
 import app.twoverse.core.data.supabase.SupabaseMemoryRepository
+import app.twoverse.core.data.supabase.SupabaseOrbitRepository
 import app.twoverse.core.data.supabase.SupabaseProfileRepository
 import app.twoverse.core.data.supabase.SupabasePushRepository
 import app.twoverse.core.data.supabase.SupabaseReunionRepository
@@ -93,6 +95,10 @@ internal interface DataModule {
     @Binds
     @Singleton
     fun bindShootingStarRepository(impl: SupabaseShootingStarRepository): ShootingStarRepository
+
+    @Binds
+    @Singleton
+    fun bindOrbitRepository(impl: SupabaseOrbitRepository): OrbitRepository
 
     @Binds
     @Singleton

@@ -5,6 +5,7 @@ import app.twoverse.core.model.CoupleCode
 import app.twoverse.core.model.DistanceUnit
 import app.twoverse.core.model.LocationPrecision
 import app.twoverse.core.model.LocationSharing
+import app.twoverse.core.model.Meetup
 import app.twoverse.core.model.Memory
 import app.twoverse.core.model.MemorySender
 import app.twoverse.core.model.ProfileSettings
@@ -18,6 +19,7 @@ import app.twoverse.core.model.UserProfile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Locale
 
@@ -62,6 +64,7 @@ internal data class CoupleDto(
     @SerialName("user_b") val userB: String? = null,
     val status: String,
     @SerialName("connected_at") val connectedAt: String? = null,
+    @SerialName("together_since") val togetherSince: String? = null,
     @SerialName("ended_at") val endedAt: String? = null,
     @SerialName("purge_after") val purgeAfter: String? = null,
     @SerialName("reconnect_requested_by") val reconnectRequestedBy: String? = null,
@@ -184,6 +187,25 @@ internal fun StarLayout.toColumn(): String = when (this) {
 
 /** The shooting_stars.photo_fit values: 'fill', 'fit'. */
 internal fun StarPhotoFit.toColumn(): String = name.lowercase(Locale.ROOT)
+
+@Serializable
+internal data class MeetupDto(
+    val id: String,
+    @SerialName("start_date") val startDate: String,
+    @SerialName("end_date") val endDate: String? = null,
+    val place: String? = null,
+    val note: String? = null,
+    @SerialName("from_reunion_at") val fromReunionAt: String? = null,
+) {
+    fun toModel() = Meetup(
+        id = id,
+        startDate = LocalDate.parse(startDate),
+        endDate = endDate?.let(LocalDate::parse),
+        place = place,
+        note = note,
+        fromReunionAt = fromReunionAt?.let(::parseTimestamp),
+    )
+}
 
 internal const val PrecisionApproximate = "approximate"
 internal const val PrecisionPrecise = "precise"

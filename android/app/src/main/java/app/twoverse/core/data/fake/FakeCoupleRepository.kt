@@ -67,6 +67,11 @@ class FakeCoupleRepository @Inject constructor() : CoupleRepository {
         ended.value = couple
     }
 
+    /** What Realtime does when the couple changes, e.g. the partner sets "together since". */
+    fun setCouple(couple: Couple?) {
+        activeCouple.value = couple
+    }
+
     /** What Realtime does when the partner joins this user's code (FR-PAIR-6). */
     fun simulatePartnerJoined() {
         activeCouple.value = SampleData.couple

@@ -42,6 +42,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -166,6 +167,7 @@ class SupabaseCoupleRepository @Inject constructor(
             partner = partner.value,
             status = CoupleStatus.Active,
             connectedAt = row.connectedAt?.let(::parseTimestamp),
+            togetherSince = row.togetherSince?.let(LocalDate::parse),
         )
     }
 

@@ -66,6 +66,33 @@ internal fun Context.reunionDate(date: LocalDate): String {
     return date.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
 }
 
+/** "845 days together". */
+internal fun Context.daysTogetherText(days: Long): String =
+    resources.getQuantityString(R.plurals.widget_days_together, days.toInt(), days.toInt())
+
+/** "days together", next to the number in large type. */
+internal fun Context.daysTogetherLabel(days: Long): String = resources.getQuantityString(R.plurals.widget_days_together_label, days.toInt())
+
+/** "2y 3m 5d together · Met 7 times" (FR-WGT-8). */
+internal fun Context.orbitSummary(orbit: WidgetOrbit): String {
+    val period = orbit.period
+    val parts = listOfNotNull(
+        period.years.takeIf { it > 0 }?.let { getString(R.string.widget_years_short, it) },
+        period.months.takeIf { it > 0 }?.let { getString(R.string.widget_months_short, it) },
+        period.days.takeIf { it > 0 }?.let { getString(R.string.widget_days_short, it) },
+    )
+    val duration = if (parts.isEmpty()) getString(R.string.widget_first_day) else getString(R.string.widget_together_for, parts.joinToString(" "))
+    val met = orbit.timesMet.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.widget_met_times, it, it) }
+    return listOfNotNull(duration, met).joinToString(" · ")
+}
+
+/** "Anniversary in 12 days" or "Happy anniversary ✨". */
+internal fun Context.anniversarySoonText(daysUntil: Long): String = if (daysUntil == 0L) {
+    getString(R.string.widget_anniversary_today)
+} else {
+    resources.getQuantityString(R.plurals.widget_anniversary_in, daysUntil.toInt(), daysUntil.toInt())
+}
+
 internal fun Context.newMemoriesText(count: Int): String =
     resources.getQuantityString(R.plurals.widget_new_memories, count, count)
 

@@ -66,6 +66,7 @@ internal data class WidgetActions(
     val openCountdown: Action? = null,
     val openVault: Action? = null,
     val openShootingStar: Action? = null,
+    val openOrbit: Action? = null,
 )
 
 @Composable
@@ -105,11 +106,19 @@ private fun ColumnScope.SmallLayout(state: WidgetState) {
         modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
     )
     Spacer(modifier = GlanceModifier.height(Gap))
-    if (state.distance != null) {
-        Distance(value = state.distance, unit = context.unitShort(state.distanceUnit), size = WidgetText.DistanceSmall)
-        Freshness(state, short = true)
-    } else {
-        StatusMessage(state)
+    val orbit = state.orbit
+    when {
+        state.distance != null -> {
+            Distance(value = state.distance, unit = context.unitShort(state.distanceUnit), size = WidgetText.DistanceSmall)
+            Freshness(state, short = true)
+            orbit?.let { Text(text = context.daysTogetherText(it.totalDays), style = WidgetText.muted(WidgetText.Small), maxLines = 1) }
+        }
+        // Without a distance, the days together take its place, with the reason in small print (FR-WGT-8).
+        orbit != null -> {
+            Distance(value = orbit.totalDays.toString(), unit = context.daysTogetherLabel(orbit.totalDays), size = WidgetText.DistanceSmall)
+            context.locationMessage(state.location)?.let { Text(text = it, style = WidgetText.muted(WidgetText.Small), maxLines = 1) }
+        }
+        else -> StatusMessage(state)
     }
 }
 
@@ -134,7 +143,7 @@ private fun ColumnScope.MediumLayout(state: WidgetState, actions: WidgetActions)
     }
     if (state.isPaired) {
         Spacer(modifier = GlanceModifier.height(Gap))
-        ReunionLine(state.reunion, onTap = actions.openCountdown)
+        ReunionLine(state.reunion, orbit = state.orbit, onTap = actions.openCountdown)
     }
 }
 
@@ -170,6 +179,7 @@ private fun ColumnScope.LargeLayout(state: WidgetState, isTall: Boolean, actions
         }
     }
     if (isTall) InfoRow(state)
+    state.orbit?.let { OrbitRow(it, onTap = actions.openOrbit) }
     if (state.isPaired) {
         Spacer(modifier = GlanceModifier.height(Gap))
         ReunionCard(state.reunion, onTap = actions.openCountdown)
@@ -256,9 +266,9 @@ private fun StatusMessage(state: WidgetState, centered: Boolean = false) {
     }
 }
 
-/** "16 days until we meet" with a calendar icon (medium widget). */
+/** "16 days until we meet · 845 days together" with a calendar icon (medium widget). */
 @Composable
-private fun ReunionLine(reunion: WidgetReunion?, onTap: Action?) {
+private fun ReunionLine(reunion: WidgetReunion?, orbit: WidgetOrbit?, onTap: Action?) {
     val context = LocalContext.current
     Row(modifier = GlanceModifier.fillMaxWidth().onTap(onTap), verticalAlignment = Alignment.CenterVertically) {
         Image(
@@ -267,8 +277,9 @@ private fun ReunionLine(reunion: WidgetReunion?, onTap: Action?) {
             modifier = GlanceModifier.size(IconSize),
         )
         Spacer(modifier = GlanceModifier.width(DotGap))
+        val reunionText = reunion?.let { context.daysUntilText(it) } ?: context.getString(R.string.widget_no_date)
         Text(
-            text = reunion?.let { context.daysUntilText(it) } ?: context.getString(R.string.widget_no_date),
+            text = listOfNotNull(reunionText, orbit?.let { context.daysTogetherText(it.totalDays) }).joinToString(Separator),
             style = if (reunion != null) WidgetText.sans(WidgetText.Body) else WidgetText.muted(),
             maxLines = 1,
         )
@@ -325,6 +336,31 @@ private fun ReunionCard(reunion: WidgetReunion?, onTap: Action?) {
                 backgroundColor = GlanceTheme.colors.outline,
             )
             Image(ImageProvider(R.drawable.widget_planet_you), null, GlanceModifier.size(ProgressPlanetSize))
+        }
+    }
+}
+
+/** Together for, times met, and the anniversary when it is close; opens Our Orbit (FR-WGT-8). */
+@Composable
+private fun OrbitRow(orbit: WidgetOrbit, onTap: Action?) {
+    val context = LocalContext.current
+    Column(modifier = GlanceModifier.fillMaxWidth().padding(top = SmallGap).onTap(onTap)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                provider = ImageProvider(R.drawable.widget_ic_heart),
+                contentDescription = null,
+                modifier = GlanceModifier.size(IconSize),
+            )
+            Spacer(modifier = GlanceModifier.width(DotGap))
+            Text(text = context.orbitSummary(orbit), style = WidgetText.sans(WidgetText.Small), maxLines = 1)
+        }
+        orbit.anniversary?.let {
+            Text(
+                text = context.anniversarySoonText(it.daysUntil),
+                style = WidgetText.sans(WidgetText.Small, color = widgetPalette.goldText, weight = FontWeight.Bold),
+                maxLines = 1,
+                modifier = GlanceModifier.padding(start = IconSize + DotGap),
+            )
         }
     }
 }

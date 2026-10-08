@@ -61,7 +61,7 @@ private val ActionRowMinHeight = 54.dp
 private val SectionHeaderInset = 4.dp
 private const val DatePattern = "dMMMy"
 
-/** You & Her (FR-SET-1 to FR-SET-6). */
+/** You & Her (FR-SET-1 to FR-SET-7). */
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
@@ -71,6 +71,7 @@ fun SettingsScreen(
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
     val settings = uiState.settings
+    val locale = LocalConfiguration.current.locales[0]
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -117,6 +118,15 @@ fun SettingsScreen(
             )
         }
         if (uiState.isConnected) {
+            SectionHeader(R.string.settings_orbit)
+            SettingsGroup {
+                SettingsValueRow(
+                    title = stringResource(R.string.settings_together_since),
+                    value = uiState.togetherSince?.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
+                        ?: stringResource(R.string.settings_together_since_not_set),
+                    onClick = actions.onSetTogetherSince,
+                )
+            }
             SectionHeader(R.string.settings_stars)
             SettingsGroup {
                 SettingsValueRow(
@@ -358,6 +368,7 @@ private fun SettingsScreenPreview() {
                 ),
                 isConnected = true,
                 connectedSince = LocalDate.of(2026, 2, 14),
+                togetherSince = LocalDate.of(2024, 2, 14),
             ),
             actions = SettingsActions(),
         )

@@ -76,8 +76,8 @@ select results_eq(
 select is(
     (select array_agg(tablename::text order by tablename) from pg_publication_tables
      where pubname = 'supabase_realtime' and schemaname = 'public'),
-    array['couples', 'locations', 'memories', 'reunions'],
-    'realtime is enabled for couples, locations, memories and reunions'
+    array['couples', 'locations', 'meetups', 'memories', 'reunions'],
+    'realtime is enabled for couples, locations, meetups, memories and reunions'
 );
 select tests.authenticate_as('a@test.dev');
 select throws_ok('select private.purge_expired_data()', '42501', null, 'clients cannot run the purge job');

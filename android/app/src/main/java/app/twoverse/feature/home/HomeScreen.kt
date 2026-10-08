@@ -1,5 +1,6 @@
 package app.twoverse.feature.home
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -55,6 +56,8 @@ import app.twoverse.core.designsystem.text.longText
 import app.twoverse.core.designsystem.text.messageRes
 import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.DistanceUnit
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 private val DistanceCardHorizontalPadding = 22.dp
 private val TilePadding = 18.dp
@@ -74,6 +77,7 @@ fun HomeScreen(
     onOpenLocationSetup: () -> Unit,
     miniNeedleRotation: () -> Float?,
     modifier: Modifier = Modifier,
+    orbitActions: HomeOrbitActions = HomeOrbitActions(),
 ) {
     val spacing = TwoverseTheme.spacing
     Box(
@@ -95,6 +99,10 @@ fun HomeScreen(
                 sharingStatus = uiState.sharingStatus,
                 onOpenLocationSetup = onOpenLocationSetup,
             )
+            uiState.meetupQuestion?.let { date ->
+                Spacer(modifier = Modifier.height(spacing.md))
+                MeetupQuestionCard(date = date, actions = orbitActions)
+            }
             Spacer(modifier = Modifier.height(spacing.lg))
             DistanceCard(uiState = uiState)
             Spacer(modifier = Modifier.height(spacing.smd))
@@ -124,6 +132,10 @@ fun HomeScreen(
                 newMemoryCount = uiState.newMemoryCount,
                 onClick = onOpenVault,
             )
+            if (uiState.orbit != null || uiState.askTogetherSince) {
+                Spacer(modifier = Modifier.height(spacing.smd))
+                OrbitRow(orbit = uiState.orbit, actions = orbitActions)
+            }
             Spacer(modifier = Modifier.height(spacing.md))
             TwoversePrimaryButton(
                 text = stringResource(R.string.home_send_memory),
@@ -451,6 +463,96 @@ private fun OursRow(memoryCount: Int, newMemoryCount: Int, onClick: () -> Unit) 
     }
 }
 
+/** Our Orbit on Our Universe (FR-ORB-2, FR-ORB-9, FR-ORB-10). */
+data class HomeOrbitActions(
+    val onOpenOrbit: () -> Unit = {},
+    val onSetTogetherSince: () -> Unit = {},
+    val onMeetupQuestionYes: () -> Unit = {},
+    val onMeetupQuestionNo: () -> Unit = {},
+)
+
+/** "Together 845 days · Met 7 times", or a gentle prompt to set the date. */
+@Composable
+private fun OrbitRow(orbit: HomeOrbit?, actions: HomeOrbitActions) {
+    val colors = TwoverseTheme.colors
+    TwoverseCard(onClick = if (orbit != null) actions.onOpenOrbit else actions.onSetTogetherSince, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(horizontal = TilePadding, vertical = OursRowVerticalPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.smd),
+        ) {
+            IconTile(icon = R.drawable.ic_heart)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = if (orbit != null) {
+                        pluralStringResource(R.plurals.home_together_days, orbit.totalDays.toInt(), orbit.totalDays.toInt())
+                    } else {
+                        stringResource(R.string.orbit_not_set_title)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.onSurface,
+                )
+                Text(
+                    text = when {
+                        orbit == null -> stringResource(R.string.home_together_prompt)
+                        orbit.timesMet == 0 -> stringResource(R.string.home_met_none)
+                        else -> pluralStringResource(R.plurals.home_met_times, orbit.timesMet, orbit.timesMet)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    modifier = Modifier.padding(top = TwoverseTheme.spacing.xxs / 2),
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_right),
+                contentDescription = null,
+                tint = colors.onSurfaceVariant,
+                modifier = Modifier.size(ChevronSize),
+            )
+        }
+    }
+}
+
+/** "Did you meet on 10 October?" once a reunion has passed (FR-ORB-10). */
+@Composable
+private fun MeetupQuestionCard(date: LocalDate, actions: HomeOrbitActions) {
+    val colors = TwoverseTheme.colors
+    val locale = LocalConfiguration.current.locales[0]
+    val day = date.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, QuestionDatePattern), locale))
+    TwoverseCard(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(TilePadding),
+            verticalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.sm),
+        ) {
+            Text(
+                text = stringResource(R.string.home_meetup_question, day),
+                style = MaterialTheme.typography.titleMedium,
+                color = colors.onSurface,
+            )
+            Text(
+                text = stringResource(R.string.home_meetup_question_body),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.sm), verticalAlignment = Alignment.CenterVertically) {
+                TwoversePrimaryButton(
+                    text = stringResource(R.string.home_meetup_question_yes),
+                    onClick = actions.onMeetupQuestionYes,
+                    small = true,
+                    modifier = Modifier.weight(1f),
+                )
+                TwoverseTextButton(
+                    text = stringResource(R.string.home_meetup_question_no),
+                    onClick = actions.onMeetupQuestionNo,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+private const val QuestionDatePattern = "dMMMM"
+
 private fun DayPeriod.greetingRes(): Int = when (this) {
     DayPeriod.Morning -> R.string.home_greeting_morning
     DayPeriod.Afternoon -> R.string.home_greeting_afternoon
@@ -500,6 +602,27 @@ private fun HomeScreenUnavailablePreview() {
     }
 }
 
+@PreviewLightDark
+@Composable
+private fun HomeScreenOrbitPromptsPreview() {
+    TwoverseTheme {
+        HomeScreen(
+            uiState = PreviewHomeState.copy(
+                orbit = null,
+                askTogetherSince = true,
+                meetupQuestion = LocalDate.of(2026, 10, 10),
+            ),
+            onOpenCompass = {},
+            onOpenCountdown = {},
+            onOpenVault = {},
+            onSendMemory = {},
+            onSendShootingStar = {},
+            onOpenLocationSetup = {},
+            miniNeedleRotation = { 42f },
+        )
+    }
+}
+
 private val PreviewHomeState = HomeUiState.Success(
     dayPeriod = DayPeriod.Evening,
     sharingStatus = SharingStatus.On,
@@ -514,4 +637,5 @@ private val PreviewHomeState = HomeUiState.Success(
     daysUntilReunion = 12,
     memoryCount = 17,
     newMemoryCount = 2,
+    orbit = HomeOrbit(totalDays = 845, timesMet = 7),
 )

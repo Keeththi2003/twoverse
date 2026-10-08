@@ -14,6 +14,8 @@ class IncomingPushTest {
         assertEquals(IncomingPush.ReunionDay, IncomingPush.fromType("reunion_day"))
         assertEquals(IncomingPush.NewMemory, IncomingPush.fromType("new_memory"))
         assertEquals(IncomingPush.ShootingStar, IncomingPush.fromType("shooting_star"))
+        assertEquals(IncomingPush.Anniversary, IncomingPush.fromType("anniversary"))
+        assertEquals(IncomingPush.OrbitMilestone, IncomingPush.fromType("orbit_milestone"))
     }
 
     @Test
@@ -29,5 +31,7 @@ class IncomingPushTest {
         assertEquals(LaunchScreen.Countdown, IncomingPush.ReunionDay.opens)
         assertEquals(LaunchScreen.Vault, IncomingPush.NewMemory.opens)
         assertEquals(LaunchScreen.ShootingStar, IncomingPush.ShootingStar.opens)
+        assertEquals(LaunchScreen.Orbit, IncomingPush.Anniversary.opens)
+        assertEquals(LaunchScreen.Orbit, IncomingPush.OrbitMilestone.opens)
     }
 }
