@@ -1,6 +1,5 @@
 package app.twoverse.feature.pairing
 
-import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -27,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.core.common.formatDate
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.Planet
 import app.twoverse.core.designsystem.component.PlanetKind
@@ -38,7 +38,6 @@ import app.twoverse.core.designsystem.theme.TwoverseTheme
 import app.twoverse.core.model.DataError
 import app.twoverse.core.model.ReconnectRequest
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private val HerSize = 56.dp
 private val YouSize = 40.dp
@@ -110,7 +109,7 @@ fun ReconnectScreen(
 private fun AvailableDetails(uiState: ReconnectUiState.Available) {
     val colors = TwoverseTheme.colors
     val locale = LocalConfiguration.current.locales[0]
-    val date = uiState.deleteOn.format(DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, DatePattern), locale))
+    val date = formatDate(uiState.deleteOn, DatePattern, locale)
     BodyText(
         stringResource(
             if (uiState.request == ReconnectRequest.ByPartner) R.string.reconnect_partner_asked else R.string.reconnect_body,
