@@ -81,7 +81,7 @@ fun TwoverseNavHost(
             LaunchScreen.Vault -> navController.navigateToTab(TopLevelDestination.Vault)
             LaunchScreen.Countdown -> navController.navigate(CountdownRoute) { launchSingleTop = true }
             LaunchScreen.ShootingStar -> navController.navigate(ShootingStarRoute()) { launchSingleTop = true }
-            LaunchScreen.Orbit -> navController.navigate(OrbitRoute) { launchSingleTop = true }
+            LaunchScreen.Orbit -> navController.navigateToTab(TopLevelDestination.Orbit)
         }
         currentOnRequestedScreenShown()
     }
@@ -240,14 +240,13 @@ private fun NavGraphBuilder.tabsGraph(navController: NavHostController) {
             onSendMemory = { navController.navigate(AddMemoryRoute) },
             onSendShootingStar = { navController.navigate(StarComposerRoute()) },
             onOpenLocationSetup = { navController.navigate(LocationSetupRoute) },
-            onOpenOrbit = { navController.navigate(OrbitRoute) },
+            onOpenOrbit = { navController.navigateToTab(TopLevelDestination.Orbit) },
             onSetTogetherSince = { navController.navigate(TogetherSinceRoute()) },
             onRecordMeetup = { navController.navigate(MeetupEditorRoute(fromReunion = true)) },
         )
     }
     composable<OrbitRoute> {
         OrbitFeatureRoute(
-            onBack = { navController.popBackStack() },
             onSetTogetherSince = { navController.navigate(TogetherSinceRoute()) },
             onAddMeetup = { navController.navigate(MeetupEditorRoute()) },
             onEditMeetup = { id -> navController.navigate(MeetupEditorRoute(meetupId = id)) },

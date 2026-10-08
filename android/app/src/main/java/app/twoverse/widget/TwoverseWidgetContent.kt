@@ -286,7 +286,7 @@ private fun ReunionLine(reunion: WidgetReunion?, orbit: WidgetOrbit?, onTap: Act
     }
 }
 
-/** Days until the reunion, its date and the planets moving closer (large widget). */
+/** Days until the reunion, its date and the planets moving closer, yours left and hers right (large widget). */
 @Composable
 private fun ReunionCard(reunion: WidgetReunion?, onTap: Action?) {
     val context = LocalContext.current
@@ -328,14 +328,14 @@ private fun ReunionCard(reunion: WidgetReunion?, onTap: Action?) {
         }
         Spacer(modifier = GlanceModifier.height(SmallGap))
         Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Image(ImageProvider(R.drawable.widget_planet_her), null, GlanceModifier.size(ProgressPlanetSize))
+            Image(ImageProvider(R.drawable.widget_planet_you), null, GlanceModifier.size(ProgressPlanetSize))
             LinearProgressIndicator(
                 progress = reunion.progress,
                 modifier = GlanceModifier.defaultWeight().height(ProgressHeight).padding(horizontal = SmallGap),
                 color = GlanceTheme.colors.primary,
                 backgroundColor = GlanceTheme.colors.outline,
             )
-            Image(ImageProvider(R.drawable.widget_planet_you), null, GlanceModifier.size(ProgressPlanetSize))
+            Image(ImageProvider(R.drawable.widget_planet_her), null, GlanceModifier.size(ProgressPlanetSize))
         }
     }
 }
