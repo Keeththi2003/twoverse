@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixed light copy of widget_dot_muted, for when the app's Appearance forces light (FR-WGT-5). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/widget_text_muted_light" />
+    <size android:width="8dp" android:height="8dp" />
+</shape>
