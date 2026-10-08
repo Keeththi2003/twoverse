@@ -76,8 +76,8 @@ fun SettingsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
-            .verticalScroll(rememberScrollState())
             .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = spacing.screenHorizontal)
             .padding(bottom = spacing.md),
     ) {

@@ -38,7 +38,10 @@ private const val ArcStartX = 24f
 private const val ArcEndY = 50f
 private const val ArcControlY = -10f
 
-/** Her planet and your planet joined by a dashed arc, with the gold star above the middle (Home). */
+/**
+ * Your planet (lavender, left, above "You") and hers (rose, right, above "Her") joined by a dashed arc,
+ * with the gold star above the middle (Home, DESIGN.md §1).
+ */
 @Composable
 internal fun DistanceArc(modifier: Modifier = Modifier) {
     val outline = TwoverseTheme.colors.outline
@@ -75,16 +78,16 @@ internal fun DistanceArc(modifier: Modifier = Modifier) {
                 .offset(y = StarTop),
         )
         Planet(
-            kind = PlanetKind.Her,
-            size = HerSize,
-            modifier = Modifier.offset(x = HerOffset, y = HerTop),
-        )
-        Planet(
             kind = PlanetKind.You,
             size = YouSize,
+            modifier = Modifier.offset(x = YouOffset, y = YouTop),
+        )
+        Planet(
+            kind = PlanetKind.Her,
+            size = HerSize,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset(x = -YouOffset, y = YouTop),
+                .offset(x = -HerOffset, y = HerTop),
         )
     }
 }
