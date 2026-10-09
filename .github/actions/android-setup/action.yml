@@ -1,0 +1,62 @@
+name: Android setup
+description: Installs JDK 17 and Gradle caching, and writes the untracked config files the build needs.
+
+inputs:
+  supabase-url:
+    description: SUPABASE_URL (a placeholder is used when empty, e.g. on fork PRs)
+    required: false
+    default: ""
+  supabase-publishable-key:
+    description: SUPABASE_PUBLISHABLE_KEY (a placeholder is used when empty)
+    required: false
+    default: ""
+  google-web-client-id:
+    description: GOOGLE_WEB_CLIENT_ID (a placeholder is used when empty)
+    required: false
+    default: ""
+  google-services-json:
+    description: Contents of google-services.json (a minimal placeholder is used when empty)
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
+
+    - uses: gradle/actions/setup-gradle@v4
+
+    - name: Write local.properties and google-services.json
+      shell: bash
+      env:
+        SUPABASE_URL: ${{ inputs.supabase-url }}
+        SUPABASE_PUBLISHABLE_KEY: ${{ inputs.supabase-publishable-key }}
+        GOOGLE_WEB_CLIENT_ID: ${{ inputs.google-web-client-id }}
+        GOOGLE_SERVICES_JSON: ${{ inputs.google-services-json }}
+      run: |
+        {
+          echo "SUPABASE_URL=${SUPABASE_URL:-https://placeholder.supabase.co}"
+          echo "SUPABASE_PUBLISHABLE_KEY=${SUPABASE_PUBLISHABLE_KEY:-sb_publishable_placeholder}"
+          echo "GOOGLE_WEB_CLIENT_ID=${GOOGLE_WEB_CLIENT_ID:-placeholder.apps.googleusercontent.com}"
+        } > android/local.properties
+
+        if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+          printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+        else
+          cat > android/app/google-services.json <<'JSON'
+        {
+          "project_info": { "project_number": "000000000000", "project_id": "placeholder" },
+          "client": [{
+            "client_info": {
+              "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+              "android_client_info": { "package_name": "app.twoverse" }
+            },
+            "api_key": [{ "current_key": "placeholder" }]
+          }],
+          "configuration_version": "1"
+        }
+        JSON
+        fi
