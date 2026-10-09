@@ -137,8 +137,10 @@
         <item quantity="one">%1$s · %2$d new</item>
         <item quantity="other">%1$s · %2$d new</item>
     </plurals>
-    <string name="home_send_memory">Send a memory</string>
-    <string name="home_send_star">Send a Shooting Star</string>
+    <string name="home_send_memory">Memory</string>
+    <string name="home_send_memory_description">Send a memory</string>
+    <string name="home_send_star">Shooting Star</string>
+    <string name="home_send_star_description">Send a Shooting Star</string>
 
     <string name="compass_title">Your Star</string>
     <string name="compass_subtitle">Turn with your phone. The star always points to %1$s.</string>

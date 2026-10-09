@@ -4,9 +4,13 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,9 +24,19 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import android.content.res.Configuration
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -34,7 +48,13 @@ private val SmallButtonHeight = 52.dp
 private val ButtonIconSize = 20.dp
 private val AccentBorderWidth = 1.5.dp
 private val ButtonContentPadding = PaddingValues(horizontal = 24.dp)
+private val AdaptiveButtonContentPadding = PaddingValues(horizontal = 12.dp)
 
+/**
+ * Filled primary button. An [adaptive] button uses compact padding and a smaller label so two
+ * fit side by side; when the label still does not fit on one line, the icon moves above it
+ * instead of truncating. [contentDescription] replaces the label for screen readers.
+ */
 @Composable
 fun TwoversePrimaryButton(
     text: String,
@@ -43,6 +63,8 @@ fun TwoversePrimaryButton(
     @DrawableRes leadingIcon: Int? = null,
     small: Boolean = false,
     enabled: Boolean = true,
+    adaptive: Boolean = false,
+    contentDescription: String? = null,
 ) {
     val colors = TwoverseTheme.colors
     FilledButton(
@@ -52,9 +74,45 @@ fun TwoversePrimaryButton(
         leadingIcon = leadingIcon,
         small = small,
         enabled = enabled,
+        adaptive = adaptive,
+        contentDescription = contentDescription,
         buttonColors = ButtonDefaults.buttonColors(
             containerColor = colors.primary,
             contentColor = colors.onPrimary,
+            disabledContainerColor = colors.chip,
+            disabledContentColor = colors.onSurfaceVariant,
+        ),
+    )
+}
+
+/**
+ * Tonal button: chip background with primary-coloured text and icon. See [TwoversePrimaryButton]
+ * for [adaptive] and [contentDescription].
+ */
+@Composable
+fun TwoverseTonalButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    @DrawableRes leadingIcon: Int? = null,
+    small: Boolean = false,
+    enabled: Boolean = true,
+    adaptive: Boolean = false,
+    contentDescription: String? = null,
+) {
+    val colors = TwoverseTheme.colors
+    FilledButton(
+        text = text,
+        onClick = onClick,
+        modifier = modifier,
+        leadingIcon = leadingIcon,
+        small = small,
+        enabled = enabled,
+        adaptive = adaptive,
+        contentDescription = contentDescription,
+        buttonColors = ButtonDefaults.buttonColors(
+            containerColor = colors.chip,
+            contentColor = colors.primary,
             disabledContainerColor = colors.chip,
             disabledContentColor = colors.onSurfaceVariant,
         ),
@@ -78,6 +136,8 @@ fun TwoverseSecondaryButton(
         leadingIcon = leadingIcon,
         small = small,
         enabled = enabled,
+        adaptive = false,
+        contentDescription = null,
         buttonColors = ButtonDefaults.buttonColors(
             containerColor = colors.chip,
             contentColor = colors.onSurface,
@@ -148,17 +208,31 @@ private fun FilledButton(
     @DrawableRes leadingIcon: Int?,
     small: Boolean,
     enabled: Boolean,
+    adaptive: Boolean,
+    contentDescription: String?,
     buttonColors: ButtonColors,
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.heightIn(min = buttonHeight(small)),
+        modifier = modifier
+            .heightIn(min = buttonHeight(small))
+            .then(
+                if (contentDescription != null) {
+                    Modifier.semantics { this.contentDescription = contentDescription }
+                } else {
+                    Modifier
+                },
+            ),
         enabled = enabled,
         shape = buttonShape(small),
         colors = buttonColors,
-        contentPadding = ButtonContentPadding,
+        contentPadding = if (adaptive) AdaptiveButtonContentPadding else ButtonContentPadding,
     ) {
-        ButtonLabel(text = text, leadingIcon = leadingIcon)
+        if (adaptive) {
+            AdaptiveButtonLabel(text = text, leadingIcon = leadingIcon)
+        } else {
+            ButtonLabel(text = text, leadingIcon = leadingIcon)
+        }
     }
 }
 
@@ -173,6 +247,43 @@ private fun ButtonLabel(text: String, @DrawableRes leadingIcon: Int?) {
         Spacer(modifier = Modifier.width(TwoverseTheme.spacing.xs))
     }
     Text(text = text, style = MaterialTheme.typography.titleMedium)
+}
+
+@Composable
+private fun AdaptiveButtonLabel(text: String, @DrawableRes leadingIcon: Int?) {
+    var stacked by remember { mutableStateOf(false) }
+    val style = MaterialTheme.typography.titleSmall
+    if (stacked) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (leadingIcon != null) {
+                Icon(
+                    painter = painterResource(leadingIcon),
+                    contentDescription = null,
+                    modifier = Modifier.size(ButtonIconSize),
+                )
+                Spacer(modifier = Modifier.height(TwoverseTheme.spacing.xxs))
+            }
+            Text(text = text, style = style, textAlign = TextAlign.Center)
+        }
+    } else {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (leadingIcon != null) {
+                Icon(
+                    painter = painterResource(leadingIcon),
+                    contentDescription = null,
+                    modifier = Modifier.size(ButtonIconSize),
+                )
+                Spacer(modifier = Modifier.width(TwoverseTheme.spacing.xxs))
+            }
+            Text(
+                text = text,
+                style = style,
+                maxLines = 1,
+                softWrap = false,
+                onTextLayout = { if (it.hasVisualOverflow) stacked = true },
+            )
+        }
+    }
 }
 
 private fun buttonHeight(small: Boolean): Dp = if (small) SmallButtonHeight else RegularButtonHeight
@@ -212,6 +323,39 @@ private fun TwoverseButtonsPreview() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = TwoverseTheme.spacing.xs),
+            )
+        }
+    }
+}
+
+@Preview(name = "360dp", widthDp = 360)
+@Preview(name = "360dp dark", widthDp = 360, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Large font", widthDp = 360, fontScale = 1.6f)
+@Preview(name = "Large font dark", widthDp = 360, fontScale = 1.6f, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TwoverseAdaptiveButtonsPreview() {
+    TwoversePreviewBackground {
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(TwoverseTheme.spacing.sm),
+        ) {
+            TwoversePrimaryButton(
+                text = "Memory",
+                onClick = {},
+                leadingIcon = R.drawable.ic_image,
+                adaptive = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+            TwoverseTonalButton(
+                text = "Shooting Star",
+                onClick = {},
+                leadingIcon = R.drawable.ic_sparkle,
+                adaptive = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
             )
         }
     }
