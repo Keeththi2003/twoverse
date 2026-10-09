@@ -11,8 +11,8 @@ A private Android app for long-distance couples.
 <p>
   <img src="docs/screenshots/home.png" alt="Our Universe (home)" width="200">
   <img src="docs/screenshots/your-star.png" alt="Your Star" width="200">
-  <img src="docs/screenshots/ours.png" alt="Ours" width="200">
   <img src="docs/screenshots/our-orbit.png" alt="Our Orbit" width="200">
+  <img src="docs/screenshots/widget.png" alt="Widget" width="200">
 </p>
 
 ## Features
