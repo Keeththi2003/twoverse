@@ -9,6 +9,10 @@
 
     <string name="splash_tagline">A private universe for two.</string>
     <string name="splash_connecting">Connecting your worlds…</string>
+    <string name="developer_name" translatable="false">Keeththi</string>
+    <!-- "v1.0.0 · Crafted by Keeththi" -->
+    <string name="splash_credit">v%1$s · Crafted by %2$s</string>
+    <string name="splash_credit_description">Version %1$s, crafted by %2$s</string>
     <string name="splash_loading">Loading</string>
 
     <string name="welcome_title">Close, no matter the distance.</string>
@@ -133,8 +137,10 @@
         <item quantity="one">%1$s · %2$d new</item>
         <item quantity="other">%1$s · %2$d new</item>
     </plurals>
-    <string name="home_send_memory">Send a memory</string>
-    <string name="home_send_star">Send a Shooting Star</string>
+    <string name="home_send_memory">Memory</string>
+    <string name="home_send_memory_description">Send a memory</string>
+    <string name="home_send_star">Shooting Star</string>
+    <string name="home_send_star_description">Send a Shooting Star</string>
 
     <string name="compass_title">Your Star</string>
     <string name="compass_subtitle">Turn with your phone. The star always points to %1$s.</string>
@@ -309,6 +315,15 @@
     <string name="settings_lock_ours">Lock Ours</string>
     <string name="settings_lock_ours_subtitle">Fingerprint or device PIN</string>
     <string name="settings_preferences">Preferences</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    <!-- versionName (versionCode): "1.0.0 (1)" -->
+    <string name="settings_version_value">%1$s (%2$d)</string>
+    <string name="settings_version_description">Version %1$s</string>
+    <string name="settings_credit">A little universe by %1$s</string>
+    <!-- Followed by a heart icon in the brand colour: "Built for two, with love ♥" -->
+    <string name="settings_credit_tagline">Built for two, with love</string>
+    <string name="settings_credit_heart_description">love</string>
     <string name="settings_distance_unit">Distance unit</string>
     <string name="settings_unit_kilometres">Kilometres</string>
     <string name="settings_unit_miles">Miles</string>

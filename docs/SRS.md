@@ -4,7 +4,7 @@
 |---|---|
 | Version | 2.4 |
 | Status | MVP scope agreed |
-| Platform | Android (min SDK 26), primary devices Samsung Galaxy |
+| Platform | Android (min SDK 28), primary devices Samsung Galaxy |
 | Package | `app.twoverse` |
 
 ---
@@ -70,7 +70,7 @@ Two users with equal permissions. There is no admin role. The user who creates
 the couple code has no extra rights.
 
 ### 2.3 Operating environment
-- Android 8.0+ phones; tested on current Samsung Galaxy devices
+- Android 9.0+ phones; tested on current Samsung Galaxy devices
 - Internet required for sync; the app remains usable offline with cached data
 - Location, notification and (optionally) biometric permissions
 

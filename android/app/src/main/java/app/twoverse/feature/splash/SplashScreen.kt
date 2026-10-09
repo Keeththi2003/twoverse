@@ -16,8 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import app.twoverse.BuildConfig
 import app.twoverse.R
 import app.twoverse.core.designsystem.component.DefaultStars
 import app.twoverse.core.designsystem.component.LoadingDots
@@ -28,9 +32,15 @@ import app.twoverse.core.designsystem.theme.TwoverseTheme
 private val OrbitSize = 232.dp
 private val OrbitToWordmarkGap = 40.dp
 
-/** Splash (FR-ONB-1): orbiting planets, twinkling stars and a loading indicator. */
+/**
+ * Splash (FR-ONB-1): orbiting planets, twinkling stars and a loading indicator, with the version
+ * and credit in small print at the very bottom.
+ */
 @Composable
-fun SplashScreen(modifier: Modifier = Modifier) {
+fun SplashScreen(
+    modifier: Modifier = Modifier,
+    versionName: String = BuildConfig.VERSION_NAME,
+) {
     val colors = TwoverseTheme.colors
     val spacing = TwoverseTheme.spacing
 
@@ -82,6 +92,20 @@ fun SplashScreen(modifier: Modifier = Modifier) {
                 color = colors.onSurfaceVariant,
             )
         }
+        // Drawn in the bottom padding, outside the column, so it never moves the logo or loading dots.
+        val developer = stringResource(R.string.developer_name)
+        val creditDescription = stringResource(R.string.splash_credit_description, versionName, developer)
+        Text(
+            text = stringResource(R.string.splash_credit, versionName, developer),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .safeDrawingPadding()
+                .padding(bottom = spacing.xs)
+                .semantics { contentDescription = creditDescription },
+        )
     }
 }
 
@@ -89,6 +113,6 @@ fun SplashScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun SplashScreenPreview() {
     TwoverseTheme {
-        SplashScreen()
+        SplashScreen(versionName = "1.0.0")
     }
 }

@@ -54,6 +54,7 @@ import app.twoverse.core.designsystem.component.TwoverseCard
 import app.twoverse.core.designsystem.component.TwoversePrimaryButton
 import app.twoverse.core.designsystem.component.TwoverseStatusChip
 import app.twoverse.core.designsystem.component.TwoverseTextButton
+import app.twoverse.core.designsystem.component.TwoverseTonalButton
 import app.twoverse.core.designsystem.text.labelRes
 import app.twoverse.core.designsystem.text.longText
 import app.twoverse.core.designsystem.text.messageRes
@@ -138,17 +139,33 @@ fun HomeScreen(
                 onClick = onOpenVault,
             )
             Spacer(modifier = Modifier.height(spacing.md))
-            TwoversePrimaryButton(
-                text = stringResource(R.string.home_send_memory),
-                onClick = onSendMemory,
-                leadingIcon = R.drawable.ic_plus,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            TwoverseTextButton(
-                text = stringResource(R.string.home_send_star),
-                onClick = onSendShootingStar,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+            ) {
+                TwoversePrimaryButton(
+                    text = stringResource(R.string.home_send_memory),
+                    onClick = onSendMemory,
+                    leadingIcon = R.drawable.ic_image,
+                    adaptive = true,
+                    contentDescription = stringResource(R.string.home_send_memory_description),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+                TwoverseTonalButton(
+                    text = stringResource(R.string.home_send_star),
+                    onClick = onSendShootingStar,
+                    leadingIcon = R.drawable.ic_sparkle,
+                    adaptive = true,
+                    contentDescription = stringResource(R.string.home_send_star_description),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+            }
         }
     }
 }
