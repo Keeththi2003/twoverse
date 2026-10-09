@@ -54,7 +54,7 @@ Never say something builds or passes unless you actually ran it and it succeeded
 
 ## Project facts
 
-- Package: `app.twoverse` · Min SDK 26 · Single Gradle module `:app` (for now)
+- Package: `app.twoverse` · Min SDK 28 · Single Gradle module `:app` (for now)
 - Primary test device: Samsung Galaxy phones
 - App stack: Kotlin, Jetpack Compose, Material 3 with a custom Twoverse theme (no dynamic colour), MVVM + unidirectional data flow, Hilt, Navigation Compose with type-safe `@Serializable` routes, Coroutines + StateFlow, Coil, DataStore
 - Backend: Supabase (Auth, Postgres with RLS, Storage, Realtime, Edge Functions, pg_cron) via supabase-kt
