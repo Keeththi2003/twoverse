@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sign-in with Google and with email and password, password reset by email, and persistent sessions.
 - Pairing with a one-time couple code, disconnecting, and reconnecting within 7 days of a disconnect.
 - Location sharing with approximate or precise precision, background updates, and a silent wake-up push that asks the partner's phone for a fresh location.
-- Our Universe (home) with the live distance, freshness, the partner's direction and the reunion countdown.
+- Our Universe (home) with the live distance, freshness, the partner's direction and the reunion countdown, and "Memory" and "Shooting Star" buttons to send either one.
 - Your Star: a compass that points toward the partner, with a calibration hint.
 - Until We Meet: a shared reunion countdown with date, time, place and note.
 - Ours: a private photo vault with captions, filters, temporary memories that expire, hiding received memories, screenshot blocking and an optional biometric lock.
@@ -24,9 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Partner texts written per pronoun from string resources, using the partner's nickname or short name.
 - Push notifications through Firebase Cloud Messaging for new memories, the partner joining, the reunion day, Shooting Stars, anniversaries and day milestones.
 - Home-screen widget in small, medium and large sizes with the distance, the reunion and Our Orbit, following the app's Appearance setting.
-- Settings for location sharing and precision, Lock Ours, distance unit, appearance (System, Light, Dark), log out, disconnect and account deletion, with an About section showing the app version.
+- Settings for location sharing and precision, Lock Ours, distance unit, appearance (System, Light, Dark), log out, disconnect and account deletion, with an About section showing the app version and a credit line.
 - Offline cache that shows the latest saved data with an offline banner.
-- Light and dark themes, adaptive launcher icons and an animated splash screen.
+- Light and dark themes, adaptive launcher icons and an animated splash screen that shows the app version.
 - Supabase backend: SQL migrations, Postgres functions for pairing, disconnecting, reconnecting and account deletion, the `send-push` Edge Function, scheduled purge and notification jobs, and pgTAP tests.
 
 ### Fixed
@@ -41,3 +41,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Saved data and cached photos cleared on sign-out.
 - Release signing and app configuration read from `local.properties`, which is not committed.
 
+[Unreleased]: https://github.com/Keeththi2003/twoverse/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/Keeththi2003/twoverse/releases/tag/v1.0.0
