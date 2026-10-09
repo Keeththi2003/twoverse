@@ -35,7 +35,7 @@ jobs:
           fi
           awk -v v="$VERSION" '
             $0 ~ "^## \\[" v "\\]" { found = 1; next }
-            found && /^## \[/ { exit }
+            found && (/^## \[/ || /^\[[^]]+\]: /) { exit }
             found { print }
           ' CHANGELOG.md > release-notes.md
           if ! grep -q '[^[:space:]]' release-notes.md; then
