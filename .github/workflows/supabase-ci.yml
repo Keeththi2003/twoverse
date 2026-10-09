@@ -2,14 +2,8 @@ name: Supabase CI
 
 on:
   pull_request:
-    paths:
-      - "supabase/**"
-      - ".github/workflows/supabase-ci.yml"
   push:
     branches: [main]
-    paths:
-      - "supabase/**"
-      - ".github/workflows/supabase-ci.yml"
 
 concurrency:
   group: supabase-ci-${{ github.ref }}

@@ -2,14 +2,8 @@ name: Android CI
 
 on:
   pull_request:
-    paths:
-      - "android/**"
-      - ".github/**"
   push:
     branches: [main]
-    paths:
-      - "android/**"
-      - ".github/**"
 
 concurrency:
   group: android-ci-${{ github.ref }}
