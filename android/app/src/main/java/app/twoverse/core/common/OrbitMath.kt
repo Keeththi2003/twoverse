@@ -61,6 +61,10 @@ private const val MilestoneStep = 1000L
 fun nextDayMilestone(day: Long): Long =
     FirstDayMilestones.firstOrNull { it >= day } ?: (((day + MilestoneStep - 1) / MilestoneStep) * MilestoneStep)
 
+/** The day milestone before [milestone] (a value from [nextDayMilestone]), or 0 before day 100. */
+fun previousDayMilestone(milestone: Long): Long =
+    if (milestone > FirstDayMilestones.last()) milestone - MilestoneStep else FirstDayMilestones.lastOrNull { it < milestone } ?: 0L
+
 /** The next milestone on or after [today]; an anniversary wins when both fall on the same day. */
 fun nextMilestone(since: LocalDate, today: LocalDate): UpcomingMilestone {
     val todayNumber = dayNumber(since, today).coerceAtLeast(1)

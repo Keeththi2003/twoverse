@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixed light copy of widget_planet_her, for when the app's Appearance forces light (FR-WGT-5). -->
+<!-- Her planet (rose) for the reunion progress line. Generated to match DESIGN.md §2 planet and star gradients; the arc follows the theme (@color/widget_arc_light). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M1.00,12.00 a11.00,11.00 0 1,0 22.00,0 a11.00,11.00 0 1,0 -22.00,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="8.04" android:centerY="7.60" android:gradientRadius="21.47">
+                <item android:offset="0" android:color="#FFFFE0E8" />
+                <item android:offset="0.55" android:color="#FFE0607E" />
+                <item android:offset="1" android:color="#FF9E3552" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

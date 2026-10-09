@@ -475,7 +475,9 @@
         <item quantity="one">day until we meet</item>
         <item quantity="other">days until we meet</item>
     </plurals>
-    <string name="widget_reunion_today">Today\'s the day</string>
+    <string name="widget_reunion_today">Today\'s the day ✨</string>
+    <!-- "6 days until we meet · Fri, 16 Oct" -->
+    <string name="widget_reunion_line">%1$s · %2$s</string>
     <string name="widget_no_date">No reunion date yet</string>
     <string name="widget_set_date">Tap to choose one</string>
     <plurals name="widget_new_memories">
@@ -625,16 +627,17 @@
     <string name="widget_months_short">%1$dm</string>
     <string name="widget_days_short">%1$dd</string>
     <string name="widget_first_day">Your first day</string>
-    <string name="widget_together_for">%1$s together</string>
+    <string name="widget_since">Since %1$s</string>
     <plurals name="widget_met_times">
         <item quantity="one">Met %d time</item>
         <item quantity="other">Met %d times</item>
     </plurals>
-    <plurals name="widget_anniversary_in">
-        <item quantity="one">Anniversary in %d day</item>
-        <item quantity="other">Anniversary in %d days</item>
+    <!-- Under the progress bar toward the next day milestone: "25 days to 500". -->
+    <plurals name="widget_days_to_milestone">
+        <item quantity="one">%1$d day to %2$d</item>
+        <item quantity="other">%1$d days to %2$d</item>
     </plurals>
-    <string name="widget_anniversary_today">Happy anniversary ✨</string>
+    <string name="widget_milestone_today">Day %1$d ✨</string>
 
     <!-- Partner names and pronouns (FR-PRO) -->
     <string name="partner_fallback_name">your partner</string>

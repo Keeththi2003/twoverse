@@ -71,9 +71,29 @@ internal fun Context.daysUntilText(reunion: WidgetReunion): String = if (reunion
 
 internal fun Context.daysLabel(days: Long): String = resources.getQuantityString(R.plurals.widget_days_label, days.toInt())
 
-internal fun Context.reunionDate(date: LocalDate): String {
-    val locale = locale()
-    return formatDate(date, DatePattern, locale)
+/** "Fri, 16 Oct" in the device locale's order and words. */
+internal fun Context.reunionDate(date: LocalDate): String = formatDate(date, ReunionDatePattern, locale())
+
+/** The small line above the Together card: "6 days until we meet · Fri, 16 Oct", or "Today's the day ✨". */
+internal fun Context.reunionLineText(reunion: WidgetReunion): String = if (reunion.isToday) {
+    getString(R.string.widget_reunion_today)
+} else {
+    getString(R.string.widget_reunion_line, daysUntilText(reunion), reunionDate(reunion.date))
+}
+
+/** "Since 22 Jun 2025". */
+internal fun Context.sinceText(since: LocalDate): String = getString(R.string.widget_since, formatDate(since, SinceDatePattern, locale()))
+
+/** "25 days to 500", or "Day 500 ✨" on the milestone itself. */
+internal fun Context.milestoneText(orbit: WidgetOrbit): String = if (orbit.daysToMilestone == 0L) {
+    getString(R.string.widget_milestone_today, orbit.nextMilestone.toInt())
+} else {
+    resources.getQuantityString(
+        R.plurals.widget_days_to_milestone,
+        orbit.daysToMilestone.toInt(),
+        orbit.daysToMilestone.toInt(),
+        orbit.nextMilestone.toInt(),
+    )
 }
 
 /** "845 days together". */
@@ -83,7 +103,7 @@ internal fun Context.daysTogetherText(days: Long): String =
 /** "days together", next to the number in large type. */
 internal fun Context.daysTogetherLabel(days: Long): String = resources.getQuantityString(R.plurals.widget_days_together_label, days.toInt())
 
-/** "2y 3m 5d together · Met 7 times" (FR-WGT-8). */
+/** "1y 3m 17d · Met 2 times" (FR-WGT-8). */
 internal fun Context.orbitSummary(orbit: WidgetOrbit): String {
     val period = orbit.period
     val parts = listOfNotNull(
@@ -91,16 +111,9 @@ internal fun Context.orbitSummary(orbit: WidgetOrbit): String {
         period.months.takeIf { it > 0 }?.let { getString(R.string.widget_months_short, it) },
         period.days.takeIf { it > 0 }?.let { getString(R.string.widget_days_short, it) },
     )
-    val duration = if (parts.isEmpty()) getString(R.string.widget_first_day) else getString(R.string.widget_together_for, parts.joinToString(" "))
+    val duration = if (parts.isEmpty()) getString(R.string.widget_first_day) else parts.joinToString(" ")
     val met = orbit.timesMet.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.widget_met_times, it, it) }
     return listOfNotNull(duration, met).joinToString(" · ")
-}
-
-/** "Anniversary in 12 days" or "Happy anniversary ✨". */
-internal fun Context.anniversarySoonText(daysUntil: Long): String = if (daysUntil == 0L) {
-    getString(R.string.widget_anniversary_today)
-} else {
-    resources.getQuantityString(R.plurals.widget_anniversary_in, daysUntil.toInt(), daysUntil.toInt())
 }
 
 internal fun Context.newMemoriesText(count: Int): String =
@@ -108,4 +121,5 @@ internal fun Context.newMemoriesText(count: Int): String =
 
 private fun Context.locale(): Locale = resources.configuration.locales[0]
 
-private const val DatePattern = "EEEdMMM"
+private const val ReunionDatePattern = "EEEdMMM"
+private const val SinceDatePattern = "dMMMy"

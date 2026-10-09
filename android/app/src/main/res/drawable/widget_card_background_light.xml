@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixed light copy of widget_card_background, for when the app's Appearance forces light (FR-WGT-5). -->
+<!-- Reunion card inside the large widget; drawn as a drawable so its corners round on every Android version. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_card_light" />
+    <corners android:radius="16dp" />
+</shape>

@@ -2,7 +2,6 @@ package app.twoverse.widget
 
 import app.twoverse.core.common.CompassDirection
 import app.twoverse.core.common.ElapsedTime
-import app.twoverse.core.common.Anniversary
 import app.twoverse.core.common.LocationFreshness
 import app.twoverse.core.model.DistanceUnit
 import java.time.LocalDate
@@ -17,14 +16,17 @@ internal val SampleWidgetState = WidgetState(
     updatedAgo = ElapsedTime.Seconds(20),
     direction = CompassDirection.NorthEast,
     partnerTimeZone = null,
-    reunion = WidgetReunion(daysUntil = 16, date = LocalDate.of(2026, 10, 18), isToday = false, progress = 0.6f),
+    reunion = WidgetReunion(daysUntil = 6, date = LocalDate.of(2026, 10, 16), isToday = false, progress = 0.6f),
     newMemoryCount = 2,
     hasWaitingStar = false,
     isOffline = false,
     orbit = WidgetOrbit(
-        totalDays = 845,
-        period = Period.of(2, 3, 5),
-        timesMet = 7,
-        anniversary = Anniversary(years = 3, date = LocalDate.of(2026, 10, 30), daysUntil = 12),
+        since = LocalDate.of(2025, 6, 22),
+        totalDays = 475,
+        period = Period.of(1, 3, 17),
+        timesMet = 2,
+        nextMilestone = 500,
+        daysToMilestone = 25,
+        milestoneProgress = 110f / 135f,
     ),
 )
