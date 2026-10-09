@@ -57,7 +57,7 @@ Conventions and coding rules are in [CLAUDE.md](CLAUDE.md).
 ### Clone
 
 ```sh
-git clone <repository-url>
+git clone https://github.com/Keeththi2003/twoverse.git
 cd twoverse
 ```
 
